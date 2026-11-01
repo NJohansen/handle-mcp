@@ -7,7 +7,7 @@ import pytest
 
 from handle_mcp import compare, server
 from handle_mcp import stores as registry
-from handle_mcp.compare import best_match, parse_item, parse_size
+from handle_mcp.compare import _score, best_match, parse_item, parse_size
 from handle_mcp.models import DeliveryInfo, Product, StoreTerms
 
 WEEK_LIST = [
@@ -247,7 +247,7 @@ async def test_failing_delivery_info_keeps_the_prices(monkeypatch):
 
 def test_singular_and_plural_match():
     line = best_match("bananer", [p("x", "b", "Banan øko.", "3.00", "1 stk")])
-    assert line.product.id == "b" and not line.sure
+    assert line.product.id == "b" and line.sure  # singular and plural are the same product
 
 
 def test_store_top_hit_when_no_name_matches():
@@ -335,3 +335,40 @@ def test_relaxed_search_hit_is_marked_unsure():
 def test_relaxed_search_hit_without_brand_is_only_a_guess():
     line = best_match("cheasy skyr passionsfrugt", [p("x", "n", "Skyr naturel", "20.00", "1 kg")])
     assert line.product.id == "n" and line.guess and not line.sure
+
+
+def test_size_in_the_item_is_the_amount_wanted():
+    line = best_match("hakket oksekød 1,5 kg", [p("x", "s", "Hakket oksekød", "35.00", "400 g")])
+    assert (line.quantity, line.line_total, line.sure) == (4, Decimal("140.00"), True)
+
+
+def test_cheapest_for_the_amount_wins():
+    small = p("x", "s", "Laks", "30.00", "2 x 90 g")
+    big = p("x", "b", "Laks", "89.00", "600 g")
+    line = best_match("laks 600 g", [small, big])  # 4 small packs cost 120
+    assert (line.product.id, line.quantity, line.line_total) == ("b", 1, Decimal("89.00"))
+
+
+def test_quantity_without_size_picks_the_cheapest_line():
+    bag = p("x", "bag", "Pærer", "22.00", "1 kg")
+    one = p("x", "one", "Pære", "2.75", "1 stk")
+    line = best_match("4 x pærer", [bag, one])
+    assert (line.product.id, line.line_total) == ("one", Decimal("11.00"))
+
+
+def test_cheapest_wins_on_the_same_name():
+    eco = p("x", "eco", "Æg økologiske", "41.95", "10 stk")
+    cheap = p("x", "cheap", "Æg frilands", "25.00", "10 stk")
+    assert best_match("æg 10 stk", [eco, cheap]).product.id == "cheap"
+
+
+def test_compound_word_counts_but_whole_word_wins():
+    assert _score(["æg"], p("x", "f", "Frilandsæg", "25.00")) == 0.75
+    whole = p("x", "m", "Mælk", "12.00", "1 l")
+    cocoa = p("x", "k", "Kakaomælk", "8.00", "1 l")
+    assert best_match("mælk 1 l", [cocoa, whole]).product.id == "m"
+
+
+def test_much_bigger_pack_is_marked():
+    line = best_match("kaffe 400 g", [p("x", "k", "Kaffe", "45.00", "500 g")])
+    assert not line.sure and "Anden størrelse" in line.note

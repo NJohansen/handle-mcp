@@ -1,17 +1,19 @@
 """compare_basket: price one shopping list in each store.
 
 Simple and explainable matching. No store-specific code here.
-- "2 x rugbrød" means quantity 2. A size like "1 l" or "500 g" in the item must match.
+- "2 x rugbrød" means quantity 2. A size like "1,5 kg" is the amount wanted: a 500 g pack
+  is bought 3 times. Products are compared on the cost of the amount wanted.
 - A product matches well when every word of the item is a whole word in its name.
 - A word only after "m.", "med", "i", "u." ... is a flavour, not the product: "Yoghurt m. banan"
   is not a banana. Such products never win.
 - On the same name score, a product in a matching store category wins ("Fisk > Laks").
-- Then the right size wins, then the lowest price. Sold-out products never win.
+- Then a product with a known size wins, then the lowest cost. Sold-out products never win.
 - Unsure matches and missing items are marked, so a human can check them.
 """
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass, field
 from decimal import Decimal
@@ -104,13 +106,27 @@ def _score(words: list[str], product: Any) -> float:
     tail_tokens = set(_words(tail))
     hits = []
     for w in words:
-        if w in tokens:
+        if w in tokens or any(_plural(w, t) for t in tokens):
             hits.append(1.0)
+        elif any(_compound(w, t) for t in tokens):
+            hits.append(0.75)  # 'frilandsæg' for 'æg': better than a word inside, below whole
         elif w in head or _stem_hit(w, tokens):
             hits.append(0.5)
         else:
             hits.append(0.25 if w in tail or _stem_hit(w, tail_tokens) else 0.0)
     return sum(hits) / len(hits) if hits else 0.0
+
+
+def _plural(word: str, token: str) -> bool:
+    """Danish singular and plural are the same product: 'pære' ~ 'pærer', 'banan' ~ 'bananer'."""
+    short, long_ = sorted((word, token), key=len)
+    return len(short) >= 4 and long_ in (short + "r", short + "er", short + "e")
+
+
+def _compound(word: str, token: str) -> bool:
+    """Danish compound words name the thing last: 'frilandsæg' is æg, 'splitlinser' is linser.
+    The token needs 3 more letters, so 'post' is not 'ost'."""
+    return len(token) >= len(word) + 3 and token.endswith(word)
 
 
 def _flavour_only(words: list[str], product: Any) -> bool:
@@ -135,25 +151,38 @@ def _suffix(word: str, token: str) -> bool:
     return len(token) >= 4 and len(word) >= 4 and (word.endswith(token) or token.endswith(word))
 
 
-def _size_ok(wanted: tuple[str, Decimal] | None, product: Any) -> bool | None:
-    """True/False when both sizes are known, None when we cannot tell."""
-    have = parse_size(_get(product, "size")) or parse_size(_get(product, "name"))
-    if not wanted or not have or wanted[0] != have[0]:
-        return None if not wanted or not have else False
-    return abs(have[1] - wanted[1]) <= wanted[1] * SIZE_TOLERANCE
+def _pack_size(product: Any) -> tuple[str, Decimal] | None:
+    return parse_size(_get(product, "size")) or parse_size(_get(product, "name"))
+
+
+def _packs(wanted: tuple[str, Decimal] | None, quantity: int, product: Any) -> int | None:
+    """How many packs give the wanted amount. '1,5 kg' with 500 g packs → 3.
+    None when the sizes cannot be compared (no size, or kg against stk)."""
+    have = _pack_size(product)
+    if not wanted or not have or wanted[0] != have[0] or not have[1]:
+        return None
+    need = wanted[1] * quantity * (1 - SIZE_TOLERANCE)  # 15 % short still counts
+    return max(1, math.ceil(need / have[1]))
+
+
+def _too_much(wanted: tuple[str, Decimal], quantity: int, count: int, product: Any) -> bool:
+    """True when the packs give over 15 % more than wanted: 500 g for '400 g'."""
+    have = _pack_size(product)
+    return bool(have) and have[1] * count > wanted[1] * quantity * (1 + SIZE_TOLERANCE)
 
 
 def best_match(item: str, products: list[Any]) -> BasketLine:
-    """Best word match first, then the right size, then the lowest price."""
+    """Best word match first, then a comparable size, then the lowest cost for the amount."""
     quantity, words, size = parse_item(item)
     ranked = []
     for product in products:
         score = _score(words, product)
         if _get(product, "available") and score >= 0.5:
-            size_ok = _size_ok(size, product)
-            size_rank = 0 if size_ok or not size else 1 if size_ok is None else 2
-            price = Decimal(_get(product, "price"))
-            ranked.append((-score, _category_rank(words, product), size_rank, price, product))
+            packs = _packs(size, quantity, product)
+            size_rank = 0 if packs or not size else 1
+            count = packs or quantity
+            cost = Decimal(_get(product, "price")) * count
+            ranked.append((-score, _category_rank(words, product), size_rank, cost, count, product))
     if not ranked:
         # The store's own top hit, e.g. "Penne" for "pasta". Never sure, but better than nothing.
         # Never a flavour-only hit ("Grøn te m. mandarin" for "mandariner").
@@ -165,14 +194,23 @@ def best_match(item: str, products: list[Any]) -> BasketLine:
         price = Decimal(_get(top, "price"))
         note = "Butikkens bedste søgeresultat. Navnet matcher ikke. Tjek varen."
         return BasketLine(item, quantity, top, price * quantity, False, note, guess=True)
-    neg_score, _cat, size_rank, price, product = min(ranked, key=lambda r: r[:4])
-    sure = neg_score == -1.0 and size_rank == 0
+    neg_score, _cat, size_rank, cost, count, product = min(
+        ranked, key=lambda r: r[:5]
+    )  # same cost: fewer packs
+    too_much = size_rank == 0 and size is not None and _too_much(size, quantity, count, product)
+    sure = neg_score == -1.0 and size_rank == 0 and not too_much
     note = None
-    if size_rank == 2:
-        note = f"Anden størrelse: {_get(product, 'size') or _get(product, 'name')}."
+    if too_much:
+        note = f"Anden størrelse: {count} x {_get(product, 'size') or _get(product, 'name')}."
+    elif size_rank == 1:
+        note = (
+            f"Størrelsen kan ikke sammenlignes: {_get(product, 'size') or _get(product, 'name')}."
+        )
     elif not sure:
         note = "Usikkert match. Tjek varen."
-    return BasketLine(item, quantity, product, price * quantity, sure, note)
+    elif size and count != quantity:
+        note = f"{count} x {_get(product, 'size') or 'pakke'} for at nå mængden."
+    return BasketLine(item, count, product, cost, sure, note)
 
 
 async def quote(store: Any, items: list[str]) -> BasketQuote:
