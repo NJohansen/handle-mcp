@@ -3,7 +3,7 @@
 Simple and explainable matching. No store-specific code here.
 - "2 x rugbrød" means quantity 2. A size like "1 l" or "500 g" in the item must match.
 - A product matches well when every word of the item is a whole word in its name.
-- A word only after "m.", "med", "i" ... is a flavour, not the product: "Yoghurt m. banan"
+- A word only after "m.", "med", "i", "u." ... is a flavour, not the product: "Yoghurt m. banan"
   is not a banana. Such products never win.
 - A product in a matching store category wins first ("Frugt > Bananer" for "banan").
 - Then the right size wins, then the lowest price. Sold-out products never win.

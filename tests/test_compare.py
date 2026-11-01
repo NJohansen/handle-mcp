@@ -299,3 +299,8 @@ def test_category_fits_a_compound_word():
     juice = p("x", "j", "Cherrytomater", "10.95", "400 g")
     juice.category = "Kolonial > Konserves > Dåsemad"
     assert best_match("cherrytomater", [juice, fresh]).product.id == "f"
+
+
+def test_and_joins_two_products_not_a_flavour():
+    line = best_match("peber", [p("x", "s", "Salt & peber", "15.00")])
+    assert line.product.id == "s" and line.sure
