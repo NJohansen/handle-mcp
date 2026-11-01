@@ -25,7 +25,7 @@ from handle_mcp.privacy import scrub
 
 log = logging.getLogger("handle_mcp")
 
-MAX_ITEMS = 50  # per set_cart_quantities call
+MAX_ITEMS = 50  # per set_cart_quantities or compare_basket call
 MAX_QUANTITY = 50  # per product
 MAX_RESULTS = 25
 
