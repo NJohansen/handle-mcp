@@ -5,7 +5,7 @@ Simple and explainable matching. No store-specific code here.
 - A product matches well when every word of the item is a whole word in its name.
 - A word only after "m.", "med", "i", "u." ... is a flavour, not the product: "Yoghurt m. banan"
   is not a banana. Such products never win.
-- A product in a matching store category wins first ("Frugt > Bananer" for "banan").
+- On the same name score, a product in a matching store category wins ("Fisk > Laks").
 - Then the right size wins, then the lowest price. Sold-out products never win.
 - Unsure matches and missing items are marked, so a human can check them.
 """
@@ -113,6 +113,11 @@ def _score(words: list[str], product: Any) -> float:
     return sum(hits) / len(hits) if hits else 0.0
 
 
+def _flavour_only(words: list[str], product: Any) -> bool:
+    """True when the item's words are only in the flavour part: 'Grøn te m. mandarin'."""
+    return _score(words, product) > 0 and all(_score([w], product) < 0.5 for w in words)
+
+
 def _stem_hit(word: str, tokens: set[str]) -> bool:
     return any(len(t) >= 4 and (word.startswith(t) or t.startswith(word)) for t in tokens)
 
@@ -146,17 +151,19 @@ def best_match(item: str, products: list[Any]) -> BasketLine:
             size_ok = _size_ok(size, product)
             size_rank = 0 if size_ok or not size else 1 if size_ok is None else 2
             price = Decimal(_get(product, "price"))
-            ranked.append((_category_rank(words, product), -score, size_rank, price, product))
+            ranked.append((-score, _category_rank(words, product), size_rank, price, product))
     if not ranked:
         # The store's own top hit, e.g. "Penne" for "pasta". Never sure, but better than nothing.
         # Never a flavour-only hit ("Grøn te m. mandarin" for "mandariner").
-        top = next((x for x in products if _get(x, "available") and _score(words, x) == 0), None)
+        top = next(
+            (x for x in products if _get(x, "available") and not _flavour_only(words, x)), None
+        )
         if top is None:
             return BasketLine(item, quantity, None, Decimal(0), False, "Ikke fundet")
         price = Decimal(_get(top, "price"))
         note = "Butikkens bedste søgeresultat. Navnet matcher ikke. Tjek varen."
         return BasketLine(item, quantity, top, price * quantity, False, note, guess=True)
-    _cat, neg_score, size_rank, price, product = min(ranked, key=lambda r: r[:4])
+    neg_score, _cat, size_rank, price, product = min(ranked, key=lambda r: r[:4])
     sure = neg_score == -1.0 and size_rank == 0
     note = None
     if size_rank == 2:

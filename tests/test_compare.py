@@ -284,13 +284,26 @@ def test_flavour_only_hit_is_never_a_guess():
     assert line.product is None and line.note == "Ikke fundet"
 
 
-def test_store_category_beats_a_name_match_in_another_category():
+def test_store_category_breaks_a_tie_on_the_name():
     """Seen live: Bilka 'laks fersk' matched a nail polish."""
     polish = p("x", "n", "Neglelak laks", "29.00")
     polish.category = "Personlig pleje > Makeup > Neglelak"
-    salmon = p("x", "l", "Laksefilet fersk", "85.00", "600 g")
+    salmon = p("x", "l", "Laks", "85.00", "600 g")
     salmon.category = "Kød & fisk > Fisk > Laks"
     assert best_match("laks fersk", [polish, salmon]).product.id == "l"
+
+
+def test_name_score_beats_the_category():
+    coffee = p("x", "k", "Kaffe", "45.00")
+    coffee.category = "Kolonial > Kaffe"
+    filters = p("x", "f", "Kaffe filter", "20.00")
+    filters.category = "Husholdning > Filtre"
+    assert best_match("kaffe filter", [coffee, filters]).product.id == "f"
+
+
+def test_partial_name_hit_is_still_a_guess():
+    line = best_match("kaffe filter brun", [p("x", "f", "Kaffefilter", "20.00")])
+    assert line.product.id == "f" and line.guess
 
 
 def test_category_fits_a_compound_word():
