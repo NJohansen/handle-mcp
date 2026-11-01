@@ -253,6 +253,8 @@ class NemligStore:
         price = _money(hit.get("Price")) or Decimal(0)
         now = _discount_price(campaign)
         offer = _offer(campaign)
+        if offer == "Tilbud" and now and price > now:
+            offer = f"Tilbud, før {_kr(price)} kr"
         return Product(
             store=self.name,
             id=str(hit["Id"]),

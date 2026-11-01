@@ -414,3 +414,22 @@ def test_fresh_beats_cheaper_frozen_or_canned():
     tomato = p("x", "t", "Cherrytomater", "15.00", "250 g")
     assert best_match("cherrytomater", [canned, tomato]).product.id == "t"
     assert best_match("frosne blåbær", [frozen, fresh]).product.id == "f"
+
+
+def test_frozen_meat_offer_still_wins():
+    frozen = p("x", "f", "Hele kyllingelår m. rygben frost", "35.00", "1250 g")
+    frozen.category = "Frost > Kød og fjerkræ"
+    fresh = p("x", "k", "Hele kyllingelår", "64.95", "1.6 kg")
+    assert best_match("kyllingelår 1,25 kg", [fresh, frozen]).product.id == "f"
+
+
+def test_canned_by_name_or_category_loses():
+    canned = p("x", "c", "Cherrytomater i tomatjuice", "10.95", "400 g")
+    canned.category = "Kolonial > Konserves & dåsemad"
+    fresh = p("x", "t", "Cherrytomater", "12.00", "400 g")
+    assert best_match("cherrytomater 250 g", [canned, fresh]).product.id == "t"
+
+
+def test_c_and_k_and_short_plural():
+    assert best_match("klementiner", [p("x", "c", "Clementiner", "20.00")]).sure
+    assert best_match("peberfrugt rød", [p("x", "p", "Peberfrugter røde", "20.00")]).sure

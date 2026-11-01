@@ -379,3 +379,9 @@ def test_campaign_we_cannot_describe_is_still_an_offer(store):
     campaign = {"Type": "ProductCampaignBuyXForY", "MinQuantity": 3}  # no TotalPrice
     p = store._product({"Id": 4, "Name": "Letmælk", "Price": 21.28, "Campaign": campaign})
     assert (p.price, p.on_offer, p.offer_text) == (Decimal("21.28"), True, "Tilbud")
+
+
+def test_plain_discount_says_the_before_price(store):
+    campaign = {"Type": "ProductCampaignDiscount", "CampaignPrice": 79.95}
+    p = store._product({"Id": 5, "Name": "Laks - back loin", "Price": 98.75, "Campaign": campaign})
+    assert p.offer_text == "Tilbud, før 98,75 kr"

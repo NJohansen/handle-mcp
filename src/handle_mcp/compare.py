@@ -40,7 +40,9 @@ MULTI_RE = re.compile(r"(\d+)\s*for\s*(\d+(?:[.,]\d+)?)", re.IGNORECASE)  # "4 f
 # Words that only say how a thing is made or packed: "frilandsæg" is æg, "splitlinser" is linser.
 DESCRIBERS = ("frilands", "skrabe", "øko", "split", "mini", "snack", "baby")
 # Frozen or canned. Never the default for fresh food: "blåbær" is fresh, "frosne blåbær" is not.
-PROCESSED = {"frost", "frosne", "frossen", "frosset", "dybfrost", "dåse", "konserves", "konserve"}
+CANNED = ("konserv", "dåse", "juice")  # "Cherrytomater i tomatjuice", "Kolonial > Konserves"
+FROZEN = ("frost", "frosne", "frossen", "frosset")
+FRESH = ("frugt", "grønt", "bær", "grøntsag")  # frozen loses only here: frozen meat is fine
 QTY_RE = re.compile(r"^\s*(\d+)\s*[x×]\s+(?=\D)", re.IGNORECASE)
 
 
@@ -103,11 +105,14 @@ def _words(text: str) -> list[str]:
 
 
 def _score(words: list[str], product: Any) -> float:
-    """1.0 when every word is a whole word in the name. Half for a word inside another word,
-    or a Danish plural or singular ('bananer' ~ 'banan'). A quarter for a word only in the
+    """1.0 when every word is a whole word in the name, or its Danish plural or singular
+    ('bananer' ~ 'banan'). Half for a word inside another word. A quarter for a word only in the
     flavour part of the name ('Yoghurt m. banan')."""
-    name = _get(product, "name") or ""
-    head = f"{FLAVOUR_RE.split(name)[0]} {_get(product, 'brand') or ''}".lower()
+    # c and k are the same sound in Danish shop names: "Clementiner" ~ "klementiner".
+    words = [w.replace("c", "k") for w in words]
+    name = (_get(product, "name") or "").replace("C", "K").replace("c", "k")
+    brand = (_get(product, "brand") or "").replace("C", "K").replace("c", "k")
+    head = f"{FLAVOUR_RE.split(name)[0]} {brand}".lower()
     tokens, tail = set(_words(head)), name.lower()
     tail_tokens = set(_words(tail))
     hits = []
@@ -126,7 +131,7 @@ def _score(words: list[str], product: Any) -> float:
 def _plural(word: str, token: str) -> bool:
     """Danish singular and plural are the same product: 'pære' ~ 'pærer', 'banan' ~ 'bananer'."""
     short, long_ = sorted((word, token), key=len)
-    return len(short) >= 4 and long_ in (short + "r", short + "er", short + "e")
+    return len(short) >= 3 and long_ in (short + "r", short + "er", short + "e")
 
 
 def _described(word: str, token: str) -> bool:
@@ -135,9 +140,15 @@ def _described(word: str, token: str) -> bool:
 
 
 def _processed_rank(words: list[str], product: Any) -> int:
-    """1 for frozen or canned food when the item does not ask for it, else 0."""
-    found = set(_words(f"{_get(product, 'name')} {_get(product, 'category') or ''}")) & PROCESSED
-    return 1 if found and not (set(words) & PROCESSED) else 0
+    """1 for canned food, or frozen fruit and vegetables, when the item does not ask for it.
+    Frozen meat or fish is not demoted: a frozen 35 kr offer is a fine 'kyllingelår'."""
+    text = f"{_get(product, 'name')} {_get(product, 'category') or ''}".lower()
+    item = " ".join(words)
+    if any(m in text for m in CANNED) and not any(m in item for m in CANNED):
+        return 1
+    produce = any(m in text for m in FRESH) or any(w.endswith("bær") for w in words)
+    frozen = any(m in text for m in FROZEN) and not any(m in item for m in FROZEN)
+    return 1 if frozen and produce else 0
 
 
 def _price(product: Any, on: date | None) -> Decimal:
