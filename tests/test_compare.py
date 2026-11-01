@@ -372,3 +372,9 @@ def test_compound_word_counts_but_whole_word_wins():
 def test_much_bigger_pack_is_marked():
     line = best_match("kaffe 400 g", [p("x", "k", "Kaffe", "45.00", "500 g")])
     assert not line.sure and "Anden størrelse" in line.note
+
+
+def test_whole_word_beats_cheaper_compound_word():
+    whole = p("x", "w", "Ris", "20.00", "1 kg")
+    compound = p("x", "c", "Kokosris", "10.00", "1 kg")
+    assert best_match("ris 1 kg", [compound, whole]).product.id == "w"

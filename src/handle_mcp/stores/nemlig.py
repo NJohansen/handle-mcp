@@ -72,7 +72,7 @@ def _offer(campaign: dict | None) -> str | None:
         return f"{qty} for {_kr(total)} kr"
     if (pct := campaign.get("DiscountPercent")) and _discount_price(campaign):
         return f"-{pct} %"
-    return "Tilbud" if _discount_price(campaign) else None
+    return "Tilbud" if campaign.get("Type") else None  # a campaign we cannot describe
 
 
 def _discount_price(campaign: dict | None) -> Decimal | None:

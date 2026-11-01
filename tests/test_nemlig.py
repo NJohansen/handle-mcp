@@ -370,3 +370,9 @@ def test_multi_buy_keeps_the_single_price(store):
     campaign["CampaignPrice"] = 50.0
     p = store._product({"Id": 3, "Name": "Hakkede tomater", "Price": 13.95, "Campaign": campaign})
     assert (p.price, p.offer_text, p.before_price) == (Decimal("13.95"), "4 for 50 kr", None)
+
+
+def test_campaign_we_cannot_describe_is_still_an_offer(store):
+    campaign = {"Type": "ProductCampaignBuyXForY", "MinQuantity": 3}  # no TotalPrice
+    p = store._product({"Id": 4, "Name": "Letmælk", "Price": 21.28, "Campaign": campaign})
+    assert (p.price, p.on_offer, p.offer_text) == (Decimal("21.28"), True, "Tilbud")

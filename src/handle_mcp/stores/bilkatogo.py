@@ -61,6 +61,9 @@ STATUS = {  # Bilka's codes → the words the website shows
 NOT_HOME = "Kurven er sat til afhentning, ikke hjemlevering. Vælg hjemlevering på bilkatogo.dk."
 
 
+GENERIC_OFFERS = {"Se Her"}  # offerDescription with no real text (docs/research.md)
+
+
 def _kr(ore: Any) -> Decimal:
     try:
         return Decimal(str(ore or 0)).scaleb(-2)
@@ -253,7 +256,7 @@ class BilkaStore:
         now, normal = _kr(store.get("price")), _kr(hit.get("price"))
         before = normal if normal > now else None
         offer = store.get("offerDescription") or None
-        if offer == "Se Her":  # a leaflet offer with no text of its own
+        if offer in GENERIC_OFFERS:  # a leaflet offer with no text of its own
             offer = f"Tilbud, før {before:.2f} kr".replace(".", ",") if before else "Tilbud"
         shown = store.get(
             "unitsOfMeasureShowPrice"
