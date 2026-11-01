@@ -351,7 +351,7 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
     if not terms.home_delivery and not note:
         notes.append("Kurven er ikke sat til hjemlevering.")
     minimum = terms.minimum_order
-    if minimum is not None and products_total < minimum:
+    if minimum is not None and 0 < products_total < minimum:  # in words, for the human
         notes.append(f"Under minimumskøb: {minimum - products_total} kr. mangler til {minimum} kr.")
     return BasketQuote(
         store=terms.store,

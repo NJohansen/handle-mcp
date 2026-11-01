@@ -504,3 +504,16 @@ def test_fat_share_or_size_is_not_a_blend():
     for name in ("Minimælk med 0,5% fedt", "Hakket svinekød u. 8% fedt", "Smør i 250 g"):
         assert compare._mixed(["x"], p("x", "a", name, "10.00")) == 0
     assert compare._mixed(["oksekød"], p("x", "b", "Oksekød m. 50% grønt", "10.00")) == 1
+
+
+def test_count_without_size_prefers_pieces_and_unknown_size_comes_last():
+    bag = p("x", "bag", "Pærer", "22.00", "1 kg")
+    one = p("x", "one", "Pære", "2.75", "1 stk")
+    loose = p("x", "loose", "Pærer", "1.00")  # no size at all
+    assert best_match("4 x pærer", [loose, bag, one]).product.id == "one"
+    assert best_match("pærer", [loose, one, bag]).product.id == "bag"
+
+
+async def test_no_minimum_note_for_an_empty_basket(two_stores):
+    result = await server.compare_basket(["findes ikke xyz"])
+    assert not any("minimumskøb" in n for n in result["stores"]["nemlig"]["notes"])
