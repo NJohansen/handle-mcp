@@ -87,6 +87,8 @@ Nyttige felter pr. hit: `objectID` (varenummer til kurven), `gtin` (**EAN findes
 - `storeData.<butik>.price` er det, du betaler. Top-feltet `price` er prisen uden tilbud. `beforePrice` er altid 0.
 - `unitsOfMeasurePrice` er enhedsprisen uden tilbud. `unitsOfMeasureShowPrice` er den med tilbud.
 - `offerDescription` "Se Her" er et avistilbud uden egen tekst. "Skarp pris" er også et tilbud med lavere pris.
+- `offerFrom` og `offerUntil` er altid tomme. Derfor kender vi ikke slutdatoen for et Bilka-tilbud, og et tilbud tæller med, selvom det slutter før levering.
+- Mængdetilbud på tværs af varer ("Mix 10 for 25" på bananer og pærer) regnes kun inden for én linje.
 
 ### Kurv
 - Læs: `GET shop/v6/Cart?u=w&extra=deliveryAddress,deliveryDate`. Tilføj `without_cache=1`, når du tjekker en ændring.

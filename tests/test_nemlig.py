@@ -385,3 +385,12 @@ def test_plain_discount_says_the_before_price(store):
     campaign = {"Type": "ProductCampaignDiscount", "CampaignPrice": 79.95}
     p = store._product({"Id": 5, "Name": "Laks - back loin", "Price": 98.75, "Campaign": campaign})
     assert p.offer_text == "Tilbud, før 98,75 kr"
+
+
+def test_multi_buy_text_is_priced_by_compare(store):
+    from handle_mcp.compare import best_match
+
+    campaign = {"Type": "ProductCampaignMixOffer", "MinQuantity": 4, "TotalPrice": 50.0}
+    hit = {"Id": 6, "Name": "Hakkede tomater", "Price": 13.95, "Description": "400 g"}
+    p = store._product({**hit, "Campaign": campaign, "Availability": {}})
+    assert best_match("4 x hakkede tomater 400 g", [p]).line_total == Decimal(50)
