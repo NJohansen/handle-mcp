@@ -459,3 +459,10 @@ def test_same_cost_more_food_wins():
     big = p("x", "b", "Snackpeber", "22.00", "500 g")
     assert best_match("snackpeber", [small, big]).product.id == "b"
     assert best_match("snackpeber", [big, small]).product.id == "b"
+
+
+def test_delivery_day_is_danish():
+    from datetime import UTC, datetime
+
+    info = DeliveryInfo("x", chosen_start=datetime(2026, 11, 4, 23, 30, tzinfo=UTC))
+    assert compare._day(info) == date(2026, 11, 5)  # 00:30 in Denmark

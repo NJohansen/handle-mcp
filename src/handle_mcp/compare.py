@@ -20,11 +20,13 @@ from datetime import date, datetime
 from decimal import Decimal
 from itertools import pairwise
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from handle_mcp.models import Product
 from handle_mcp.stores import StoreError
 
 SEARCH_LIMIT = 10
+DK = ZoneInfo("Europe/Copenhagen")  # offers end on Danish days
 SIZE_TOLERANCE = Decimal("0.15")  # 15 % off the wanted size still counts as the same size
 STOP_WORDS = {"og", "med", "i", "af", "en", "et", "til", "uden"}
 UNITS = {
@@ -305,7 +307,7 @@ def _day(info: Any) -> date | None:
     """The delivery day: the chosen slot, else the next free one."""
     start = _get(info, "chosen_start") if info is not None else None
     if isinstance(start, datetime):
-        return start.date()
+        return (start.astimezone(DK) if start.tzinfo else start).date()
     nxt = _get(info, "next_available") if info is not None else None
     return nxt if isinstance(nxt, date) else None
 
