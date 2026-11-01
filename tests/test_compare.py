@@ -256,3 +256,16 @@ def test_store_top_hit_when_no_name_matches():
     line = best_match("pasta 500 g", [sold_out, p("x", "pe", "Penne rigate", "12.00", "500 g")])
     assert line.product.id == "pe" and not line.sure
     assert "bedste søgeresultat" in line.note
+
+
+def test_guesses_stay_out_of_the_verdict():
+    good = compare.best_match("rugbrød", [p("a", "r", "Rugbrød", "20.00")])
+    guess = compare.best_match("pasta", [p("b", "pe", "Penne", "1.00")])
+    assert guess.guess
+    quotes = {
+        n: compare.BasketQuote(n, lines, [], Decimal(0), {}, Decimal(0), None, None)
+        for n, lines in {"a": [good, good], "b": [good, guess]}.items()
+    }
+    quotes["a"].lines[1] = compare.BasketLine("pasta", 1, good.product, Decimal(50), True)
+    verdict = compare.verdict(quotes)
+    assert verdict["comparable_totals"] == {"a": Decimal(20), "b": Decimal(20)}  # pasta left out

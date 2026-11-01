@@ -40,6 +40,7 @@ class BasketLine:
     line_total: Decimal
     sure: bool
     note: str | None = None
+    guess: bool = False  # the store's top hit with no word match: left out of the verdict
 
 
 @dataclass
@@ -129,7 +130,7 @@ def best_match(item: str, products: list[Any]) -> BasketLine:
             return BasketLine(item, quantity, None, Decimal(0), False, "Ikke fundet")
         price = Decimal(_get(top, "price"))
         note = "Butikkens bedste søgeresultat. Navnet matcher ikke. Tjek varen."
-        return BasketLine(item, quantity, top, price * quantity, False, note)
+        return BasketLine(item, quantity, top, price * quantity, False, note, guess=True)
     neg_score, size_rank, price, product = min(ranked, key=lambda r: r[:3])
     sure = neg_score == -1.0 and size_rank == 0
     note = None
@@ -177,7 +178,7 @@ def verdict(quotes: dict[str, Any]) -> dict[str, Any]:
             f"Kun {', '.join(ok)} kunne prise listen." if ok else "Ingen butik kunne prise listen."
         )
         return {"cheapest": None, "summary": priced + (f" Fejl: {failed}." if failed else "")}
-    common = set.intersection(*({ln.item for ln in q.lines} for q in ok.values()))
+    common = set.intersection(*({ln.item for ln in q.lines if not ln.guess} for q in ok.values()))
     if not common:
         return {"cheapest": None, "summary": "Ingen vare blev fundet i alle butikker. Tjek listen."}
     totals = {
