@@ -167,7 +167,7 @@ async def test_home_delivery_cart(store):
     assert cart.total == Decimal("166.00")
     assert (cart.minimum_order, cart.minimum_met) == (Decimal("500.00"), False)
     assert NOT_HOME not in cart.warnings
-    assert "373,00" in cart.warnings[0]
+    assert cart.warnings[0].startswith("373,00 kr. fra minimumskøb")  # HTML tags removed
     names = [ln.name for ln in cart.lines]
     assert "Papirpose" not in names and "Pakkeservice" not in names  # fees, not products
 

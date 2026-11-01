@@ -32,7 +32,7 @@
   "global_discounts": [],
   "vouchers": [],
   "minimum_left": 37300,
-  "minimum_left_text": "Du mangler 373,00 kr. for at nå minimumskøb",
+  "minimum_left_text": "<strong>373,00 kr.</strong> fra minimumskøb på 500,00 kr. alt inkl. for at få hjemmelevering",
   "delivery_comment": null,
   "specifications": [
    {

@@ -11,6 +11,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from typing import Any
@@ -257,7 +258,7 @@ class BilkaStore:
         }
         warnings = [] if _is_home(address) else [NOT_HOME]
         if stat.get("minimum_left_text"):
-            warnings.append(stat["minimum_left_text"])
+            warnings.append(re.sub(r"<[^>]+>", "", stat["minimum_left_text"]))
         warnings += [
             m.get("text", str(m)) if isinstance(m, dict) else str(m)
             for m in data.get("messages") or []
