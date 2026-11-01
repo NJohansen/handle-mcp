@@ -32,7 +32,7 @@ UNITS = {
 SIZE_RE = re.compile(
     r"(?:(\d+)\s*[x×]\s*)?(\d+(?:[.,]\d+)?)\s*(" + "|".join(UNITS) + r")\b", re.IGNORECASE
 )
-FLAVOUR_RE = re.compile(r"\s(?:m\.|med|i|u\.|uden|&|smag)\s", re.IGNORECASE)
+FLAVOUR_RE = re.compile(r"\s(?:m\.|med|i|u\.|uden|smag)\s", re.IGNORECASE)
 QTY_RE = re.compile(r"^\s*(\d+)\s*[x×]\s+(?=\D)", re.IGNORECASE)
 
 
