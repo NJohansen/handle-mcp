@@ -311,3 +311,21 @@ async def test_recipes_format_change_is_a_clear_error(store, monkeypatch):
     monkeypatch.setattr(store, "_search_settings", settings)
     with pytest.raises(StoreError, match="ændret format"):
         await store.recipes("karry")
+
+
+async def test_recipe_links_absolute_or_empty(store, monkeypatch):
+    async def recipes(*_args, **_kwargs):
+        return {
+            "Recipes": [
+                {"Id": "a", "Name": "Absolut", "Url": "https://www.nemlig.com/opskrifter/a-1"},
+                {"Id": "b", "Name": "Uden link", "Url": ""},
+            ]
+        }
+
+    async def settings():
+        return {}
+
+    monkeypatch.setattr(store, "_api", recipes)
+    monkeypatch.setattr(store, "_search_settings", settings)
+    (only,) = await store.recipes("x")
+    assert only.url == "https://www.nemlig.com/opskrifter/a-1"
