@@ -138,7 +138,7 @@ def test_wrong_size_is_kept_but_marked():
 
 
 def test_sold_out_is_missing():
-    line = best_match("toiletpapir", BILKA)
+    line = best_match("toiletpapir", [BILKA[14]])  # the only hit is sold out
     assert line.product is None and line.note == "Ikke fundet"
 
 
@@ -243,3 +243,16 @@ async def test_failing_delivery_info_keeps_the_prices(monkeypatch):
     result = await server.compare_basket(["rugbrød"])
     assert result["stores"]["nemlig"]["lines"][0]["product"]["id"] == "n3"
     assert result["stores"]["nemlig"]["notes"] == []
+
+
+def test_singular_and_plural_match():
+    line = best_match("bananer", [p("x", "b", "Banan øko.", "3.00", "1 stk")])
+    assert line.product.id == "b" and not line.sure
+
+
+def test_store_top_hit_when_no_name_matches():
+    """Seen live: nemlig answers 'pasta' with 'Penne rigate'."""
+    sold_out = p("x", "s", "Spaghetti", "9.00", "500 g", available=False)
+    line = best_match("pasta 500 g", [sold_out, p("x", "pe", "Penne rigate", "12.00", "500 g")])
+    assert line.product.id == "pe" and not line.sure
+    assert "bedste søgeresultat" in line.note

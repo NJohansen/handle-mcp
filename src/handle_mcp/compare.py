@@ -90,11 +90,18 @@ def _words(text: str) -> list[str]:
 
 
 def _score(words: list[str], product: Any) -> float:
-    """1.0 when every word is a whole word in the name; a word inside another word counts half."""
+    """1.0 when every word is a whole word in the name. Half for a word inside another word,
+    or a Danish plural or singular ('bananer' ~ 'banan')."""
     text = f"{_get(product, 'name')} {_get(product, 'brand') or ''}".lower()
     tokens = set(_words(text))
-    hits = [1.0 if w in tokens else 0.5 if w in text else 0.0 for w in words]
+    hits = [
+        1.0 if w in tokens else 0.5 if w in text or _stem_hit(w, tokens) else 0.0 for w in words
+    ]
     return sum(hits) / len(hits) if hits else 0.0
+
+
+def _stem_hit(word: str, tokens: set[str]) -> bool:
+    return any(len(t) >= 4 and (word.startswith(t) or t.startswith(word)) for t in tokens)
 
 
 def _size_ok(wanted: tuple[str, Decimal] | None, product: Any) -> bool | None:
@@ -116,7 +123,13 @@ def best_match(item: str, products: list[Any]) -> BasketLine:
             size_rank = 0 if size_ok or not size else 1 if size_ok is None else 2
             ranked.append((-score, size_rank, Decimal(_get(product, "price")), product))
     if not ranked:
-        return BasketLine(item, quantity, None, Decimal(0), False, "Ikke fundet")
+        # The store's own top hit, e.g. "Penne" for "pasta". Never sure, but better than nothing.
+        top = next((x for x in products if _get(x, "available")), None)
+        if top is None:
+            return BasketLine(item, quantity, None, Decimal(0), False, "Ikke fundet")
+        price = Decimal(_get(top, "price"))
+        note = "Butikkens bedste søgeresultat. Navnet matcher ikke. Tjek varen."
+        return BasketLine(item, quantity, top, price * quantity, False, note)
     neg_score, size_rank, price, product = min(ranked, key=lambda r: r[:3])
     sure = neg_score == -1.0 and size_rank == 0
     note = None
