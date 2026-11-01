@@ -433,3 +433,12 @@ def test_canned_by_name_or_category_loses():
 def test_c_and_k_and_short_plural():
     assert best_match("klementiner", [p("x", "c", "Clementiner", "20.00")]).sure
     assert best_match("peberfrugt rød", [p("x", "p", "Peberfrugter røde", "20.00")]).sure
+
+
+def test_canned_loses_even_when_fresh_has_no_fitting_category():
+    """Seen live at Bilka: the canned one sits in '... > Cherrytomater', the fresh one does not."""
+    canned = p("x", "c", "Cherrytomater i tomatjuice", "10.95", "400 g")
+    canned.category = "Kolonial > Konserves, bouillon & krydderier > Tomatprodukter > Cherrytomater"
+    fresh = p("x", "f", "Cherrytomater", "12.00", "400 g")
+    fresh.category = "Frugt & grønt > Grønt"
+    assert best_match("cherrytomater 250 g", [canned, fresh]).product.id == "f"

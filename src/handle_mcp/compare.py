@@ -231,7 +231,9 @@ def best_match(item: str, products: list[Any], on: date | None = None) -> Basket
             size_rank = 0 if packs or not size else 1
             count = packs or quantity
             cost = _cost(product, count, on)
-            fit = _category_rank(words, product) + _processed_rank(words, product)
+            # Canned or frozen produce loses before the category counts: a canned product can sit
+            # in a category that fits ("... > Cherrytomater") while the fresh one does not.
+            fit = (_processed_rank(words, product), _category_rank(words, product))
             ranked.append((-score, fit, size_rank, cost, count, product))
     if not ranked:
         # The store's own top hit, e.g. "Penne" for "pasta". Never sure, but better than nothing.
