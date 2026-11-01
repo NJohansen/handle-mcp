@@ -37,10 +37,11 @@ def run(args: list[str]) -> int:
         _say("Login slettet fra nøgleringen." if removed else "Der var intet login i nøgleringen.")
         return 0
 
-    sys.stderr.write("Email: ")
+    _say(f"Log ind på {store}. Brug den email og det kodeord, du bruger på butikkens hjemmeside.")
+    sys.stderr.write(f"Email til {store}: ")
     sys.stderr.flush()
     email = sys.stdin.readline().strip()
-    password = getpass.getpass("Kodeord (vises ikke): ")
+    password = getpass.getpass(f"Kodeord til {store} (vises ikke): ")
     if not email or not password:
         _say("Email og kodeord skal udfyldes. Intet er gemt.")
         return 1
