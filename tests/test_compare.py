@@ -498,3 +498,9 @@ def test_guess_with_a_size_is_the_cheapest_of_that_size():
     line = best_match("pasta 500 g", [tortelloni, fettuccine])
     assert (line.product.id, line.guess, line.sure) == ("f", True, False)
     assert best_match("pasta 500 g", [p("x", "s", "Penne", "9.00", "6 stk")]).product is None
+
+
+def test_fat_share_or_size_is_not_a_blend():
+    for name in ("Minimælk med 0,5% fedt", "Hakket svinekød u. 8% fedt", "Smør i 250 g"):
+        assert compare._mixed(["x"], p("x", "a", name, "10.00")) == 0
+    assert compare._mixed(["oksekød"], p("x", "b", "Oksekød m. 50% grønt", "10.00")) == 1

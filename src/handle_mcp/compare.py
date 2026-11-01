@@ -49,6 +49,8 @@ DESCRIBERS = ("frilands", "skrabe", "øko", "split", "mini", "snack", "baby")
 CANNED = ("konserv", "dåse", "juice")  # "Cherrytomater i tomatjuice", "Kolonial > Konserves"
 FROZEN = ("frost", "frosne", "frossen", "frosset")
 FRESH = ("frugt", "grønt", "bær", "grøntsag")  # frozen loses only here: frozen meat is fine
+BLEND_RE = re.compile(r"\d+(?:[.,]\d+)?\s*%\s*([a-zæøå]+)", re.IGNORECASE)  # "50% grønt"
+NUTRIENTS = {"fedt", "protein", "sukker", "kakao", "alkohol", "salt", "frugt", "kulhydrat"}
 QTY_RE = re.compile(r"^\s*(\d+)\s*[x×]\s+(?=\D)", re.IGNORECASE)
 
 
@@ -187,10 +189,12 @@ def _compound(word: str, token: str) -> bool:
 
 
 def _mixed(words: list[str], product: Any) -> int:
-    """1 for a blend the item does not ask for: 'Hakket oksekød m. 50% grønt'. A number in the
-    extra part means a mix. 'Rugbrød m. kerner' and 'Laks m. skind' are the plain product."""
+    """1 for a blend the item does not ask for: 'Hakket oksekød m. 50% grønt'. A share of
+    another food ('50% grønt') means a mix. A share of fat or sugar ('m. 0,5% fedt') does not,
+    nor 'Rugbrød m. kerner' or 'Laks m. skind'."""
     parts = FLAVOUR_RE.split(_get(product, "name") or "", maxsplit=1)
-    if len(parts) < 2 or not re.search(r"\d", parts[1]):
+    shares = BLEND_RE.findall(parts[1]) if len(parts) == 2 else []
+    if not any(w.lower() not in NUTRIENTS for w in shares):
         return 0
     tail = set(_words(parts[1]))
     return 0 if any(w in tail or _stem_hit(w, tail) for w in words) else 1
