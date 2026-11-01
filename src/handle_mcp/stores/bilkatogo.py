@@ -319,6 +319,8 @@ class BilkaStore:
         start, end = _slot(
             chosen.get("deliveryDate"), chosen.get("intervalStart"), chosen.get("intervalEnd")
         )
+        if end and end < datetime.now(TZ):
+            start = end = None  # an old slot from a past order is not a choice
         nxt = address.get("nextAvailableDeliveryDate")
         return DeliveryInfo(
             store=self.name,

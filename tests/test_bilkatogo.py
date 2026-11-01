@@ -196,7 +196,7 @@ async def test_terms_and_delivery_info(store):
     )
     assert terms.other_fees == {"pakkeservice": Decimal("39.00")}
     info = await store.delivery_info()
-    assert info.chosen_start.isoformat() == "2026-11-01T14:00:00+01:00"
+    assert info.chosen_start.isoformat() == "2036-11-01T14:00:00+01:00"
     assert info.next_available.isoformat() == "2026-11-03"
     assert info.note is None
 
@@ -250,3 +250,12 @@ async def test_tools_hide_personal_data_from_bilka(store, monkeypatch):
         "eyFake",
     ):
         assert secret not in text
+
+
+async def test_old_chosen_slot_is_ignored(store, fake):
+    fake.cart = {
+        **fake.cart,
+        "deliveryDate": {**fake.cart["deliveryDate"], "deliveryDate": "2024-09-04"},
+    }
+    info = await store.delivery_info()
+    assert info.chosen_start is None and info.chosen_end is None
