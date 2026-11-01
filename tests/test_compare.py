@@ -243,7 +243,9 @@ async def test_failing_delivery_info_keeps_the_prices(monkeypatch):
     monkeypatch.setattr(registry, "STORES", {"nemlig": NoDelivery})
     result = await server.compare_basket(["rugbrød"])
     assert result["stores"]["nemlig"]["lines"][0]["product"]["id"] == "n3"
-    assert result["stores"]["nemlig"]["notes"] == []
+    assert result["stores"]["nemlig"]["notes"] == [
+        "Under minimumskøb: 278.00 kr. mangler til 300 kr."
+    ]
 
 
 def test_singular_and_plural_match():
@@ -466,3 +468,33 @@ def test_delivery_day_is_danish():
 
     info = DeliveryInfo("x", chosen_start=datetime(2026, 11, 4, 23, 30, tzinfo=UTC))
     assert compare._day(info) == date(2026, 11, 5)  # 00:30 in Denmark
+
+
+def test_blend_loses_to_plain_and_is_not_sure():
+    """Seen live at nemlig: 'Hakket oksekød m. 50% grønt' was a sure match for minced beef."""
+    blend = p("x", "g", "Hakket oksekød m. 50% grønt", "30.00", "500 g")
+    plain = p("x", "o", "Hakket oksekød 14-18%", "47.44", "500 g")
+    assert best_match("hakket oksekød 500 g", [blend, plain]).product.id == "o"
+    only = best_match("hakket oksekød 500 g", [blend])
+    assert not only.sure and "Blandingsvare" in only.note
+    assert best_match("rugbrød", [p("x", "r", "Rugbrød m. kerner", "22.00", "1 kg")]).sure
+
+
+def test_no_size_compares_per_kg_not_per_pack():
+    """Seen live at Bilka: 'æbler' gave 1 apple for 2.75 while nemlig gave 1 kg."""
+    one = p("x", "1", "Æbler", "2.75", "1 stk")
+    bag = p("x", "b", "Æbler", "12.00", "1 kg")
+    line = best_match("æbler", [one, bag])
+    assert line.product.id == "b" and "Skriv en mængde" in line.note
+    six = p("x", "6", "Toiletpapir", "20.00", "6 rl.")
+    eight = p("x", "8", "Toiletpapir", "15.22", "8 rl.")
+    assert best_match("toiletpapir", [six, eight]).product.id == "8"
+
+
+def test_guess_with_a_size_is_the_cheapest_of_that_size():
+    """Seen live at nemlig: 'pasta' only finds fresh pasta, and Tortelloni 250 g was the guess."""
+    tortelloni = p("x", "t", "Tortelloni m. ricotta", "25.00", "250 g")
+    fettuccine = p("x", "f", "Fettuccine", "13.95", "500 g")
+    line = best_match("pasta 500 g", [tortelloni, fettuccine])
+    assert (line.product.id, line.guess, line.sure) == ("f", True, False)
+    assert best_match("pasta 500 g", [p("x", "s", "Penne", "9.00", "6 stk")]).product is None
