@@ -189,6 +189,14 @@ async def test_search_parses_products(store, fake):
     assert search.url.params["deliveryZoneId"] == "3"
 
 
+async def test_recipes_are_parsed_with_full_links(store, fake):
+    (recipe,) = await store.recipes("cocio", limit=3)
+    assert (recipe.name, recipe.time, recipe.persons) == ("Cocioshake med topping", "10 min", 4)
+    assert recipe.url == "https://www.nemlig.com/opskrifter/cocioshake-topping-98003783"
+    search = next(r for r in fake.requests if r.url.path == "/searchgateway/api/search")
+    assert search.url.params["recipeCount"] == "3"
+
+
 async def test_search_reuses_settings(store, fake):
     await store.search("mælk")
     await store.search("brød")

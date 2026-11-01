@@ -9,6 +9,7 @@ from handle_mcp import server
 
 ALLOWED = {
     "search_products": False,
+    "search_recipes": False,
     "compare_basket": False,
     "get_cart": False,
     "set_cart_quantities": True,
