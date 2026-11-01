@@ -26,10 +26,14 @@ Needs [uv](https://docs.astral.sh/uv/) (`brew install uv`).
 **1. Logins.** One file per store, readable only by you:
 
 ```sh
-mkdir -p ~/.config/handle-mcp
-echo '{"email": "you@example.com", "password": "..."}' > ~/.config/handle-mcp/nemlig.json
-echo '{"email": "you@example.com", "password": "..."}' > ~/.config/handle-mcp/bilkatogo.json
-chmod 600 ~/.config/handle-mcp/*.json
+mkdir -p ~/.config/handle-mcp && cd ~/.config/handle-mcp
+(umask 077 && touch nemlig.json bilkatogo.json)   # readable only by you from the start
+```
+
+Open each file in an editor (not `echo`, which leaves the password in your shell history) and write:
+
+```json
+{"email": "you@example.com", "password": "..."}
 ```
 
 Or use env vars: `HANDLE_NEMLIG_EMAIL`, `HANDLE_NEMLIG_PASSWORD`, `HANDLE_BILKATOGO_EMAIL`, `HANDLE_BILKATOGO_PASSWORD`. Env vars win. The server refuses a login file that others can read.
