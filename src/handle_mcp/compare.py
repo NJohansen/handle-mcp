@@ -130,7 +130,9 @@ def _category_rank(words: list[str], product: Any) -> int:
 
 
 def _suffix(word: str, token: str) -> bool:
-    return len(token) >= 3 and len(word) >= 3 and (word.endswith(token) or token.endswith(word))
+    """Danish compound words: 'cherrytomater' ends with 'tomater'. Short tokens like 'ost' are too
+    loose ('post'), so both sides need 4+ letters."""
+    return len(token) >= 4 and len(word) >= 4 and (word.endswith(token) or token.endswith(word))
 
 
 def _size_ok(wanted: tuple[str, Decimal] | None, product: Any) -> bool | None:

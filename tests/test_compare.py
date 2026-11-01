@@ -317,3 +317,9 @@ def test_category_fits_a_compound_word():
 def test_and_joins_two_products_not_a_flavour():
     line = best_match("peber", [p("x", "s", "Salt & peber", "15.00")])
     assert line.product.id == "s" and line.sure
+
+
+def test_short_category_word_is_not_a_compound_hit():
+    cheese = p("x", "o", "Post-it", "10.00")
+    cheese.category = "Mejeri > Ost"
+    assert compare._category_rank(["post"], cheese) == 1
