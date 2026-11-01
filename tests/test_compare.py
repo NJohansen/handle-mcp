@@ -269,3 +269,33 @@ def test_guesses_stay_out_of_the_verdict():
     quotes["a"].lines[1] = compare.BasketLine("pasta", 1, good.product, Decimal(50), True)
     verdict = compare.verdict(quotes)
     assert verdict["comparable_totals"] == {"a": Decimal(20), "b": Decimal(20)}  # pasta left out
+
+
+def test_flavour_word_is_not_the_product():
+    """Seen live: Bilka 'banan' matched 'Yoghurt m. banan' as sure."""
+    yoghurt = p("x", "y", "Yoghurt m. banan", "12.00")
+    line = best_match("14 x banan", [yoghurt, p("x", "b", "Bananer", "2.75", "1 stk")])
+    assert line.product.id == "b"
+
+
+def test_flavour_only_hit_is_never_a_guess():
+    """Seen live: nemlig 'mandariner' matched 'Grøn te m. mandarin & appelsin'."""
+    line = best_match("mandariner 1 kg", [p("x", "t", "Grøn te m. mandarin & appelsin", "31.50")])
+    assert line.product is None and line.note == "Ikke fundet"
+
+
+def test_store_category_beats_a_name_match_in_another_category():
+    """Seen live: Bilka 'laks fersk' matched a nail polish."""
+    polish = p("x", "n", "Neglelak laks", "29.00")
+    polish.category = "Personlig pleje > Makeup > Neglelak"
+    salmon = p("x", "l", "Laksefilet fersk", "85.00", "600 g")
+    salmon.category = "Kød & fisk > Fisk > Laks"
+    assert best_match("laks fersk", [polish, salmon]).product.id == "l"
+
+
+def test_category_fits_a_compound_word():
+    fresh = p("x", "f", "Cherrytomater", "15.00", "250 g")
+    fresh.category = "Frugt & grønt > Grøntsager > Tomater"
+    juice = p("x", "j", "Cherrytomater", "10.95", "400 g")
+    juice.category = "Kolonial > Konserves > Dåsemad"
+    assert best_match("cherrytomater", [juice, fresh]).product.id == "f"
