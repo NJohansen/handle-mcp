@@ -298,3 +298,16 @@ async def test_queue_it_waiting_room_is_a_clear_error(store, fake):
     fake.queue = True
     with pytest.raises(StoreError, match="kø"):
         await store.search("mælk")
+
+
+async def test_recipes_format_change_is_a_clear_error(store, monkeypatch):
+    async def no_recipes(*_args, **_kwargs):
+        return {"Products": {"Products": []}}
+
+    async def settings():
+        return {}
+
+    monkeypatch.setattr(store, "_api", no_recipes)
+    monkeypatch.setattr(store, "_search_settings", settings)
+    with pytest.raises(StoreError, match="ændret format"):
+        await store.recipes("karry")
