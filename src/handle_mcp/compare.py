@@ -275,7 +275,7 @@ def best_match(item: str, products: list[Any], on: date | None = None) -> Basket
         if not _get(x, "available") or _get(x, "id") == chosen:
             continue
         alt = _best(item, [x], on)
-        if alt.product is not None:
+        if alt.product is not None and not alt.guess:
             others.append((-_score(parse_item(item)[1], x), alt.line_total, alt))
     others.sort(key=lambda o: o[:2])
     line.alternatives = [_brief(a) for _s, _t, a in others[:ALTERNATIVES]]
@@ -291,6 +291,7 @@ def _brief(line: BasketLine) -> dict[str, Any]:
         "quantity": line.quantity,
         "line_total": line.line_total,
         "offer_text": _get(p, "offer_text"),
+        "note": line.note,
     }
 
 

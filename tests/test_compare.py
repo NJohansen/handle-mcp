@@ -540,6 +540,27 @@ def test_alternatives_let_the_caller_swap():
     line = best_match("bananer", [shallot, banana, cheap])
     ids = [a["id"] for a in line.alternatives]
     assert line.product.id not in ids and len(ids) == 2
-    assert {"id", "name", "size", "quantity", "line_total", "offer_text"} <= set(
+    assert {"id", "name", "size", "quantity", "line_total", "offer_text", "note"} <= set(
         line.alternatives[0]
     )
+
+
+def test_alternatives_skip_store_guesses():
+    banana = p("x", "b", "Bananer", "3.00", "1 stk")
+    tea = p("x", "t", "Grøn te", "10.00", "100 g")
+    assert best_match("bananer", [banana, tea]).alternatives == []
+
+
+def test_alternatives_keep_the_note():
+    small = p("x", "s", "Hakket kylling", "20.00", "300 g")
+    big = p("x", "b", "Hakket kylling", "59.00", "1 kg")
+    line = best_match("hakket kylling 1 kg", [small, big])
+    assert line.product.id == "b"
+    assert line.alternatives[0]["note"]
+
+
+def test_alternatives_survive_out():
+    banana = p("x", "b", "Bananer", "3.00", "1 stk")
+    cheap = p("x", "c", "Bananer øko", "2.50", "1 stk")
+    out = server._out(best_match("bananer", [banana, cheap]))
+    assert out["alternatives"][0]["line_total"] in {"3.00", "2.50"}
