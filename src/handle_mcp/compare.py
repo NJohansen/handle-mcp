@@ -80,6 +80,11 @@ def parse_item(item: str) -> tuple[int, list[str], tuple[str, Decimal] | None]:
     return max(quantity, 1), words, size
 
 
+def _query(item: str) -> str:
+    """What we send to the store's search: the words only. '2 x letmælk 1 l' → 'letmælk'."""
+    return " ".join(parse_item(item)[1]) or item
+
+
 def _words(text: str) -> list[str]:
     return re.findall(r"[a-zæøå0-9]+", text.lower())
 
@@ -124,7 +129,7 @@ def best_match(item: str, products: list[Any]) -> BasketLine:
 
 async def quote(store: Any, items: list[str]) -> BasketQuote:
     """Search each item in one store (one call at a time) and add fees and minimum order."""
-    lines = [best_match(item, await store.search(item, SEARCH_LIMIT)) for item in items]
+    lines = [best_match(item, await store.search(_query(item), SEARCH_LIMIT)) for item in items]
     terms = await store.terms()
     found = [ln for ln in lines if ln.product is not None]
     products_total = sum((ln.line_total for ln in found), Decimal(0))
@@ -153,8 +158,12 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
 def verdict(quotes: dict[str, Any]) -> dict[str, Any]:
     """Compare stores on the items every store has, plus each store's fees."""
     ok = {n: q for n, q in quotes.items() if isinstance(q, BasketQuote)}
-    if not ok:
-        return {"cheapest": None, "summary": "Ingen butik kunne prise listen."}
+    failed = ", ".join(n for n in quotes if n not in ok)
+    if len(ok) < 2:
+        priced = (
+            f"Kun {', '.join(ok)} kunne prise listen." if ok else "Ingen butik kunne prise listen."
+        )
+        return {"cheapest": None, "summary": priced + (f" Fejl: {failed}." if failed else "")}
     common = set.intersection(*({ln.item for ln in q.lines} for q in ok.values()))
     if not common:
         return {"cheapest": None, "summary": "Ingen vare blev fundet i alle butikker. Tjek listen."}
@@ -170,4 +179,6 @@ def verdict(quotes: dict[str, Any]) -> dict[str, Any]:
         not ln.sure for q in ok.values() for ln in q.lines
     ):
         summary += " Nogle varer mangler eller er usikre. Tjek dem."
+    if failed:
+        summary += f" Fejl: {failed}."
     return {"cheapest": cheapest, "comparable_totals": totals, "summary": summary}

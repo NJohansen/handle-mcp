@@ -168,10 +168,20 @@ async def test_week_list_in_both_stores(two_stores):
 
 
 async def test_one_broken_store_does_not_stop_the_compare(monkeypatch):
-    monkeypatch.setattr(registry, "STORES", {"nemlig": Nemlig, "broken": BrokenCatalog})
+    monkeypatch.setattr(
+        registry, "STORES", {"nemlig": Nemlig, "bilkatogo": Bilka, "broken": BrokenCatalog}
+    )
     result = await server.compare_basket(["rugbrød"])
     assert "500" in result["stores"]["broken"]["error"]
-    assert result["cheapest"] == "nemlig"
+    assert result["cheapest"] == "nemlig"  # 22 + 35 kr. fees beats 18 + 78 kr.
+    assert "Fejl: broken." in result["summary"]
+
+
+async def test_no_winner_when_only_one_store_answers(monkeypatch):
+    monkeypatch.setattr(registry, "STORES", {"nemlig": Nemlig, "broken": BrokenCatalog})
+    result = await server.compare_basket(["rugbrød"])
+    assert result["cheapest"] is None
+    assert result["summary"] == "Kun nemlig kunne prise listen. Fejl: broken."
 
 
 class BrokenCatalog(CatalogStore):
@@ -195,6 +205,13 @@ async def test_empty_or_too_long_list_is_refused(two_stores):
         await server.compare_basket([" ", ""])
     with pytest.raises(ToolError, match="Højst"):
         await server.compare_basket(["mælk"] * (server.MAX_ITEMS + 1))
+
+
+async def test_search_gets_words_only(two_stores):
+    """Store search engines miss '2 x letmælk 1 l'; quantity and size are for matching only."""
+    store = server._store("bilkatogo")
+    await server.compare_basket(["2 x letmælk 1 l", "hakket oksekød 500 g", "æg 10 stk"])
+    assert store.searches == ["letmælk", "hakket oksekød", "æg"]
 
 
 async def test_compare_only_reads(two_stores):
@@ -225,4 +242,4 @@ async def test_failing_delivery_info_keeps_the_prices(monkeypatch):
     monkeypatch.setattr(registry, "STORES", {"nemlig": NoDelivery})
     result = await server.compare_basket(["rugbrød"])
     assert result["stores"]["nemlig"]["lines"][0]["product"]["id"] == "n3"
-    assert result["cheapest"] == "nemlig"
+    assert result["stores"]["nemlig"]["notes"] == []
