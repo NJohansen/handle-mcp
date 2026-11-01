@@ -15,6 +15,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 from typing import Any
+from urllib.parse import urljoin
 
 import httpx
 
@@ -216,12 +217,12 @@ class NemligStore:
                 store=self.name,
                 id=str(h["Id"]),
                 name=h.get("Name", ""),
-                url=BASE + "/" + str(h.get("Url", "")).lstrip("/"),
+                url=urljoin(BASE + "/", str(h["Url"])),
                 time=h.get("TotalTime") or None,
                 persons=h.get("NumberOfPersons") or None,
             )
             for h in hits[:limit]
-            if h.get("Id")
+            if h.get("Id") and h.get("Url")
         ]
 
     def _product(self, hit: dict) -> Product:
