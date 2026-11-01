@@ -79,3 +79,9 @@ def test_broken_keychain_entry_gives_a_clear_error(memory_keychain, secret):
     memory_keychain.secrets[(registry.KEYCHAIN_SERVICE, "fake")] = secret
     with pytest.raises(registry.StoreError, match="Ugyldigt login i nøgleringen"):
         registry.keychain_get("fake")
+
+
+def test_load_login_surfaces_a_broken_keychain_entry(memory_keychain):
+    memory_keychain.secrets[(registry.KEYCHAIN_SERVICE, "fake")] = "not json"
+    with pytest.raises(registry.StoreError, match="handle-mcp login fake"):
+        registry.load_login("fake")
