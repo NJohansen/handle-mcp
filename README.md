@@ -64,7 +64,7 @@ Then ask: *"Compare this week's list in nemlig and Bilka, and fill the cheapest 
 - **Logins** live in env vars or `~/.config/handle-mcp/` (chmod 600). Never in code, config in git or test fixtures.
 - **stdout is JSON-RPC.** Logs go to stderr.
 - Use one client at a time per store. Close the store's app or website before an agent changes the cart.
-- Be kind to the stores: the server calls them one request at a time per store and retries only on timeouts, network errors, 429 and 5xx.
+- Be kind to the stores: the server makes few calls, mostly one at a time per store, and retries only on timeouts, network errors, 429 and 5xx.
 
 ## Add a store
 
