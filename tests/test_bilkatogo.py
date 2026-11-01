@@ -259,3 +259,19 @@ async def test_old_chosen_slot_is_ignored(store, fake):
     }
     info = await store.delivery_info()
     assert info.chosen_start is None and info.chosen_end is None
+
+
+async def test_set_quantities_stops_on_store_failure(store, fake):
+    await store.get_cart()
+    fake.scripted["/api/shop/v6/ChangeLineCount"] = [503, 503, 503]
+    with pytest.raises(StoreError, match="503"):
+        await store.set_quantities({"18381": 2, "19753": 1})
+    assert fake.paths().count("/api/shop/v6/ChangeLineCount") == 3  # second item not sent
+
+
+def test_money_in_ore_is_robust():
+    assert bilka_module._kr(12345) == Decimal("123.45")
+    assert bilka_module._kr("1250") == Decimal("12.50")
+    assert bilka_module._kr(None) == Decimal("0.00")
+    with pytest.raises(StoreError, match="ukendt beløb"):
+        bilka_module._kr("abc")

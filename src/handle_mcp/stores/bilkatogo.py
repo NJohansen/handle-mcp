@@ -13,7 +13,7 @@ import json
 import logging
 import re
 from datetime import date, datetime, time, timedelta
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any
 from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
@@ -60,7 +60,10 @@ NOT_HOME = "Kurven er sat til afhentning, ikke hjemlevering. Vælg hjemlevering 
 
 
 def _kr(ore: Any) -> Decimal:
-    return Decimal(int(ore or 0)).scaleb(-2)
+    try:
+        return Decimal(str(ore or 0)).scaleb(-2)
+    except (InvalidOperation, ValueError) as exc:
+        raise StoreError(f"BilkaToGo sendte et ukendt beløb: {ore!r}.") from exc
 
 
 def _is_home(address: dict) -> bool:
@@ -171,8 +174,11 @@ class BilkaStore:
 
     async def _shop(self, method: str, path: str, params: dict[str, Any] | None = None) -> dict:
         for fresh in (False, True):
+            used = self._jwt
             async with self._lock:
-                if fresh or not self._jwt or datetime.now(TZ) >= self._jwt_until:
+                # Skip a fresh login if another call already logged in while we waited.
+                stale = fresh and self._jwt == used
+                if stale or not self._jwt or datetime.now(TZ) >= self._jwt_until:
                     await self._login()
             resp = await self._send(
                 method,
@@ -287,7 +293,7 @@ class BilkaStore:
                     "shop/v6/ChangeLineCount",
                     {"productId": pid, "count": qty, "fullCart": 0},
                 )
-            except StoreError as exc:  # _Refused carries Bilka's own message
+            except _Refused as exc:  # Bilka's own message; other errors stop the loop
                 results.append(QuantityResult(pid, qty, None, False, str(exc)))
                 continue
             applied = answer.get("productAmount")
