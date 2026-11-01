@@ -394,3 +394,13 @@ def test_multi_buy_text_is_priced_by_compare(store):
     hit = {"Id": 6, "Name": "Hakkede tomater", "Price": 13.95, "Description": "400 g"}
     p = store._product({**hit, "Campaign": campaign, "Availability": {}})
     assert best_match("4 x hakkede tomater 400 g", [p]).line_total == Decimal(50)
+
+
+def test_offer_end_uses_danish_time(store):
+    summer = {
+        "Type": "ProductCampaignDiscount",
+        "CampaignPrice": 10,
+        "IntervalEnd": "2026-07-01T21:59:59Z",
+    }
+    p = store._product({"Id": 7, "Name": "Is", "Price": 20, "Campaign": summer})
+    assert p.offer_until == date(2026, 7, 1)  # 23:59:59 in DK summer time

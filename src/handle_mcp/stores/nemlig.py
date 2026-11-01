@@ -12,10 +12,11 @@ import logging
 import os
 import time
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 from urllib.parse import urljoin
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -83,10 +84,13 @@ def _discount_price(campaign: dict | None) -> Decimal | None:
     return _money(campaign.get("CampaignPrice")) or None
 
 
+DK = ZoneInfo("Europe/Copenhagen")
+
+
 def _until(campaign: dict | None) -> date | None:
     """Last Danish day of the campaign. IntervalEnd is UTC, e.g. 22:59:59Z = 23:59:59 in DK."""
     end = _time((campaign or {}).get("IntervalEnd"))
-    return (end + timedelta(hours=1)).date() if end else None
+    return end.astimezone(DK).date() if end and end.tzinfo else (end.date() if end else None)
 
 
 def _kr(value: Decimal) -> str:
