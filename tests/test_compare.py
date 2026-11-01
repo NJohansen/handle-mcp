@@ -452,3 +452,10 @@ def test_split_compound_is_the_same_word():
     fresh.category = "Frugt & grønt > Grøntsager > Tomater > Cherrytomater"
     line = best_match("cherrytomater 250 g", [canned, fresh])
     assert line.product.id == "f" and line.sure
+
+
+def test_same_cost_more_food_wins():
+    small = p("x", "s", "Snackpeber mini", "22.00", "250 g")
+    big = p("x", "b", "Snackpeber", "22.00", "500 g")
+    assert best_match("snackpeber", [small, big]).product.id == "b"
+    assert best_match("snackpeber", [big, small]).product.id == "b"

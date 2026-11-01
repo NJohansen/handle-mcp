@@ -238,7 +238,9 @@ def best_match(item: str, products: list[Any], on: date | None = None) -> Basket
             # Canned or frozen produce loses before the category counts: a canned product can sit
             # in a category that fits ("... > Cherrytomater") while the fresh one does not.
             fit = (_processed_rank(words, product), _category_rank(words, product))
-            ranked.append((-score, fit, size_rank, cost, count, product))
+            have = _pack_size(product)
+            amount = have[1] * count if have else Decimal(0)
+            ranked.append((-score, fit, size_rank, cost, -amount, count, product))
     if not ranked:
         # The store's own top hit, e.g. "Penne" for "pasta". Never sure, but better than nothing.
         # Never a flavour-only hit ("Grøn te m. mandarin" for "mandariner").
@@ -249,9 +251,8 @@ def best_match(item: str, products: list[Any], on: date | None = None) -> Basket
             return BasketLine(item, quantity, None, Decimal(0), False, "Ikke fundet")
         note = "Butikkens bedste søgeresultat. Navnet matcher ikke. Tjek varen."
         return BasketLine(item, quantity, top, _cost(top, quantity, on), False, note, guess=True)
-    neg_score, _cat, size_rank, cost, count, product = min(
-        ranked, key=lambda r: r[:5]
-    )  # same cost: fewer packs
+    # Same cost: more food wins, then fewer packs. Never the store's search order.
+    neg_score, _cat, size_rank, cost, _amount, count, product = min(ranked, key=lambda r: r[:6])
     too_much = size_rank == 0 and size is not None and _too_much(size, quantity, count, product)
     sure = neg_score == -1.0 and size_rank == 0 and not too_much
     note = None
