@@ -28,12 +28,19 @@ class FakeNemlig:
         self.basket = fixture("basket")
         self.scripted: dict[str, list[int]] = {}  # path → status codes to answer first
         self.token_count = 0
+        self.queue = False
 
     def handle(self, request: httpx.Request) -> httpx.Response:
         self.requests.append(request)
         path = request.url.path
         if self.scripted.get(path):
             return httpx.Response(self.scripted[path].pop(0))
+        if request.url.host == "nemlig.queue-it.net":
+            return httpx.Response(200, text="<html>Du er i kø</html>")
+        if path == "/" and self.queue:
+            return httpx.Response(
+                302, headers={"Location": "https://nemlig.queue-it.net/?c=nemlig"}
+            )
         if path == "/webapi/AntiForgery":
             return httpx.Response(200, json={"Header": "X-XSRF-TOKEN", "Value": "xsrf-1"})
         if path == "/webapi/Token":
@@ -92,7 +99,9 @@ async def _no_sleep(_seconds):
 
 @pytest.fixture
 def store(fake):
-    return NemligStore(httpx.AsyncClient(transport=httpx.MockTransport(fake.handle)))
+    return NemligStore(
+        httpx.AsyncClient(transport=httpx.MockTransport(fake.handle), follow_redirects=True)
+    )
 
 
 async def test_login_flow_then_authorized_calls(store, fake):
@@ -264,3 +273,9 @@ async def test_tools_hide_personal_data_from_nemlig(store, monkeypatch):
     ):
         assert secret not in text
     assert "Black Coffee Blend Supreme" in text
+
+
+async def test_queue_it_waiting_room_is_a_clear_error(store, fake):
+    fake.queue = True
+    with pytest.raises(StoreError, match="kø"):
+        await store.search("mælk")

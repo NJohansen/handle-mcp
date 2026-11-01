@@ -30,6 +30,7 @@ from handle_mcp.models import (
 from handle_mcp.stores import StoreError, load_login
 
 log = logging.getLogger(__name__)
+logging.getLogger("httpx").setLevel(logging.WARNING)  # its INFO logs full URLs with tokens
 
 BASE = "https://www.nemlig.com"
 SEARCH = "https://webapi.prod.knl.nemlig.it/searchgateway/api/search"
@@ -107,6 +108,8 @@ class NemligStore:
             except httpx.HTTPError as exc:
                 raise StoreError(f"Kan ikke nå nemlig.com ({type(exc).__name__}).") from exc
             else:
+                if resp.url.host.endswith("queue-it.net"):
+                    raise StoreError("nemlig.com har kø lige nu (queue-it). Prøv igen om lidt.")
                 if resp.status_code == 429 or resp.status_code >= 500:
                     if attempt == RETRIES:
                         raise StoreError(f"nemlig.com svarer {resp.status_code}. Prøv igen senere.")
