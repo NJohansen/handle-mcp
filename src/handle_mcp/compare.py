@@ -18,6 +18,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
+from itertools import pairwise
 from typing import Any
 
 from handle_mcp.models import Product
@@ -113,7 +114,10 @@ def _score(words: list[str], product: Any) -> float:
     name = (_get(product, "name") or "").replace("C", "K").replace("c", "k")
     brand = (_get(product, "brand") or "").replace("C", "K").replace("c", "k")
     head = f"{FLAVOUR_RE.split(name)[0]} {brand}".lower()
-    tokens, tail = set(_words(head)), name.lower()
+    head_words = _words(head)
+    # A compound split in two: "Cherry tomater" is "cherrytomater".
+    tokens = set(head_words) | {a + b for a, b in pairwise(head_words)}
+    tail = name.lower()
     tail_tokens = set(_words(tail))
     hits = []
     for w in words:

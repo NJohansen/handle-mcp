@@ -442,3 +442,13 @@ def test_canned_loses_even_when_fresh_has_no_fitting_category():
     fresh = p("x", "f", "Cherrytomater", "12.00", "400 g")
     fresh.category = "Frugt & grønt > Grønt"
     assert best_match("cherrytomater 250 g", [canned, fresh]).product.id == "f"
+
+
+def test_split_compound_is_the_same_word():
+    """Seen live at Bilka: every 'Cherrytomater' is canned; the fresh one is 'Cherry tomater øko'."""
+    canned = p("x", "c", "Cherrytomater", "12.00", "400 g")
+    canned.category = "Kolonial > Konserves > Flåede tomater"
+    fresh = p("x", "f", "Cherry tomater øko", "17.00", "250 g")
+    fresh.category = "Frugt & grønt > Grøntsager > Tomater > Cherrytomater"
+    line = best_match("cherrytomater 250 g", [canned, fresh])
+    assert line.product.id == "f" and line.sure
