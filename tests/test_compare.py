@@ -205,3 +205,24 @@ async def test_compare_only_reads(two_stores):
 
 def test_verdict_with_no_store():
     assert compare.verdict({"x": {"error": "nede"}})["cheapest"] is None
+
+
+def test_verdict_without_common_items_names_no_winner():
+    a = compare.BasketQuote(
+        "a", [], ["x"], Decimal(0), {"levering": Decimal(19)}, Decimal(19), None, None
+    )
+    b = compare.BasketQuote(
+        "b", [], ["x"], Decimal(0), {"levering": Decimal(39)}, Decimal(39), None, None
+    )
+    assert compare.verdict({"a": a, "b": b})["cheapest"] is None
+
+
+async def test_failing_delivery_info_keeps_the_prices(monkeypatch):
+    class NoDelivery(Nemlig):
+        async def delivery_info(self):
+            raise NotImplementedError
+
+    monkeypatch.setattr(registry, "STORES", {"nemlig": NoDelivery})
+    result = await server.compare_basket(["rugbrød"])
+    assert result["stores"]["nemlig"]["lines"][0]["product"]["id"] == "n3"
+    assert result["cheapest"] == "nemlig"

@@ -15,6 +15,7 @@ from decimal import Decimal
 from typing import Any
 
 from handle_mcp.models import Product
+from handle_mcp.stores import StoreError
 
 SEARCH_LIMIT = 10
 SIZE_TOLERANCE = Decimal("0.15")  # 15 % off the wanted size still counts as the same size
@@ -128,7 +129,10 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
     found = [ln for ln in lines if ln.product is not None]
     products_total = sum((ln.line_total for ln in found), Decimal(0))
     fees = {k: v for k, v in {"levering": terms.delivery_fee, **terms.other_fees}.items() if v}
-    note = _get(await store.delivery_info(), "note")  # e.g. a fee that depends on the slot
+    try:  # read-only; e.g. a fee that depends on the slot. Prices still count without it.
+        note = _get(await store.delivery_info(), "note")
+    except (NotImplementedError, StoreError):
+        note = None
     notes = [note] if note else []
     if not terms.home_delivery and not note:
         notes.append("Kurven er ikke sat til hjemlevering.")
@@ -152,6 +156,8 @@ def verdict(quotes: dict[str, Any]) -> dict[str, Any]:
     if not ok:
         return {"cheapest": None, "summary": "Ingen butik kunne prise listen."}
     common = set.intersection(*({ln.item for ln in q.lines} for q in ok.values()))
+    if not common:
+        return {"cheapest": None, "summary": "Ingen vare blev fundet i alle butikker. Tjek listen."}
     totals = {
         n: sum((ln.line_total for ln in q.lines if ln.item in common), Decimal(0))
         + sum(q.fees.values(), Decimal(0))
