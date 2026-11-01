@@ -182,7 +182,7 @@ async def test_search_parses_products(store, fake):
     )
     assert not can.on_offer and can.available and can.ean is None
     assert can.category == "Drikke"
-    assert bottle.unit == "l" and bottle.on_offer and bottle.offer_text == "3 for 68.0 kr"
+    assert bottle.unit == "l" and bottle.on_offer and bottle.offer_text == "3 for 68 kr"
     assert not bottle.available
     search = next(r for r in fake.requests if r.url.path == "/searchgateway/api/search")
     assert search.url.params["timeslotUtc"] == "2026110316-60-180"
@@ -329,3 +329,44 @@ async def test_recipe_links_absolute_or_empty(store, monkeypatch):
     monkeypatch.setattr(store, "_search_settings", settings)
     (only,) = await store.recipes("x")
     assert only.url == "https://www.nemlig.com/opskrifter/a-1"
+
+
+# Shapes seen live 2026-11-01 (docs/research.md). Only the fields we read.
+def test_discount_campaign_pays_the_campaign_price(store):
+    hit = {
+        "Id": 1,
+        "Name": "Laksefilet m. skind",
+        "Price": 120.75,
+        "UnitPriceCalc": 201.25,
+        "Campaign": {
+            "Type": "ProductCampaignDiscountPercent",
+            "DiscountPercent": 30,
+            "CampaignPrice": 84.53,
+            "CampaignUnitPrice": 140.88,
+        },
+    }
+    p = store._product(hit)
+    assert (p.price, p.unit_price, p.before_price) == (
+        Decimal("84.53"),
+        Decimal("140.88"),
+        Decimal("120.75"),
+    )
+    assert p.on_offer and p.offer_text == "-30 %"
+
+
+def test_discount_label_alone_is_not_an_offer(store):
+    hit = {"Id": 2, "Name": "Letmælk 1,5%", "Price": 10.95, "Campaign": None, "DiscountItem": True}
+    p = store._product(hit)
+    assert (p.price, p.on_offer, p.offer_text, p.before_price) == (
+        Decimal("10.95"),
+        False,
+        None,
+        None,
+    )
+
+
+def test_multi_buy_keeps_the_single_price(store):
+    campaign = {"Type": "ProductCampaignMixOffer", "MinQuantity": 4, "TotalPrice": 50.0}
+    campaign["CampaignPrice"] = 50.0
+    p = store._product({"Id": 3, "Name": "Hakkede tomater", "Price": 13.95, "Campaign": campaign})
+    assert (p.price, p.offer_text, p.before_price) == (Decimal("13.95"), "4 for 50 kr", None)

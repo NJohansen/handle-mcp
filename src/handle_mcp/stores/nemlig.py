@@ -63,12 +63,28 @@ def _unit(label: str | None) -> str | None:
 
 
 def _offer(campaign: dict | None) -> str | None:
+    """Text for a real campaign. 'DiscountItem' alone is nemlig's everyday 'Discount' label,
+    not an offer, so it gives no text (docs/research.md)."""
     if not campaign:
         return None
-    qty, price = campaign.get("MinQuantity"), campaign.get("TotalPrice")
-    if qty and qty > 1 and price:
-        return f"{qty} for {price} kr"
-    return campaign.get("Type")
+    qty, total = campaign.get("MinQuantity"), _money(campaign.get("TotalPrice"))
+    if qty and qty > 1 and total:
+        return f"{qty} for {_kr(total)} kr"
+    if (pct := campaign.get("DiscountPercent")) and _discount_price(campaign):
+        return f"-{pct} %"
+    return "Tilbud" if _discount_price(campaign) else None
+
+
+def _discount_price(campaign: dict | None) -> Decimal | None:
+    """Discount campaigns: the hit's Price is the price BEFORE the offer, CampaignPrice is what
+    you pay. Multi-buy campaigns (MinQuantity > 1) keep the single price."""
+    if not campaign or (campaign.get("MinQuantity") or 0) > 1:
+        return None
+    return _money(campaign.get("CampaignPrice")) or None
+
+
+def _kr(value: Decimal) -> str:
+    return f"{value:.2f}".replace(".", ",").removesuffix(",00")
 
 
 class NemligStore:
@@ -227,18 +243,24 @@ class NemligStore:
 
     def _product(self, hit: dict) -> Product:
         avail = hit.get("Availability") or {}
+        campaign = hit.get("Campaign") or None
+        price = _money(hit.get("Price")) or Decimal(0)
+        now = _discount_price(campaign)
+        offer = _offer(campaign)
         return Product(
             store=self.name,
             id=str(hit["Id"]),
             name=hit.get("Name", ""),
-            price=_money(hit.get("Price")) or Decimal(0),
+            price=now or price,
             brand=hit.get("Brand") or None,
             size=hit.get("Description") or None,
-            unit_price=_money(hit.get("UnitPriceCalc")),
+            unit_price=(now and _money(campaign.get("CampaignUnitPrice")))
+            or _money(hit.get("UnitPriceCalc")),
             unit=_unit(hit.get("UnitPriceLabel")),
             ean=None,  # not in nemlig's search answers (docs/research.md)
-            on_offer=bool(hit.get("Campaign") or hit.get("DiscountItem")),
-            offer_text=_offer(hit.get("Campaign")),
+            on_offer=bool(offer),
+            offer_text=offer,
+            before_price=price if now and price > now else None,
             available=avail.get("IsDeliveryAvailable", True)
             and avail.get("IsAvailableInStock", True),
             category=hit.get("Category") or None,

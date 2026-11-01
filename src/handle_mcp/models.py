@@ -20,6 +20,7 @@ class Product:
     ean: str | None = None
     on_offer: bool = False
     offer_text: str | None = None
+    before_price: Decimal | None = None  # the price without the offer, when the store says it
     available: bool = True
     category: str | None = None  # the store's category path, e.g. "Frugt & grønt > Bananer"
 
