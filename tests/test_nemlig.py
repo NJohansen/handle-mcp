@@ -1,6 +1,7 @@
 """nemlig.com adapter against a fake backend (httpx.MockTransport). No network."""
 
 import json
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
@@ -343,6 +344,7 @@ def test_discount_campaign_pays_the_campaign_price(store):
             "DiscountPercent": 30,
             "CampaignPrice": 84.53,
             "CampaignUnitPrice": 140.88,
+            "IntervalEnd": "2026-11-04T22:59:59Z",
         },
     }
     p = store._product(hit)
@@ -352,6 +354,7 @@ def test_discount_campaign_pays_the_campaign_price(store):
         Decimal("120.75"),
     )
     assert p.on_offer and p.offer_text == "-30 %"
+    assert p.offer_until == date(2026, 11, 4)  # 22:59:59 UTC is the last minute of the day in DK
 
 
 def test_discount_label_alone_is_not_an_offer(store):

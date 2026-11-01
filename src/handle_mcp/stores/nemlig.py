@@ -12,7 +12,7 @@ import logging
 import os
 import time
 import uuid
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 from urllib.parse import urljoin
@@ -81,6 +81,12 @@ def _discount_price(campaign: dict | None) -> Decimal | None:
     if not campaign or (campaign.get("MinQuantity") or 0) > 1:
         return None
     return _money(campaign.get("CampaignPrice")) or None
+
+
+def _until(campaign: dict | None) -> date | None:
+    """Last Danish day of the campaign. IntervalEnd is UTC, e.g. 22:59:59Z = 23:59:59 in DK."""
+    end = _time((campaign or {}).get("IntervalEnd"))
+    return (end + timedelta(hours=1)).date() if end else None
 
 
 def _kr(value: Decimal) -> str:
@@ -261,6 +267,7 @@ class NemligStore:
             on_offer=bool(offer),
             offer_text=offer,
             before_price=price if now and price > now else None,
+            offer_until=_until(campaign),
             available=avail.get("IsDeliveryAvailable", True)
             and avail.get("IsAvailableInStock", True),
             category=hit.get("Category") or None,

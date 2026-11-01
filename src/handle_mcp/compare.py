@@ -16,6 +16,7 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -35,6 +36,11 @@ SIZE_RE = re.compile(
     r"(?:(\d+)\s*[x×]\s*)?(\d+(?:[.,]\d+)?)\s*(" + "|".join(UNITS) + r")\b", re.IGNORECASE
 )
 FLAVOUR_RE = re.compile(r"\s(?:m\.|med|i|u\.|uden|smag)\s", re.IGNORECASE)
+MULTI_RE = re.compile(r"(\d+)\s*for\s*(\d+(?:[.,]\d+)?)", re.IGNORECASE)  # "4 for 50 kr"
+# Words that only say how a thing is made or packed: "frilandsæg" is æg, "splitlinser" is linser.
+DESCRIBERS = ("frilands", "skrabe", "øko", "split", "mini", "snack", "baby")
+# Frozen or canned. Never the default for fresh food: "blåbær" is fresh, "frosne blåbær" is not.
+PROCESSED = {"frost", "frosne", "frossen", "frosset", "dybfrost", "dåse", "konserves", "konserve"}
 QTY_RE = re.compile(r"^\s*(\d+)\s*[x×]\s+(?=\D)", re.IGNORECASE)
 
 
@@ -106,7 +112,7 @@ def _score(words: list[str], product: Any) -> float:
     tail_tokens = set(_words(tail))
     hits = []
     for w in words:
-        if w in tokens or any(_plural(w, t) for t in tokens):
+        if w in tokens or any(_plural(w, t) or _described(w, t) for t in tokens):
             hits.append(1.0)
         elif any(_compound(w, t) for t in tokens):
             hits.append(0.75)  # 'frilandsæg' for 'æg': better than a word inside, below whole
@@ -121,6 +127,37 @@ def _plural(word: str, token: str) -> bool:
     """Danish singular and plural are the same product: 'pære' ~ 'pærer', 'banan' ~ 'bananer'."""
     short, long_ = sorted((word, token), key=len)
     return len(short) >= 4 and long_ in (short + "r", short + "er", short + "e")
+
+
+def _described(word: str, token: str) -> bool:
+    """'frilandsæg' is plain æg: the first part only says how it is made."""
+    return any(token == d + word for d in DESCRIBERS)
+
+
+def _processed_rank(words: list[str], product: Any) -> int:
+    """1 for frozen or canned food when the item does not ask for it, else 0."""
+    found = set(_words(f"{_get(product, 'name')} {_get(product, 'category') or ''}")) & PROCESSED
+    return 1 if found and not (set(words) & PROCESSED) else 0
+
+
+def _price(product: Any, on: date | None) -> Decimal:
+    """The price on the delivery day: the offer is gone after its last day."""
+    until, before = _get(product, "offer_until"), _get(product, "before_price")
+    if on and until and before and on > until:
+        return Decimal(before)
+    return Decimal(_get(product, "price"))
+
+
+def _cost(product: Any, count: int, on: date | None) -> Decimal:
+    """Price for `count` packs, with a multi-buy offer like '4 for 50 kr' when it is still on."""
+    price = _price(product, on)
+    match = MULTI_RE.search(_get(product, "offer_text") or "")
+    until = _get(product, "offer_until")
+    if match and not (on and until and on > until):
+        size, total = int(match.group(1)), Decimal(match.group(2).replace(",", "."))
+        if size > 1 and total < price * size:
+            return (count // size) * total + (count % size) * price
+    return price * count
 
 
 def _compound(word: str, token: str) -> bool:
@@ -171,8 +208,9 @@ def _too_much(wanted: tuple[str, Decimal], quantity: int, count: int, product: A
     return bool(have) and have[1] * count > wanted[1] * quantity * (1 + SIZE_TOLERANCE)
 
 
-def best_match(item: str, products: list[Any]) -> BasketLine:
-    """Best word match first, then a comparable size, then the lowest cost for the amount."""
+def best_match(item: str, products: list[Any], on: date | None = None) -> BasketLine:
+    """Best word match first, then a comparable size, then the lowest cost for the amount.
+    `on` is the delivery day: offers that end before it do not count."""
     quantity, words, size = parse_item(item)
     ranked = []
     for product in products:
@@ -181,8 +219,9 @@ def best_match(item: str, products: list[Any]) -> BasketLine:
             packs = _packs(size, quantity, product)
             size_rank = 0 if packs or not size else 1
             count = packs or quantity
-            cost = Decimal(_get(product, "price")) * count
-            ranked.append((-score, _category_rank(words, product), size_rank, cost, count, product))
+            cost = _cost(product, count, on)
+            fit = _category_rank(words, product) + _processed_rank(words, product)
+            ranked.append((-score, fit, size_rank, cost, count, product))
     if not ranked:
         # The store's own top hit, e.g. "Penne" for "pasta". Never sure, but better than nothing.
         # Never a flavour-only hit ("Grøn te m. mandarin" for "mandariner").
@@ -191,9 +230,8 @@ def best_match(item: str, products: list[Any]) -> BasketLine:
         )
         if top is None:
             return BasketLine(item, quantity, None, Decimal(0), False, "Ikke fundet")
-        price = Decimal(_get(top, "price"))
         note = "Butikkens bedste søgeresultat. Navnet matcher ikke. Tjek varen."
-        return BasketLine(item, quantity, top, price * quantity, False, note, guess=True)
+        return BasketLine(item, quantity, top, _cost(top, quantity, on), False, note, guess=True)
     neg_score, _cat, size_rank, cost, count, product = min(
         ranked, key=lambda r: r[:5]
     )  # same cost: fewer packs
@@ -210,20 +248,24 @@ def best_match(item: str, products: list[Any]) -> BasketLine:
         note = "Usikkert match. Tjek varen."
     elif size and count != quantity:
         note = f"{count} x {_get(product, 'size') or 'pakke'} for at nå mængden."
+    until = _get(product, "offer_until")
+    if on and until and on > until and _get(product, "before_price"):
+        note = " ".join(filter(None, [note, f"Tilbuddet slutter {until:%d/%m}, før levering."]))
     return BasketLine(item, count, product, cost, sure, note)
 
 
 async def quote(store: Any, items: list[str]) -> BasketQuote:
     """Search each item in one store (one call at a time) and add fees and minimum order."""
-    lines = [best_match(item, await store.search(_query(item), SEARCH_LIMIT)) for item in items]
+    try:  # read-only; e.g. a fee that depends on the slot. Prices still count without it.
+        info = await store.delivery_info()
+        note, on = _get(info, "note"), _day(info)
+    except (NotImplementedError, StoreError):
+        note, on = None, None
+    lines = [best_match(item, await store.search(_query(item), SEARCH_LIMIT), on) for item in items]
     terms = await store.terms()
     found = [ln for ln in lines if ln.product is not None]
     products_total = sum((ln.line_total for ln in found), Decimal(0))
     fees = {k: v for k, v in {"levering": terms.delivery_fee, **terms.other_fees}.items() if v}
-    try:  # read-only; e.g. a fee that depends on the slot. Prices still count without it.
-        note = _get(await store.delivery_info(), "note")
-    except (NotImplementedError, StoreError):
-        note = None
     notes = [note] if note else []
     if not terms.home_delivery and not note:
         notes.append("Kurven er ikke sat til hjemlevering.")
@@ -239,6 +281,15 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
         minimum_met=None if minimum is None else products_total >= minimum,
         notes=notes,
     )
+
+
+def _day(info: Any) -> date | None:
+    """The delivery day: the chosen slot, else the next free one."""
+    start = _get(info, "chosen_start") if info is not None else None
+    if isinstance(start, datetime):
+        return start.date()
+    nxt = _get(info, "next_available") if info is not None else None
+    return nxt if isinstance(nxt, date) else None
 
 
 def verdict(quotes: dict[str, Any]) -> dict[str, Any]:

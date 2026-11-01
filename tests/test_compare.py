@@ -1,5 +1,6 @@
 """compare_basket with a real week list against two fake stores. No network."""
 
+from datetime import date
 from decimal import Decimal
 from typing import ClassVar
 
@@ -363,7 +364,7 @@ def test_cheapest_wins_on_the_same_name():
 
 
 def test_compound_word_counts_but_whole_word_wins():
-    assert _score(["æg"], p("x", "f", "Frilandsæg", "25.00")) == 0.75
+    assert _score(["mælk"], p("x", "k", "Kakaomælk", "8.00")) == 0.75
     whole = p("x", "m", "Mælk", "12.00", "1 l")
     cocoa = p("x", "k", "Kakaomælk", "8.00", "1 l")
     assert best_match("mælk 1 l", [cocoa, whole]).product.id == "m"
@@ -378,3 +379,38 @@ def test_whole_word_beats_cheaper_compound_word():
     whole = p("x", "w", "Ris", "20.00", "1 kg")
     compound = p("x", "c", "Kokosris", "10.00", "1 kg")
     assert best_match("ris 1 kg", [compound, whole]).product.id == "w"
+
+
+def test_how_it_is_made_is_the_same_product():
+    eco = p("x", "eco", "Økologiske æg S", "13.95", "4 stk")
+    offer = p("x", "offer", "Frilandsæg", "25.00", "10 stk")
+    line = best_match("æg 10 stk", [eco, offer])  # 3 small packs would cost 41.85
+    assert (line.product.id, line.line_total, line.sure) == ("offer", Decimal("25.00"), True)
+
+
+def test_multi_buy_counts_in_the_line_total():
+    legs = p("x", "l", "Kyllingelår", "113.50", "600 g")
+    legs.offer_text = "2 for 175 kr"
+    line = best_match("kyllingelår 1,2 kg", [legs])
+    assert (line.quantity, line.line_total) == (2, Decimal(175))
+
+
+def test_offer_that_ends_before_delivery_does_not_count():
+    salmon = p("x", "s", "Laksefilet", "84.53", "600 g")
+    salmon.before_price, salmon.offer_until = Decimal("120.75"), date(2026, 11, 4)
+    line = best_match("laksefilet 600 g", [salmon], on=date(2026, 11, 9))
+    assert line.line_total == Decimal("120.75") and "slutter 04/11" in line.note
+    assert best_match("laksefilet 600 g", [salmon], on=date(2026, 11, 3)).line_total == Decimal(
+        "84.53"
+    )
+
+
+def test_fresh_beats_cheaper_frozen_or_canned():
+    frozen = p("x", "f", "Blåbær frost", "20.00", "300 g")
+    fresh = p("x", "b", "Blåbær", "25.00", "125 g")
+    assert best_match("blåbær", [frozen, fresh]).product.id == "b"
+    canned = p("x", "c", "Cherrytomater i tomatjuice", "8.00", "400 g")
+    canned.category = "Kolonial > Konserves"
+    tomato = p("x", "t", "Cherrytomater", "15.00", "250 g")
+    assert best_match("cherrytomater", [canned, tomato]).product.id == "t"
+    assert best_match("frosne blåbær", [frozen, fresh]).product.id == "f"
