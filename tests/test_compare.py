@@ -897,3 +897,11 @@ def test_pickled_cucumbers_lose_to_fresh():
         _cat(p("x", "s", "Agurkesalat", "16.95", "710 g / 405 g"), "Kolonial"),
     ]
     assert best_match("agurk", products).product.id == "o"
+
+
+def test_half_a_name_on_a_fresh_vegetable_is_not_produce():
+    """Seen live 2 Nov: 'Spaghettisquash' (Grønt) made dry spaghetti in 'Kolonial' lose to fresh."""
+    dry = _cat(p("x", "d", "Spaghetti øko.", "7.95", "500 g / Casaneo"), "Kolonial")
+    fresh = _cat(p("x", "f", "Spaghetti (frisk)", "20.95", "250 g / Rana"), "Køl")
+    squash = _cat(p("x", "s", "Spaghettisquash øko.", "25.0", "1 stk."), "Grønt")
+    assert best_match("spaghetti 500 g", [dry, fresh, squash]).product.id == "d"
