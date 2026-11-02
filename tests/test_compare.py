@@ -905,3 +905,20 @@ def test_half_a_name_on_a_fresh_vegetable_is_not_produce():
     fresh = _cat(p("x", "f", "Spaghetti (frisk)", "20.95", "250 g / Rana"), "Køl")
     squash = _cat(p("x", "s", "Spaghettisquash øko.", "25.0", "1 stk."), "Grønt")
     assert best_match("spaghetti 500 g", [dry, fresh, squash]).product.id == "d"
+
+
+def test_kolonial_dry_goods_win_when_nothing_fresh():
+    """nemlig 'Kolonial' is the dry aisle. It loses only when the search found the item fresh."""
+    dry = _cat(p("x", "d", "Røde linser", "14.00", "500 g"), "Kolonial")
+    tin = _cat(p("x", "t", "Røde linser i dåse", "12.00", "400 g"), "Kolonial")
+    assert best_match("røde linser 500 g", [dry, tin]).product.id == "d"
+    pasta = _cat(p("x", "s", "Spaghetti", "7.95", "500 g"), "Kolonial")
+    squash = _cat(p("x", "q", "Spaghettisquash", "15.00", "1 stk"), "Grønt")
+    assert best_match("spaghetti 500 g", [pasta, squash]).product.id == "s"
+
+
+def test_dried_herb_loses_to_fresh():
+    """With a fresh full-name hit the item is produce: a dried 'Kolonial' jar loses."""
+    dried = _cat(p("x", "d", "Basilikum tørret", "12.00", "10 g"), "Kolonial")
+    fresh = _cat(p("x", "f", "Basilikum", "15.00", "1 stk"), "Grønt")
+    assert best_match("basilikum", [dried, fresh]).product.id == "f"
