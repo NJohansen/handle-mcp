@@ -22,6 +22,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from handle_mcp.match import (
+    PIECES,
     asked,
     brand_only,
     category_rank,
@@ -144,7 +145,7 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
             amount = have[1] * count if have else Decimal(0)
             # '6 x bananer' or '2 x broccoli': N things. Compare what they cost, also a 500 g
             # broccoli against '1 stk'. Not per piece or kg. '2 x mælk' still compares per litre.
-            by_piece = not size and quantity > 1 and bool(have) and (have[0] == "stk" or produce)
+            by_piece = not size and quantity > 1 and bool(have) and (have[0] in PIECES or produce)
             value = (
                 (line_cost,)
                 if size
@@ -174,7 +175,7 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
     elif size and count != quantity:
         note = f"{count} x {get(product, 'size') or 'pakke'} for at nå mængden."
     have = pack_size(product)
-    if not size and quantity > 1 and have and have[0] == "stk":
+    if not size and quantity > 1 and have and have[0] in PIECES:
         if have[1] * count > quantity:
             extra = f"{count} x {get(product, 'size') or 'pakke'} = {have[1] * count:g} stk."
             note = " ".join(filter(None, [note, extra]))

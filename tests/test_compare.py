@@ -323,6 +323,22 @@ def test_rolls_are_not_wet_wipes():
     assert pack_size(nemlig) == ("rl", 8)
 
 
+def test_rolls_count_as_pieces():
+    """'6 x køkkenrulle' with no size: 6 rolls, so a 4-pack is bought twice, like '6 x bananer'."""
+    four = p("x", "4", "Køkkenrulle 3-lags", "20.00", "4 rl.")
+    one = p("x", "1", "Køkkenrulle 2-lags", "8.00", "1 rl.")
+    line = best_match("6 x køkkenrulle", [four, one])
+    assert (line.product.id, line.quantity, line.line_total) == ("4", 2, Decimal(40))
+
+
+def test_only_cold_cuts_found_is_no_penalty():
+    """Nothing raw in the search: the cheapest cold cut for the amount still wins."""
+    pålæg = "Pålæg > Kyllingepålæg"
+    smoked = _cat(p("x", "r", "Røget kyllingebryst", "11.00", "100 g"), pålæg)
+    sliced = _cat(p("x", "s", "Kyllingebryst i skiver", "32.00", "350 g"), pålæg)
+    assert best_match("kyllingebryst 400 g", [smoked, sliced]).product.id == "r"
+
+
 def test_alternatives_show_the_category():
     """So a human sees that the cheaper 'Cherrytomater' is a tin."""
     tin = _cat(p("x", "t", "Cherrytomater", "12.00", "400 g"), "Kolonial > Konserves")

@@ -29,6 +29,8 @@ UNITS = {
     "ruller": ("rl", 1), "rulle": ("rl", 1), "rl": ("rl", 1),  # rolls, not 42 wet wipes
 }  # fmt: skip
 
+PIECES = ("stk", "rl")  # counted things: '2 x køkkenrulle' is 2 packs of rolls, like pieces
+
 SIZE_RE = re.compile(
     r"(?:(\d+)\s*[x×]\s*)?(\d+(?:[.,]\d+)?)\s*(" + "|".join(UNITS) + r")\b", re.IGNORECASE
 )
