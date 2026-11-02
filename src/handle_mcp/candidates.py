@@ -51,7 +51,8 @@ def brief(item: str, line: Any, suggested: bool = False) -> dict[str, Any]:
     name_score = score(words, p, asked(item))
     fits = None
     if size:
-        fits = bool(packs(size, quantity, p)) and not too_much(size, quantity, line.quantity, p)
+        n = packs(size, quantity, p)  # None: no size, or kg against stk. Unknown, not false.
+        fits = None if n is None else not too_much(size, quantity, line.quantity, p)
     elif quantity > 1 and (have := pack_size(p)) and have[0] in PIECES:
         fits = True  # '6 x bananer': pieces fit, a 1 kg bag cannot be compared
     facts = {

@@ -967,6 +967,13 @@ def test_candidate_flags_canned_blend_and_no_size():
     assert brief("hakket oksekød", best_match("hakket oksekød", [blend]))["blend"] is True
 
 
+def test_size_fits_is_unknown_when_sizes_cannot_be_compared():
+    loose = p("x", "l", "Kyllingebryst", "40.00", None)
+    two = p("x", "s", "Kyllingebryst", "40.00", "2 stk")
+    assert "size_fits" not in brief("kyllingebryst 500 g", best_match("kyllingebryst", [loose]))
+    assert "size_fits" not in brief("kyllingebryst 500 g", best_match("kyllingebryst", [two]))
+
+
 def test_six_pieces_fit_in_the_tool_answer():
     banana = p("x", "b", "Bananer", "3.00", "1 stk")
     out = server._out(best_match("6 x bananer", [banana]))
