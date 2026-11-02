@@ -22,7 +22,7 @@ Stores in v1: [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.b
 
 Weekly food shopping is a lot of small decisions: what to cook, what is on offer, which store is cheapest, and does it fit the budget. handle-mcp gives your agent the store data, so it can do the whole loop:
 
-1. **Plan.** The agent plans the week's meals from your budget, your taste and this week's offers (`list_offers`, `search_recipes`, `get_orders`).
+1. **Plan.** The agent plans the week's meals from your budget, your taste and this week's offers (`list_offers`, `search_recipes` (nemlig), `get_orders`).
 2. **Compare.** It turns the plan into a shopping list and prices it in every store, fees and minimum order included (`compare_basket`). It picks a product per item and asks you when it is unsure.
 3. **Fill.** It fills the cheapest store's cart (`set_cart_quantities`, the only write).
 4. **You pay.** You open the store's website, check the cart, choose a delivery time and pay.
