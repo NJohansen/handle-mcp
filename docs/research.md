@@ -8,7 +8,7 @@ Trin 1 af v1. Skrevet 2026-11-01.
 [nickknissen/bilkatogo](https://github.com/nickknissen/bilkatogo) (fixtures er rigtige, redigerede svar) og
 [stigvoss/bilkatogo-mcp](https://github.com/stigvoss/bilkatogo-mcp) (ingen licens: kun læst for fakta).
 
-**Ikke gjort:** live kald mod butikkerne. Punkter markeret **⚠ live** er ikke bekræftet med en rigtig konto. Se "Åbne spørgsmål" sidst.
+Skrevet før de første live kald. Punkter markeret **⚠ live** er stadig ikke bekræftet med en rigtig konto; de står samlet under "Åbne spørgsmål" sidst. Det, der er bekræftet siden, står under "Bekræftet live".
 
 ## Kort svar
 
@@ -119,7 +119,8 @@ Nyttige felter pr. hit: `objectID` (varenummer til kurven), `gtin` (**EAN findes
 ## Bekræftet live (2026-11-01, hjemlevering valgt)
 
 - **BilkaToGo `Cart`:** `stat.delivery_price` = 39 kr (levering) + 39 kr (pakkeservice), minimumskøb 500 kr. Hjemlevering ses på `deliveryAddress.dawa_uid` / `recipient_name`.
-- **nemlig:** leveringsgebyret afhænger af den valgte tid (19-51 kr). Tiderne kan ses på hjemmesiden uden login.
+- **nemlig:** leveringsgebyret afhænger af den valgte tid (19-51 kr). Aflæst i tidsvælgeren på hjemmesiden, ikke fra et API-felt. Tiderne kan ses uden login.
+- **Privacy:** hele `deliveryAddress`-blokken fjernes af `privacy.scrub()`, så `dawa_uid` og `recipient_name` når aldrig modellen.
 
 ## Åbne spørgsmål
 
@@ -128,5 +129,6 @@ Hvis du finder svaret i DevTools → Network (Fetch/XHR): kopier kun URL og svar
 1. **nemlig:** hvilket kald henter de ledige leveringstider? Er det et GET (kun læse)?
 2. **nemlig:** står EAN/GTIN på produktsiden (`/webapi/…/product`)? Søgesvaret har det ikke.
 3. **BilkaToGo:** hvilket kald henter de ledige tider for hjemlevering?
+4. **nemlig:** hvad svarer API'et på en forældet `Version`-header? (I dag: `HANDLE_NEMLIG_APP_VERSION` kan sættes som env var.)
 
 Indtil da viser v1 kun den valgte tid (begge) og næste ledige dag (Bilka), og matcher på navn + mængde i stedet for EAN hos nemlig.
