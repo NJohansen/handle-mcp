@@ -89,7 +89,9 @@ def packs(wanted: tuple[str, Decimal] | None, quantity: int, product: Any) -> in
     """How many packs give the wanted amount. '1,5 kg' with 500 g packs → 3.
     None when the sizes cannot be compared (no size, or kg against stk)."""
     have = pack_size(product)
-    if not wanted or not have or wanted[0] != have[0] or not have[1]:
+    # '8 stk' toilet paper takes rolls. '8 ruller' never takes '42 stk' wet wipes.
+    unit = "stk" if have and have[0] == "rl" and wanted and wanted[0] == "stk" else have and have[0]
+    if not wanted or not have or wanted[0] != unit or not have[1]:
         return None
     need = wanted[1] * quantity * (1 - SHORT_TOLERANCE)
     return max(1, math.ceil(need / have[1]))
