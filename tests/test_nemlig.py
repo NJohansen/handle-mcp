@@ -544,3 +544,9 @@ async def test_offers_find_free_gifts_by_search(store, fake):
     assert (gift.price, gift.campaign, gift.max_per_order) == (Decimal(0), "Gratis", 1)
     searches = [r for r in fake.requests if r.url.path == "/searchgateway/api/search"]
     assert [r.url.params["query"] for r in searches] == ["gratis"]
+
+
+async def test_offers_survive_a_failed_gift_search(store, fake):
+    fake.scripted["/searchgateway/api/search"] = [500] * 3
+    offers = await store.offers(10)
+    assert offers and "5606321" not in {p.id for p in offers}
