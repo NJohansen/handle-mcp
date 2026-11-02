@@ -161,7 +161,7 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
         ranked, key=lambda r: r[:7]
     )
     over = size_rank == 0 and size is not None and too_much(size, quantity, count, product)
-    is_mixed = fit[3] == 1
+    is_mixed = fit[-1] == 1  # mixed() is always last in fit
     sure = neg_score == -1.0 and size_rank == 0 and not over and not is_mixed
     note = None
     if over:
