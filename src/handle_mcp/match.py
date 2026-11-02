@@ -45,6 +45,7 @@ DESCRIBERS = ("frilands", "skrabe", "øko", "split", "mini", "snack")
 
 # A part inside a compound: "kyllingeoverlår" and "kyllingeunderlår" are kyllingelår.
 PARTS = ("over", "under")
+LIMBS = ("lår",)  # only before these: never "kartoverofler"
 
 # A cut of the thing named first: "makrelfilet" and "makrelstykker" are makrel.
 CUTS = ("filet", "fileter", "stykke", "stykker", "strimler", "tern")
@@ -154,7 +155,7 @@ def _described(word: str, token: str) -> bool:
     return (
         any(token == d + word for d in DESCRIBERS)
         or any(token in (b + c, b + "e" + c, b + "s" + c) for b in bases for c in CUTS)
-        or any(token == word[:i] + m + word[i:] for i in range(4, len(word) - 2) for m in PARTS)
+        or any(word.endswith(b) and token == word[: -len(b)] + m + b for b in LIMBS for m in PARTS)
     )
 
 

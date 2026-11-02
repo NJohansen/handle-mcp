@@ -922,3 +922,9 @@ def test_dried_herb_loses_to_fresh():
     dried = _cat(p("x", "d", "Basilikum tørret", "12.00", "10 g"), "Kolonial")
     fresh = _cat(p("x", "f", "Basilikum", "15.00", "1 stk"), "Grønt")
     assert best_match("basilikum", [dried, fresh]).product.id == "f"
+
+
+def test_over_under_only_before_a_limb():
+    """'Kyllingeoverlår' is kyllingelår. 'over' inside other words is not a part."""
+    assert score(["kyllingelår"], p("x", "o", "Kyllingeoverlår", "60.00")) == 1
+    assert score(["kartofler"], p("x", "k", "Kartoverofler", "10.00")) < 1
