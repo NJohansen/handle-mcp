@@ -106,9 +106,6 @@ def test_no_keychain_falls_back_to_file(tmp_path, monkeypatch):
     assert registry.load_login("fake")["email"] == "a@example.com"
 
 
-pytest_plugins = ["pytester"]
-
-
 def test_live_failures_do_not_print_logins(pytester, monkeypatch):
     """A failed live login must not show the password in pytest's traceback."""
     monkeypatch.setenv("HANDLE_LIVE", "1")
