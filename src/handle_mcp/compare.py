@@ -104,6 +104,7 @@ def _brief(line: BasketLine) -> dict[str, Any]:
     return {
         "id": get(p, "id"),
         "name": get(p, "name"),
+        "brand": get(p, "brand"),
         "size": get(p, "size"),
         "price": get(p, "price"),
         "quantity": line.quantity,

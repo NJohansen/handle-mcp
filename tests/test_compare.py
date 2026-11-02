@@ -346,6 +346,7 @@ def test_alternatives_show_the_category():
     line = best_match("cherrytomater 250 g", [tin, fresh])
     assert line.product.id == "f"
     assert line.alternatives[0]["category"] == "Kolonial > Konserves"
+    assert "brand" in line.alternatives[0]
 
 
 def test_flavour_only_hit_is_never_a_guess():
