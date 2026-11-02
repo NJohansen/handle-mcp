@@ -79,6 +79,10 @@ def _campaign(offer: str | None) -> str | None:
     return offer if offer == "Skarp pris" else "Mix" if offer.startswith("Mix ") else "Tilbud"
 
 
+def _today() -> date:
+    return datetime.now(TZ).date()
+
+
 def _is_home(address: dict) -> bool:
     """Home addresses have a DAWA id or a recipient; pickup points (Bilka stores) do not.
     ⚠ Confirm with a live home-delivery cart (docs/research.md)."""
@@ -388,7 +392,7 @@ class BilkaStore:
         unknown = (
             "" if fee is not None else "Gebyret er ukendt: kurven viser det ikke (tom kurv?). "
         )
-        last = date.today() + timedelta(days=days)
+        last = _today() + timedelta(days=days - 1)  # `days` calendar days, today included
         slots = []
         for day in data.get("availableIntervals") or []:
             for iv in day.get("intervals") or []:

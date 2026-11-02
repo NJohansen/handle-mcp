@@ -1,6 +1,7 @@
 """BilkaToGo adapter against a fake backend (httpx.MockTransport). No network."""
 
 import json
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from urllib.parse import parse_qs
@@ -351,6 +352,12 @@ async def test_delivery_slots_flat_fee_and_night_slots(store, fake):
     assert wed.note.startswith("Levering vil ske natten til onsdag.") and "<" not in wed.note
     call = next(r for r in fake.requests if r.url.path.endswith("AvailableDeliveryDates"))
     assert call.method == "GET"
+
+
+async def test_delivery_slots_keep_exactly_days(store, monkeypatch):
+    monkeypatch.setattr(bilka_module, "_today", lambda: date(2026, 11, 2))
+    assert [s.start.day for s in await store.delivery_slots(days=1)] == [2]
+    assert [s.start.day for s in await store.delivery_slots(days=3)] == [2, 4]
 
 
 async def test_delivery_slots_say_when_the_fee_is_unknown(store, fake):
