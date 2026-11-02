@@ -1,6 +1,6 @@
 """A fixed list of ~50 everyday items, priced live in every store.
 
-A matcher change that picks the wrong product shows up here before the family shops.
+A matcher change that picks the wrong product shows up here before anyone shops.
 The list is data: tests/live_list.json. The offline tests below check the list and the checker.
 
 Run: HANDLE_LIVE=1 uv run pytest -m live -s tests/test_live_list.py
