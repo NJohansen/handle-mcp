@@ -1,5 +1,5 @@
 {
-  "about": "A fixed list of ~50 things a family buys most weeks. tests/test_live_list.py prices it live in every store and fails on a wrong pick. Keys per item: item (the list line), has (words the product name or brand must have), not (words it must not have). Words match inside other words, because Danish compounds put them there ('krydderolie'), so keep them long enough to be unique; 'a|b' means a or b, stores (only these stores; default all), max_kr (the line may cost at most this), why (what went wrong before). Every item also gets the øko rule: an øko pick may cost at most 10 % more than the best non-øko alternative.",
+  "about": "A fixed list of ~50 things a family buys most weeks. tests/test_live_list.py prices it live in every store and fails on a wrong pick. Keys per item: item (the list line), has (words the product name or brand must have), not (words it must not have). A word must start or end a name word, plural ending allowed ('kylling' hits 'Kyllingebryst', 'olie' hits 'krydderolie', 'ost' does not hit 'Leverpostej'); 'a|b' means a or b, stores (only these stores; default all), max_kr (the line may cost at most this), why (what went wrong before). Every item also gets the øko rule: an øko pick may cost at most 10 % more than the best non-øko alternative.",
   "items": [
     {"item": "letmælk 1 l", "has": ["letmælk"], "not": ["kakao", "skummet"]},
     {"item": "smør 250 g", "has": ["smør"], "not": ["kage", "kiks", "dej"]},
@@ -15,8 +15,8 @@
     {"item": "Stryhns leverpostej bacon peber 275 g", "has": ["leverpostej", "stryhn", "bacon"], "why": "the kids only eat this one"},
     {"item": "makrel i tomat 125 g", "has": ["makrel", "tomat"], "not": ["salat", "smørepålæg"], "why": "a 90 g spread beat the 125 g tin (#29)"},
     {"item": "laksefilet 600 g", "has": ["laks"], "not": ["røget", "gravad", "rogn", "kat"], "why": "laks 600 g became 400 g (week 46)"},
-    {"item": "kyllingebryst 450 g", "has": ["kylling", "bryst"], "not": ["pålæg", "røget", "skiver"]},
-    {"item": "kyllingelår 1 kg", "has": ["kylling", "lår"], "not": ["pålæg"]},
+    {"item": "kyllingebryst 450 g", "has": ["kyllingebryst"], "not": ["pålæg", "røget", "skiver"]},
+    {"item": "kyllingelår 1 kg", "has": ["kylling", "lår|lårfilet"], "not": ["pålæg"]},
     {"item": "hakket grisekød 1 kg", "has": ["hakket", "gris"], "not": ["grønt"], "why": "blends lose (#21)"},
     {"item": "hakket kyllingekød 700 g", "has": ["hakket", "kylling"], "not": ["grønt"]},
     {"item": "hakket oksekød 500 g", "has": ["hakket", "okse"], "not": ["kaffe", "bønner", "grønt"], "why": "nemlig 'hakket oksekød 1 kg' found coffee beans"},

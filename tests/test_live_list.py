@@ -9,6 +9,7 @@ Needs logins (keychain or env). Only reads: never changes the cart.
 
 import json
 import os
+import re
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -48,9 +49,13 @@ def problems(entry: dict[str, Any], line: BasketLine | None) -> list[str]:
 
 
 def _any(word: str, text: str) -> bool:
-    """Substring on purpose: Danish compounds put the word inside ('Kyllingebrystfilet', 'krydderolie').
-    So keep 'has' and 'not' words long enough to be unique. 'a|b' means a or b."""
-    return any(w.lower() in text for w in word.split("|"))
+    """'a|b' means a or b. A word must start or end a name word, with a Danish plural ending:
+    'kylling' hits 'Kyllingebryst', 'olie' hits 'krydderolie', 'tomat' hits 'Cherrytomater'.
+    A word deep inside another does not: 'ost' is not 'Leverpostej', 'ris' is not 'friske'."""
+    return any(
+        re.search(rf"\b{re.escape(w)}|{re.escape(w)}(?:e|er|r|s)?\b", text)
+        for w in word.lower().split("|")
+    )
 
 
 # --- offline: the list and the checker ---------------------------------------------------------
@@ -85,6 +90,11 @@ def test_checker_finds_wrong_words_price_and_guess():
     assert problems(jam, _line("Jordbær", brand="Fior di Frutta")) == [
         "mangler 'fior di latte|mozzarella'"
     ]
+    cheese = {"item": "ost", "has": ["ost"], "not": ["olie"]}
+    assert problems(cheese, _line("Skiveost 45+")) == []
+    assert problems(cheese, _line("Leverpostej")) == ["mangler 'ost'"]
+    assert problems(cheese, _line("Ost i krydderolie")) == ["har 'olie'"]
+    assert problems({"item": "t", "has": ["tomat"]}, _line("Cherrytomater")) == []
     stryhn = {"item": "leverpostej", "has": ["stryhn"]}
     assert problems(stryhn, _line("Leverpostej bacon-peber", brand="Stryhn's")) == []
 
