@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" width="800" height="160" role="img" aria-label="Give AI a budget, fill the cheapest cart, you pay and we deliver, unpack the week, enjoy dinner">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" width="800" height="160" role="img" aria-label="Give AI a budget, fill the cheapest cart, you pay and they deliver, unpack the week, enjoy dinner">
 <style>
 .p{fill:#1f2328;animation-duration:8s;animation-iteration-count:infinite}
 .w{fill:#1f2328;font:600 22px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;opacity:0;animation-duration:8s;animation-iteration-count:infinite;transform-box:fill-box}
@@ -88,7 +88,7 @@
 <rect class="p p79" x="428" y="115" width="6" height="6"/>
 <text class="w w0" x="316" y="86" text-anchor="end">Give AI</text><text class="w w0" x="484" y="86">a budget</text>
 <text class="w w1" x="316" y="86" text-anchor="end">Fill</text><text class="w w1" x="484" y="86">the cheapest cart</text>
-<text class="w w2" x="316" y="86" text-anchor="end">You pay,</text><text class="w w2" x="484" y="86">we deliver</text>
+<text class="w w2" x="316" y="86" text-anchor="end">You pay,</text><text class="w w2" x="484" y="86">they deliver</text>
 <text class="w w3" x="316" y="86" text-anchor="end">Unpack</text><text class="w w3" x="484" y="86">the week</text>
 <text class="w w4" x="316" y="86" text-anchor="end">Enjoy</text><text class="w w4" x="484" y="86">dinner</text>
 </svg>
