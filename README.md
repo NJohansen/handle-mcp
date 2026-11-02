@@ -6,7 +6,7 @@
 
 **Your AI agent plans the week's meals on a budget, finds the cheapest cart and fills it. You approve and pay.**
 
-<p align="center"><img src="docs/hero.svg" alt="Your agent plans the meals on a budget, handle-mcp finds the cheapest cart, you pay and it arrives" width="100%"></p>
+<p align="center"><img src="docs/hero.svg" alt="An AI sparkle turns into a shopping basket, then into a delivery box" width="600"></p>
 
 A local MCP server for Danish grocery stores with home delivery. An AI agent can search products, read this week's offers, compare a shopping list across stores and fill the cart. **You always approve and pay yourself**, on the store's own website.
 

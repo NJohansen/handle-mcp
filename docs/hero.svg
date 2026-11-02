@@ -1,64 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" width="900" height="240" role="img" aria-label="Your AI agent plans the week's meals on a budget, handle-mcp finds the cheapest cart, and you pay and get the delivery">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200" role="img" aria-label="An AI sparkle turns into a shopping basket, then into a delivery box">
 <style>
-text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
-@keyframes s1{0%,1%{opacity:0;transform:translate(0px,10px)}5%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.s1{animation:s1 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes l0{0%,6%{opacity:0;transform:translate(-8px,0px)}10%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.l0{animation:l0 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes l1{0%,12%{opacity:0;transform:translate(-8px,0px)}16%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.l1{animation:l1 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes l2{0%,18%{opacity:0;transform:translate(-8px,0px)}22%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.l2{animation:l2 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes a1{0%,26%{stroke-dashoffset:120}33%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
-.a1{stroke-dasharray:120;animation:a1 9s ease-in-out infinite}
-@keyframes h1{0%,32%{opacity:0;transform:translate(0px,0px)}36%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.h1{animation:h1 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes i0{0%,36%{opacity:0;transform:translate(0px,-50px)}40%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.i0{animation:i0 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes i1{0%,41%{opacity:0;transform:translate(0px,-50px)}45%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.i1{animation:i1 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes i2{0%,46%{opacity:0;transform:translate(0px,-50px)}50%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.i2{animation:i2 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes i3{0%,51%{opacity:0;transform:translate(0px,-50px)}55%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.i3{animation:i3 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes s2{0%,33%{opacity:0;transform:translate(0px,0px)}37%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.s2{animation:s2 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes p2{0%,56%{opacity:0;transform:translate(0px,0px) scale(.6)}60%,90%{opacity:1;transform:translate(0,0) scale(1)}97%,100%{opacity:0;transform:translate(0,0) scale(1)}}
-.p2{animation:p2 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes a2{0%,60%{stroke-dashoffset:120}67%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
-.a2{stroke-dasharray:120;animation:a2 9s ease-in-out infinite}
-@keyframes h2{0%,66%{opacity:0;transform:translate(0px,0px)}70%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.h2{animation:h2 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes s3{0%,69%{opacity:0;transform:translate(0px,12px)}73%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.s3{animation:s3 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes c3{0%,76%{opacity:0;transform:translate(0px,0px) scale(.6)}80%,90%{opacity:1;transform:translate(0,0) scale(1)}97%,100%{opacity:0;transform:translate(0,0) scale(1)}}
-.c3{animation:c3 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes t0{0%,1%{opacity:0;transform:translate(0px,0px)}5%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.t0{animation:t0 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes t1{0%,33%{opacity:0;transform:translate(0px,0px)}37%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.t1{animation:t1 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes t2{0%,69%{opacity:0;transform:translate(0px,0px)}73%,90%{opacity:1;transform:translate(0,0)}97%,100%{opacity:0;transform:translate(0,0)}}
-.t2{animation:t2 9s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}}
+.i{fill:none;stroke:#1f2328;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;transform-box:view-box;transform-origin:300px 100px;animation:6s cubic-bezier(.65,0,.35,1) infinite}
+@media (prefers-color-scheme:dark){.i{stroke:#e6edf3}}
+.ai{animation-name:ai}.cart{animation-name:cart}.box{animation-name:box}
+@keyframes ai{0%,26%{opacity:1;transform:scale(1) rotate(0)}34%,92%{opacity:0;transform:scale(.4) rotate(90deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes cart{0%,26%{opacity:0;transform:scale(.4)}34%,59%{opacity:1;transform:scale(1)}67%,100%{opacity:0;transform:scale(.4)}}
+@keyframes box{0%,59%{opacity:0;transform:scale(.4) translateY(30px)}67%,92%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:0;transform:scale(.4) translateY(0)}}
+@media (prefers-reduced-motion:reduce){.i{animation:none}.ai,.box{opacity:0}}
 </style>
-<rect width="900" height="240" rx="20" fill="#f6f4ff"/>
-<g class="s1"><rect x="40" y="40" width="200" height="118" rx="16" fill="#fff" stroke="#7c3aed" stroke-width="2.5"/><path d="M70 158 l-8 18 l26 -18z" fill="#fff" stroke="#7c3aed" stroke-width="2.5" stroke-linejoin="round"/><rect x="66" y="156" width="26" height="5" fill="#fff"/><path d="M64 62 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z" fill="#7c3aed"/></g>
-<text class="l0" x="86" y="80" font-size="15" fill="#1f2937" font-weight="600">Week's meal plan</text>
-<text class="l1" x="64" y="108" font-size="15" fill="#6b7280" font-weight="400">Budget: 900 kr</text>
-<text class="l2" x="64" y="134" font-size="15" fill="#6b7280" font-weight="400">Built on offers</text>
-<path class="a1" d="M262 104 H352" stroke="#6b7280" stroke-width="3" fill="none" stroke-linecap="round"/>
-<path class="h1" d="M344 96 l10 8 l-10 8" stroke="#6b7280" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-<g class="i0"><circle cx="410" cy="96" r="13" fill="#ef4444"/><path d="M410 83 q4 -8 10 -6" stroke="#15803d" stroke-width="3" fill="none"/></g>
-<g class="i1"><rect x="428" y="66" width="20" height="42" rx="4" fill="#e5e7eb" stroke="#9ca3af" stroke-width="2"/><rect x="428" y="78" width="20" height="12" fill="#3b82f6"/></g>
-<g class="i2"><path d="M458 104 q-4 -30 12 -40 q16 10 12 40z" fill="#f59e0b"/><path d="M470 64 l-5 -10 M470 64 l5 -10" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/></g>
-<g class="i3"><ellipse cx="502" cy="94" rx="20" ry="13" fill="#b45309"/><path d="M490 90 h24 M492 97 h20" stroke="#fcd34d" stroke-width="2"/></g>
-<g class="s2"><path d="M382 104 H538 L522 168 H398 Z" fill="#fff" stroke="#1f2937" stroke-width="3" stroke-linejoin="round"/><path d="M418 116 V156 M444 116 V156 M470 116 V156 M496 116 V156" stroke="#d1d5db" stroke-width="3" stroke-linecap="round"/><path d="M400 104 Q460 40 520 104" stroke="#1f2937" stroke-width="3" fill="none"/></g>
-<g class="p2"><rect x="470" y="140" width="92" height="30" rx="15" fill="#16a34a"/><text x="516" y="160" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">847 kr</text></g>
-<path class="a2" d="M576 104 H666" stroke="#6b7280" stroke-width="3" fill="none" stroke-linecap="round"/>
-<path class="h2" d="M658 96 l10 8 l-10 8" stroke="#6b7280" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-<g class="s3"><path d="M700 92 H860 V168 H700 Z" fill="#d6a76c" stroke="#92602b" stroke-width="3" stroke-linejoin="round"/><path d="M700 92 L716 68 H844 L860 92" fill="#e8c08d" stroke="#92602b" stroke-width="3" stroke-linejoin="round"/><rect x="766" y="92" width="28" height="30" fill="#f5deb3" stroke="#92602b" stroke-width="2"/></g>
-<g class="c3"><circle cx="846" cy="76" r="18" fill="#16a34a"/><path d="M837 76 l6 6 l12 -12" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text class="t0" x="140" y="212" font-size="16" font-weight="600" fill="#1f2937" text-anchor="middle">1. Your agent plans</text>
-<text class="t1" x="460" y="212" font-size="16" font-weight="600" fill="#1f2937" text-anchor="middle">2. Cheapest cart</text>
-<text class="t2" x="780" y="212" font-size="16" font-weight="600" fill="#1f2937" text-anchor="middle">3. You pay, it arrives</text>
+<g class="i ai">
+  <path d="M300 48 C305 82 318 95 352 100 C318 105 305 118 300 152 C295 118 282 105 248 100 C282 95 295 82 300 48 Z"/>
+  <path d="M352 50 C354 60 358 64 368 66 C358 68 354 72 352 82 C350 72 346 68 336 66 C346 64 350 60 352 50 Z"/>
+</g>
+<g class="i cart">
+  <path d="M240 88 H360 L346 148 H254 Z"/>
+  <path d="M258 88 L282 52 M342 88 L318 52"/>
+  <path d="M280 106 V130 M300 106 V130 M320 106 V130"/>
+</g>
+<g class="i box">
+  <path d="M300 46 L356 72 V130 L300 156 L244 130 V72 Z"/>
+  <path d="M244 72 L300 98 L356 72 M300 98 V156"/>
+  <path d="M272 59 L328 85 V105"/>
+</g>
 </svg>
