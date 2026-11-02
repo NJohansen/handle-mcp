@@ -175,8 +175,12 @@ def _price(product: Any, on: date | None) -> Decimal:
 
 
 def _cost(product: Any, count: int, on: date | None) -> Decimal:
-    """Price for `count` packs, with a multi-buy offer like '4 for 50 kr' when it is still on."""
+    """Price for `count` packs, with a multi-buy offer like '4 for 50 kr' when it is still on.
+    Packs over the offer's limit ('max 1 stk.', e.g. a free gift) cost the normal price."""
     price = _price(product, on)
+    limit, before = _get(product, "max_per_order"), _get(product, "before_price")
+    if limit and before and count > limit:
+        return price * limit + Decimal(before) * (count - limit)
     match = MULTI_RE.search(_get(product, "offer_text") or "")
     until = _get(product, "offer_until")
     if match and not (on and until and on > until):

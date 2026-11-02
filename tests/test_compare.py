@@ -564,3 +564,10 @@ def test_alternatives_survive_out():
     cheap = p("x", "c", "Bananer øko", "2.50", "1 stk")
     out = server._out(best_match("bananer", [banana, cheap]))
     assert out["alternatives"][0]["line_total"] in {"3.00", "2.50"}
+
+
+def test_offer_limit_counts_extra_packs_at_the_normal_price():
+    gift = p("x", "g", "Mums rosinboller", "0", "6 stk")
+    gift.before_price, gift.max_per_order = Decimal("20.45"), 1
+    assert best_match("rosinboller 6 stk", [gift]).line_total == Decimal(0)
+    assert best_match("2 x rosinboller 6 stk", [gift]).line_total == Decimal("20.45")
