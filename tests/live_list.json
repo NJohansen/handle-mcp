@@ -1,5 +1,5 @@
 {
-  "about": "A fixed list of ~50 things a family buys most weeks. tests/test_live_list.py prices it live in every store and fails on a wrong pick. Keys per item: item (the list line), has (words the product name or brand must have), not (words it must not have). A word must start or end a name word, plural ending allowed ('kylling' hits 'Kyllingebryst', 'olie' hits 'krydderolie', 'ost' does not hit 'Leverpostej'); 'a|b' means a or b, stores (only these stores; default all), max_kr (the line may cost at most this), why (what went wrong before). Every item also gets the øko rule: an øko pick may cost at most 10 % more than the best non-øko alternative.",
+  "about": "A fixed list of ~50 things a family buys most weeks. tests/test_live_list.py prices it live in every store and fails on a wrong pick. Keys per item: item (the list line), has (words the product name or brand must have), not (words it must not have). A word must start or end a name word, plural ending allowed ('kylling' hits 'Kyllingebryst', 'olie' hits 'krydderolie', 'ost' does not hit 'Leverpostej'); 'a|b' means a or b, stores (only these stores; default all), max_kr (the line may cost at most this), why (what went wrong before). Every item also gets the øko rule: an øko pick may cost at most 10 % more than the best non-øko alternative that passes the same has/not words (on its name and store category).",
   "items": [
     {"item": "letmælk 1 l", "has": ["letmælk"], "not": ["kakao", "skummet"]},
     {"item": "smør 250 g", "has": ["smør"], "not": ["kage", "kiks", "dej"]},
@@ -38,7 +38,7 @@
     {"item": "clementiner 500 g", "has": ["klementin|clementin"], "not": ["juice"], "why": "c ~ k, was marked unsure"},
     {"item": "4 x pærer", "has": ["pære"], "not": ["juice", "dåse"], "max_kr": 40, "why": "became 4 bags of 1 kg, 88 kr (week 46)"},
     {"item": "agurk", "has": ["agurk"], "not": ["syltede", "salat", "asie", "appetit"]},
-    {"item": "cherrytomater 250 g", "has": ["tomat"], "not": ["dåse", "hakkede", "juice", "flåede"], "why": "Bilka found canned tomatoes (week 46)"},
+    {"item": "cherrytomater 250 g", "has": ["tomat"], "not": ["dåse", "hakkede", "juice", "flåede", "konserv"], "why": "Bilka found canned tomatoes (week 46)"},
     {"item": "peberfrugt 3 stk", "has": ["peberfrugt"], "not": ["snack", "grillet", "dåse", "flager"], "why": "a 3-pack over singles"},
     {"item": "snackpeber 250 g", "has": ["snackpeber|snack peber"]},
     {"item": "2 x broccoli", "has": ["broccoli"], "not": ["frost", "frosne", "suppe"], "why": "2 packs, fresh not frozen (#29)"},
@@ -47,7 +47,7 @@
     {"item": "kartofler 1 kg", "has": ["kartof"], "not": ["chips", "pommes", "salat", "pulver"]},
     {"item": "løg 1 kg", "has": ["løg"], "not": ["hvidløg", "forårsløg", "ristede", "stegte", "pulver", "syltede"]},
     {"item": "hvidløg 1 stk", "has": ["hvidløg"], "not": ["olie", "pulver", "granuleret", "pasta"], "why": "garlic in oil beat fresh garlic (#28)"},
-    {"item": "citroner 2 stk", "has": ["citron"], "not": ["juice", "saft", "græs"]},
+    {"item": "citroner 2 stk", "has": ["citron"], "not": ["juice", "saft", "græs", "peber"]},
     {"item": "blåbær 250 g", "has": ["blåbær"], "not": ["frost", "frosne", "yoghurt", "syltetøj", "marmelade", "frugtstænger", "bar"]},
     {"item": "kaffebønner 1 kg", "has": ["kaffe|caffé|caffè|espresso|bønner"], "not": ["kapsler", "pads", "instant", "filter"]},
     {"item": "toiletpapir 8 ruller", "has": ["toiletpapir"], "not": ["vådt", "fugtig"]}

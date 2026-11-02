@@ -42,10 +42,19 @@ def problems(entry: dict[str, Any], line: BasketLine | None) -> list[str]:
     if "max_kr" in entry and line.line_total > Decimal(str(entry["max_kr"])):
         out.append(f"{line.line_total} kr. > {entry['max_kr']} kr.")
     if line.oeko:
-        plain = [a["line_total"] for a in line.alternatives if not a["oeko"]]
+        plain = [a["line_total"] for a in line.alternatives if not a["oeko"] and _fits(entry, a)]
         if plain and min(plain) * OEKO_MARGIN < line.line_total:
             out.append(f"øko {line.line_total} kr. mod {min(plain)} kr.")
     return out
+
+
+def _fits(entry: dict[str, Any], alt: dict[str, Any]) -> bool:
+    """An alternative counts for the øko rule only when it is the same kind of thing:
+    not 'Citron peber' for citroner, not a tin ('Konserves') for cherrytomater."""
+    text = f"{alt['name']} {alt.get('category') or ''}".lower()
+    return all(_any(w, text) for w in entry.get("has", [])) and not any(
+        _any(w, text) for w in entry.get("not", [])
+    )
 
 
 def _any(word: str, text: str) -> bool:
@@ -100,12 +109,17 @@ def test_checker_finds_wrong_words_price_and_guess():
 
 
 def test_checker_oeko_within_10_percent():
-    alt = [{"line_total": Decimal(20), "oeko": False}]
+    alt = [{"name": "Røde linser", "line_total": Decimal(20), "oeko": False}]
     entry = {"item": "linser", "has": ["linser"]}
     assert problems(entry, _line("Røde linser øko", "22", oeko=True, alternatives=alt)) == []
     assert problems(entry, _line("Røde linser øko", "27", oeko=True, alternatives=alt)) == [
         "øko 27 kr. mod 20 kr."
     ]
+    tin = [
+        {"name": "Røde linser", "category": "Konserves", "line_total": Decimal(9), "oeko": False}
+    ]
+    canned = {"item": "linser", "has": ["linser"], "not": ["konserv"]}
+    assert problems(canned, _line("Røde linser øko", "27", oeko=True, alternatives=tin)) == []
 
 
 # --- live --------------------------------------------------------------------------------------
