@@ -481,16 +481,15 @@ class NemligStore:
         slot here: the human does (docs/adr/0001)."""
         slots: list[DeliverySlot] = []
         start, seen = None, 0
-        while seen < days:
+        for _page in range(days):  # every page has at least one day, so this is the cap
             params = {"days": days - seen, "showForSubscriptions": "false", "startDate": start}
             url = f"{BASE}/webapi/v2/Delivery/GetDeliveryDays"
             data = await self._api("GET", url, params={k: v for k, v in params.items() if v})
             day_list = (data or {}).get("DayRangeHours") or []
             for day in day_list:
                 slots += [self._slot(h) for h in day.get("DayHours") or []]
-            seen += len(day_list)
-            start = (data or {}).get("NextRangeStart")
-            if not day_list or not start:
+            seen, start = seen + len(day_list), (data or {}).get("NextRangeStart")
+            if not day_list or not start or seen >= days:
                 break
         return [s for s in slots if s]
 
@@ -498,11 +497,10 @@ class NemligStore:
         day, deadline = _time(hour.get("Date")), _time(hour.get("Deadline"))
         if day is None or None in (hour.get("StartHour"), hour.get("EndHour")):
             return None
-        day = day.replace(tzinfo=DK)
         return DeliverySlot(
             store=self.name,
-            start=day + timedelta(hours=hour["StartHour"]),
-            end=day + timedelta(hours=hour["EndHour"]),
+            start=day.replace(tzinfo=DK) + timedelta(hours=hour["StartHour"]),
+            end=day.replace(tzinfo=DK) + timedelta(hours=hour["EndHour"]),
             price=_money(hour.get("DeliveryPrice")),
             available=hour.get("Availability") == 0,  # 1 past deadline, 2 sold out, 3 off
             kind=SLOT_KINDS.get(hour.get("Type")),

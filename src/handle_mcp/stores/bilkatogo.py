@@ -385,6 +385,9 @@ class BilkaStore:
         if not _is_home(cart.get("deliveryAddress") or {}):
             raise StoreError(NOT_HOME)
         fee = self._cart(cart).fees.get("levering")
+        unknown = (
+            "" if fee is not None else "Gebyret er ukendt: kurven viser det ikke (tom kurv?). "
+        )
         last = date.today() + timedelta(days=days)
         slots = []
         for day in data.get("availableIntervals") or []:
@@ -402,7 +405,7 @@ class BilkaStore:
                         available=not iv.get("closed")
                         and bool(1 & (iv.get("availability_bit") or 0)),
                         kind="Nat" if start.hour < 6 else None,
-                        note=re.sub(r"<[^>]+>", "", info).strip() or None,
+                        note=(unknown + re.sub(r"<[^>]+>", "", info)).strip() or None,
                     )
                 )
         return slots

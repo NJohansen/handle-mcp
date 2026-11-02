@@ -353,6 +353,12 @@ async def test_delivery_slots_flat_fee_and_night_slots(store, fake):
     assert call.method == "GET"
 
 
+async def test_delivery_slots_say_when_the_fee_is_unknown(store, fake):
+    fake.cart = {**fake.cart, "stat": {}}  # an empty cart may send no delivery price
+    wed = (await store.delivery_slots())[1]
+    assert wed.price is None and wed.note.startswith("Gebyret er ukendt")
+
+
 async def test_delivery_slots_need_home_delivery(store, fake):
     fake.cart = {**fake.cart, "deliveryAddress": {"sid": "1234"}}
     with pytest.raises(StoreError, match="hjemlevering"):
