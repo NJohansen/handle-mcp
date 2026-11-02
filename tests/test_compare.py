@@ -756,6 +756,21 @@ def test_two_broccoli_compares_a_pack_with_one_piece():
     # Live at nemlig: '2 x broccoli' took 2 x 1 stk at 36 kr, not 2 x 500 g at 30 kr.
     piece = p("x", "s", "Broccoli", "18.00", "1 stk.")
     pack = p("x", "g", "Broccoli", "15.00", "500 g")
+    piece.category = pack.category = "Grønt"
     line = best_match("2 x broccoli", [piece, pack])
     assert (line.product.id, line.quantity, line.line_total) == ("g", 2, Decimal(30))
     assert "billigst 2 pakker" in line.note
+
+
+def test_two_milk_still_compares_per_litre():
+    small = p("x", "s", "Letmælk", "8.00", "500 ml")
+    big = p("x", "b", "Letmælk", "12.00", "1 l")
+    line = best_match("2 x letmælk", [small, big])
+    assert line.product.id == "b" and "pr. kg, l eller stk" in line.note
+
+
+def test_without_a_fresh_hit_canned_is_not_demoted():
+    oil = p("x", "o", "Hvidløg i krydderolie", "17.80", "290 g")
+    paste = p("x", "p", "Hvidløgspasta", "25.00", "100 g")
+    assert compare._processed_rank(["hvidløg"], oil) == 0  # no 'Grønt' hit: not known produce
+    assert best_match("hvidløg", [oil, paste]).product.id == "o"

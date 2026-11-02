@@ -11,6 +11,7 @@ Simple and explainable matching. No store-specific code here.
 - Canned, preserved or frozen produce ("Hvidløg i krydderolie") loses when the search also found
   it fresh. Canned fish and frozen meat do not lose: "Makrel i tomat" is a tin.
 - "2 x broccoli" with no size: the lowest cost for 2 packs wins, also 500 g against 1 stk.
+  Only for pieces and produce: "2 x mælk" still compares per litre.
 - A product that matches only by its brand is never a guess: "Fior di Frutta" jam.
 - On the same name score, a product in a matching store category wins ("Fisk > Laks").
 - Then a product with a known size wins, then the lowest cost. Sold-out products never win.
@@ -402,9 +403,9 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
             )
             have = _pack_size(product)
             amount = have[1] * count if have else Decimal(0)
-            # '6 x bananer' or '2 x broccoli': N things. Compare what they cost, also a 500 g pack
-            # against '1 stk'. Not the price per piece or per kg.
-            by_piece = not size and quantity > 1 and bool(have)
+            # '6 x bananer' or '2 x broccoli': N things. Compare what they cost, also a 500 g
+            # broccoli against '1 stk'. Not per piece or kg. '2 x mælk' still compares per litre.
+            by_piece = not size and quantity > 1 and bool(have) and (have[0] == "stk" or fresh)
             value = (
                 (cost,)
                 if size
@@ -441,7 +442,7 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
             extra = f"{count} x {_get(product, 'size') or 'pakke'} = {have[1] * count:g} stk."
             note = " ".join(filter(None, [note, extra]))
     elif not size:
-        what = f"{quantity} pakker" if quantity > 1 else "pr. kg, l eller stk"
+        what = f"{quantity} pakker" if quantity > 1 and fresh else "pr. kg, l eller stk"
         hint = f"Ingen mængde på listen: billigst {what}. Skriv en mængde, fx '1 kg'."
         note = " ".join(filter(None, [note, hint]))
     note = " ".join(filter(None, [note, _multi_hint(product, count, on)]))
