@@ -192,7 +192,7 @@ def _cost(product: Any, count: int, on: date | None) -> Decimal:
     Packs over the offer's limit ('max 1 stk.', e.g. a free gift) cost the normal price."""
     price = _price(product, on)
     limit, before = _get(product, "max_per_order"), _get(product, "before_price")
-    if limit and before and count > limit:
+    if limit and before and count > limit and not _multi(product, on):
         return price * limit + Decimal(before) * (count - limit)
     if offer := _multi(product, on):
         size, total = offer
