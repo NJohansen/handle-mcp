@@ -223,9 +223,13 @@ async def test_cart_hides_removed_lines(store, fake):
     assert cart.products_total == Decimal("147.45")  # nemlig's own total is kept
 
 
-async def test_terms_estimate_bags_for_an_empty_cart(store, fake):
+async def test_terms_estimate_bags_for_an_empty_cart(store, fake, monkeypatch):
     assert (await store.terms()).other_fees == {"poser": Decimal("6.0")}
     fake.basket = {**fake.basket, "Lines": [], "TotalBagsPrice": 0}
+    assert (await store.terms()).other_fees == {"poser (anslået)": Decimal("17.85")}
+    monkeypatch.setenv("HANDLE_NEMLIG_BAG_FEE", "12,50")
+    assert (await store.terms()).other_fees == {"poser (anslået)": Decimal("12.50")}
+    monkeypatch.setenv("HANDLE_NEMLIG_BAG_FEE", "ikke et tal")
     assert (await store.terms()).other_fees == {"poser (anslået)": Decimal("17.85")}
 
 
