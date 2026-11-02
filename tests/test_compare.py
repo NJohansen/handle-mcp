@@ -982,3 +982,10 @@ def test_six_pieces_fit_in_the_tool_answer():
 
 def test_no_candidates_when_nothing_is_found():
     assert best_match("bananer 1 kg", []).candidates == []
+
+
+def test_a_guess_is_still_the_suggestion_marked_no_name_match():
+    # Intended: the caller sees the store's top hit, flagged, and can search again.
+    line = best_match("pasta", [p("x", "pe", "Penne", "10.00", "500 g")])
+    assert line.guess and len(line.candidates) == 1
+    assert line.candidates[0]["suggested"] and line.candidates[0]["name_match"] == "none"
