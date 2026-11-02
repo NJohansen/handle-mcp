@@ -616,7 +616,8 @@ def test_oeko_is_a_whole_word():
     assert not is_oeko(p("x", "c", "Økonomipakke toiletpapir", "1"))
 
 
-def test_offer_limit_keeps_a_multi_buy():
+def test_offer_limit_caps_a_multi_buy():
     mix = p("x", "m", "Bananer", "2.75", "1 stk")
-    mix.offer_text, mix.before_price, mix.max_per_order = "Mix 10 for 25,00", Decimal("2.75"), 10
-    assert best_match("20 x bananer", [mix]).line_total == Decimal(50)
+    mix.offer_text, mix.max_per_order = "Mix 10 for 25,00", 10
+    assert best_match("10 x bananer", [mix]).line_total == Decimal(25)
+    assert best_match("20 x bananer", [mix]).line_total == Decimal("52.50")  # 10 on offer
