@@ -239,4 +239,9 @@ def prepared(words: list[str], product: Any) -> bool:
     it: 'kyllingebryst 450 g' is raw meat, 'røget laks' asks."""
     text = f"{get(product, 'name')} {get(product, 'category') or ''}".lower()
     item = " ".join(words)
-    return any(m in text for m in PREPARED) and not any(m in item for m in PREPARED)
+    return _marked(text) and not _marked(item)
+
+
+def _marked(text: str) -> bool:
+    """A PREPARED word starts or ends a word: 'Røget', 'Kyllingepålæg'. Not deep inside one."""
+    return any(re.search(rf"\b{m}|{m}\b", text) for m in PREPARED)
