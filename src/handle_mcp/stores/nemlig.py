@@ -43,6 +43,9 @@ SETTINGS_TTL = 600  # seconds to reuse timeslot/zone for search
 RETRIES = 2  # extra attempts on timeout, 429 and 5xx
 STATUS = {1: "Bestilt", 2: "Under behandling", 4: "Leveret"}
 UNITS = {"kg": "kg", "l": "l", "ltr": "l", "stk": "stk"}
+# Bags for a normal week (~800 kr), seen live 2026-11. The basket only says the bag price when it
+# has products, so compare_basket uses this for an empty cart.
+BAG_FEE = Decimal(os.environ.get("HANDLE_NEMLIG_BAG_FEE", "17.85"))
 
 
 def _money(value: Any) -> Decimal | None:
@@ -291,6 +294,7 @@ class NemligStore:
                 _money(ln.get("Price")) or Decimal(0),
             )
             for ln in basket.get("Lines") or []
+            if int(ln.get("Quantity") or 0) > 0  # removed lines can stay with a price
         ]
         products = _money(basket.get("TotalProductsPrice"))
         if products is None:
@@ -355,13 +359,12 @@ class NemligStore:
 
     async def terms(self) -> StoreTerms:
         basket = await self._basket()
+        bags = _money(basket.get("TotalBagsPrice"))
         return StoreTerms(
             store=self.name,
             home_delivery=True,
             delivery_fee=_money(basket.get("DeliveryPrice")),
-            other_fees={"poser": _money(basket["TotalBagsPrice"])}
-            if basket.get("TotalBagsPrice")
-            else {},
+            other_fees={"poser": bags} if bags else {"poser (anslået)": BAG_FEE},
             minimum_order=_money(basket.get("MinimumOrderTotal")),
         )
 
