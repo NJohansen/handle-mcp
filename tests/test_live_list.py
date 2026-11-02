@@ -37,7 +37,7 @@ def problems(entry: dict[str, Any], line: BasketLine | None) -> list[str]:
         return [f"gæt: {get(line.product, 'name')}"]
     text = f"{get(line.product, 'name')} {get(line.product, 'brand') or ''}".lower()
     out = [f"mangler '{w}'" for w in entry.get("has", []) if not _any(w, text)]
-    out += [f"har '{w}'" for w in entry.get("not", []) if w.lower() in text]
+    out += [f"har '{w}'" for w in entry.get("not", []) if _any(w, text)]
     if "max_kr" in entry and line.line_total > Decimal(str(entry["max_kr"])):
         out.append(f"{line.line_total} kr. > {entry['max_kr']} kr.")
     if line.oeko:
@@ -48,6 +48,8 @@ def problems(entry: dict[str, Any], line: BasketLine | None) -> list[str]:
 
 
 def _any(word: str, text: str) -> bool:
+    """Substring on purpose: Danish compounds put the word inside ('Kyllingebrystfilet', 'krydderolie').
+    So keep 'has' and 'not' words long enough to be unique. 'a|b' means a or b."""
     return any(w.lower() in text for w in word.split("|"))
 
 

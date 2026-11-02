@@ -1,11 +1,11 @@
 {
-  "about": "A fixed list of ~50 things a family buys most weeks. tests/test_live_list.py prices it live in every store and fails on a wrong pick. Keys per item: item (the list line), has (words the product name or brand must have; 'a|b' means a or b), not (words it must not have), stores (only these stores; default all), max_kr (the line may cost at most this), why (what went wrong before). Every item also gets the øko rule: an øko pick may cost at most 10 % more than the best non-øko alternative.",
+  "about": "A fixed list of ~50 things a family buys most weeks. tests/test_live_list.py prices it live in every store and fails on a wrong pick. Keys per item: item (the list line), has (words the product name or brand must have), not (words it must not have). Words match inside other words, because Danish compounds put them there ('krydderolie'), so keep them long enough to be unique; 'a|b' means a or b, stores (only these stores; default all), max_kr (the line may cost at most this), why (what went wrong before). Every item also gets the øko rule: an øko pick may cost at most 10 % more than the best non-øko alternative.",
   "items": [
     {"item": "letmælk 1 l", "has": ["letmælk"], "not": ["kakao", "skummet"]},
     {"item": "smør 250 g", "has": ["smør"], "not": ["kage", "kiks", "dej"]},
     {"item": "æg 10 stk", "has": ["æg"], "not": ["yoghurt", "nudler", "pasta"], "why": "Bilka 'æg' found græsk yoghurt"},
     {"item": "rugbrød", "has": ["rugbrød"], "not": ["chips", "mel"]},
-    {"item": "havregryn 1 kg", "has": ["havregryn"], "not": ["bar", "drik", "kiks"]},
+    {"item": "havregryn 1 kg", "has": ["havregryn"], "not": ["drik", "kiks", "müsli"]},
     {"item": "Cheasy skyr 1 kg", "has": ["skyr", "cheasy"], "not": ["drik"], "why": "Cheasy passion/banan was marked unsure"},
     {"item": "græsk yoghurt 1 kg", "has": ["yoghurt", "græsk"], "not": ["drik"]},
     {"item": "hytteost 500 g", "has": ["hytteost"]},
