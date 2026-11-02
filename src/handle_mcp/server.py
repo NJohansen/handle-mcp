@@ -144,7 +144,7 @@ async def compare_basket(items: list[str], stores: list[str] | None = None) -> d
     suggested product and up to 5 "candidates" (the suggestion first, one øko when found) with
     the cost for the amount and flags: name_match, size_fits, prepared (cold cuts, smoked,
     breaded), processed (frost/konserves), blend, oeko. The suggestion is a guess by word rules:
-    pick the candidate that fits the family, and ask when "sure" is false or none fits
+    pick the candidate that fits the user, and ask when "sure" is false or none fits
     (search_products finds more). Unknown facts and false flags are left out. Also total incl.
     fees and minimum order met. Only reads: use set_cart_quantities with the chosen ids after."""
     items = [i.strip() for i in items if i.strip()]
