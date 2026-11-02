@@ -50,7 +50,8 @@ def check(entry: dict[str, Any], line: BasketLine | None) -> tuple[list[str], li
     if line.guess:
         warn = [f"gæt: {get(line.product, 'name')}"]
     else:
-        warn = problems(entry, line.candidates[0]) if line.candidates else []
+        first = next((c for c in line.candidates if c.get("suggested")), None)
+        warn = problems(entry, first) if first else []
     if not any(not problems(entry, c) for c in cands):
         return [f"ingen kandidat passer ({len(cands)} vist)", *warn], []
     if line.oeko:
@@ -146,6 +147,11 @@ def test_a_guess_never_counts_as_fitting():
         ["ingen kandidat passer (0 vist)", "gæt: Hvidløg"],
         [],
     )
+
+
+def test_a_guess_with_a_fitting_candidate_is_a_warning():
+    garlic = {"item": "hvidløg", "has": ["hvidløg"]}
+    assert check(garlic, _line(_c("Løg"), _c("Hvidløg 1 stk"), guess=True)) == ([], ["gæt: Løg"])
 
 
 def test_oeko_too_dear_is_a_warning():
