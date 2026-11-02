@@ -508,7 +508,7 @@ async def test_list_offers_tool_never_shows_the_user_id(store, monkeypatch):
 
 async def test_offer_list_error_never_shows_the_user_id(store, fake):
     url = "/webapi/ts-1/2026110316-60-180/3/user-4711/Products/GetByProductGroupId"
-    fake.scripted[url] = [404] * 5  # every list fails
+    fake.scripted[url] = [404] * len(TILBUD)  # every list fails
     with pytest.raises(StoreError) as err:
         await store.offers()
     assert "user-4711" not in str(err.value) and "<bruger>" in str(err.value)
