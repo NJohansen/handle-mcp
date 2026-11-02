@@ -51,7 +51,7 @@ def problems(entry: dict[str, Any], line: BasketLine | None) -> list[str]:
 def _fits(entry: dict[str, Any], alt: dict[str, Any]) -> bool:
     """An alternative counts for the øko rule only when it is the same kind of thing:
     not 'Citron peber' for citroner, not a tin ('Konserves') for cherrytomater."""
-    # brand and category come with #38; before it they are missing and only the name counts.
+    # Needs #38 (brand and category on alternatives). Without it, brand words never match here.
     text = f"{alt['name']} {alt.get('brand') or ''} {alt.get('category') or ''}".lower()
     return all(_any(w, text) for w in entry.get("has", [])) and not any(
         _any(w, text) for w in entry.get("not", [])
