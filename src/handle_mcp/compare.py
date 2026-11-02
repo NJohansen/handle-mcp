@@ -56,7 +56,7 @@ DESCRIBERS = ("frilands", "skrabe", "øko", "split", "mini", "snack", "baby")
 CUTS = ("filet", "fileter", "stykker", "strimler", "tern")
 # Frozen or canned. Never the default for fresh food: "blåbær" is fresh, "frosne blåbær" is not.
 CANNED = ("konserv", "dåse", "juice")  # "Cherrytomater i tomatjuice", "Kolonial > Konserves"
-PRESERVED = ("olie", "lage", "marinade")  # in the name only: "Hvidløg i krydderolie"
+PRESERVED = ("olie", "lage", "marinade")  # last part of a name word: "krydderolie", not "Lagerøl"
 FROZEN = ("frost", "frosne", "frossen", "frosset")
 FRESH = ("frugt", "grønt", "bær", "grøntsag")  # frozen loses only here: frozen meat is fine
 BLEND_RE = re.compile(r"\d+(?:[.,]\d+)?\s*%\s*([a-zæøå]+)", re.IGNORECASE)  # "50% grønt"
@@ -154,7 +154,7 @@ def _score(words: list[str], product: Any, asked: set[str] | frozenset[str] = fr
             hits.append(1.0)
         elif any(_compound(w, t) for t in tokens):
             hits.append(0.75)  # 'frilandsæg' for 'æg': better than a word inside, below whole
-        elif w in head or _stem_hit(w, tokens) or w in brand or _stem_hit(w, brand_tokens):
+        elif w in head or _stem_hit(w, tokens) or w in brand_tokens or _stem_hit(w, brand_tokens):
             hits.append(0.5)
         elif w in tail_tokens or _stem_hit(w, tail_tokens):
             hits.append(1.0 if w in asked else 0.25)
@@ -184,8 +184,9 @@ def _processed_rank(words: list[str], product: Any) -> int:
     item = " ".join(words)
     if any(m in text for m in CANNED) and not any(m in item for m in CANNED):
         return 1
-    name = (_get(product, "name") or "").lower()
-    if any(m in name for m in PRESERVED) and not any(m in item for m in PRESERVED):
+    name_words = _words(_get(product, "name") or "")
+    preserved = any(w.endswith(m) for w in name_words for m in PRESERVED)
+    if preserved and not any(m in item for m in PRESERVED):
         return 1
     produce = any(m in text for m in FRESH) or any(w.endswith("bær") for w in words)
     frozen = any(m in text for m in FROZEN) and not any(m in item for m in FROZEN)

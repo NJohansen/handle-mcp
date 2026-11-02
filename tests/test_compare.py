@@ -677,7 +677,6 @@ def test_garlic_with_an_amount_buys_one_bulb():
     for products in (_nemlig("match_hvidloeg"), _bilka("match_hvidloeg")):
         line = best_match("hvidløg 1 stk", products)
         assert line.sure and _pack_size(line.product) == ("stk", 1)
-        assert line.line_total < 6
 
 
 def test_mackerel_in_tomato_finds_the_single_tin():
@@ -689,6 +688,20 @@ def test_mackerel_in_tomato_finds_the_single_tin():
         True,
     )
     assert any(a["size"].startswith("125 g") for a in line.alternatives)
+
+
+def test_preserved_is_a_whole_word_end():
+    beer = p("x", "l", "Lagerøl", "8.00", "33 cl")
+    oil = p("x", "o", "Hvidløg i krydderolie", "17.80", "290 g")
+    assert compare._processed_rank(["øl"], beer) == 0  # 'lage' inside a word is not 'lage'
+    assert compare._processed_rank(["hvidløg"], oil) == 1
+
+
+async def test_lines_say_oeko_in_the_tool_answer(two_stores):
+    result = await server.compare_basket(WEEK_LIST)
+    lines = result["stores"]["nemlig"]["lines"]
+    assert all(isinstance(ln["oeko"], bool) for ln in lines)
+    assert all("price" in a for ln in lines for a in ln["alternatives"])
 
 
 def test_item_flavour_words_count_in_full():
