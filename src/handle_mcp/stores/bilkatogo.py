@@ -24,6 +24,7 @@ from handle_mcp.models import (
     Cart,
     CartLine,
     DeliveryInfo,
+    DeliverySlot,
     Order,
     Product,
     QuantityResult,
@@ -374,6 +375,37 @@ class BilkaStore:
             next_available=date.fromisoformat(nxt) if nxt else None,
             note=None if _is_home(address) else NOT_HOME,
         )
+
+    async def delivery_slots(self, days: int = 7) -> list[DeliverySlot]:
+        """GET shop/v3/AvailableDeliveryDates for the cart's address. Bilka has no price per
+        slot: the fee is the cart's flat delivery price. Never choose a slot here."""
+        data, cart = await asyncio.gather(
+            self._shop("GET", "shop/v3/AvailableDeliveryDates"), self._cart_json()
+        )
+        if not _is_home(cart.get("deliveryAddress") or {}):
+            raise StoreError(NOT_HOME)
+        fee = self._cart(cart).fees.get("levering")
+        last = date.today() + timedelta(days=days)
+        slots = []
+        for day in data.get("availableIntervals") or []:
+            for iv in day.get("intervals") or []:
+                start, end = _slot(day.get("date"), iv.get("intervalStart"), iv.get("intervalEnd"))
+                if start is None or end is None or start.date() > last:
+                    continue
+                info = " ".join(m.get("message", "") for m in iv.get("info") or [])
+                slots.append(
+                    DeliverySlot(
+                        store=self.name,
+                        start=start,
+                        end=end if end > start else end + timedelta(days=1),
+                        price=fee,
+                        available=not iv.get("closed")
+                        and bool(1 & (iv.get("availability_bit") or 0)),
+                        kind="Nat" if start.hour < 6 else None,
+                        note=re.sub(r"<[^>]+>", "", info).strip() or None,
+                    )
+                )
+        return slots
 
     def _order(self, o: dict, lines: list[CartLine] | None = None) -> Order:
         start, end = _slot(
