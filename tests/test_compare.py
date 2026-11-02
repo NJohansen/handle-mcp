@@ -322,7 +322,8 @@ def test_rolls_are_not_wet_wipes():
     nemlig = p("x", "n", "Toiletpapir 8 ruller", "39.00", "8 stk")
     assert pack_size(nemlig) == ("rl", 8)
     # '8 stk' still finds rolls: only the other way round is closed.
-    assert best_match("toiletpapir 8 stk", [rolls]).quantity == 1
+    eight = p("x", "8", "Toiletpapir 3-lags", "28.00", "8 rl.")
+    assert best_match("toiletpapir 8 stk", [eight]).sure
 
 
 def test_rolls_count_as_pieces():
