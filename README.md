@@ -4,16 +4,33 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)
 
-**Let your AI agent do the Danish grocery shopping. You approve and pay.**
+**Your AI agent plans the week's meals on a budget, finds the cheapest cart and fills it. You approve and pay.**
 
-A local MCP server for Danish grocery stores with home delivery. An AI agent can search products, compare a shopping list across stores and fill the cart. **You always approve and pay yourself**, on the store's own website.
+<p align="center"><img src="docs/hero.svg" alt="Your agent plans the meals on a budget, handle-mcp finds the cheapest cart, you pay and it arrives" width="100%"></p>
+
+A local MCP server for Danish grocery stores with home delivery. An AI agent can search products, read this week's offers, compare a shopping list across stores and fill the cart. **You always approve and pay yourself**, on the store's own website.
 
 Stores in v1: [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.bilkatogo.dk) (home delivery).
 
 > [!WARNING]
 > Unofficial. The stores have no public API. This uses the same private APIs as their websites, and it can break at any time. Not affiliated with nemlig.com or Salling Group.
 
+## The idea
+
+Weekly food shopping is a lot of small decisions: what to cook, what is on offer, which store is cheapest, and does it fit the budget. handle-mcp gives your agent the store data, so it can do the whole loop:
+
+1. **Plan.** The agent plans the week's meals from your budget, your taste and this week's offers (`list_offers`, `search_recipes`, `get_orders`).
+2. **Compare.** It turns the plan into a shopping list and prices it in every store, fees and minimum order included (`compare_basket`). It picks a product per item and asks you when it is unsure.
+3. **Fill.** It fills the cheapest store's cart (`set_cart_quantities`, the only write).
+4. **You pay.** You open the store's website, check the cart, choose a delivery time and pay.
+
+Your budget, taste and meal rules live in your own prompt or skill, not in the server. See [Build your own skill on top](#build-your-own-skill-on-top).
+
 ## What you can ask
+
+**Meal plan on a budget**
+- *"Plan 5 dinners for 4 people within 900 kr, built on this week's offers. Then compare the list and fill the cheapest cart."*
+- *"We have rice, pasta and chickpeas at home. Plan around them."*
 
 **Compare and save**
 - *"Here is this week's list. Which store is cheapest, fees included?"*
@@ -21,7 +38,6 @@ Stores in v1: [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.b
 
 **Offers**
 - *"What is on offer this week? Any free gifts?"*
-- *"Plan three dinners around this week's offers."*
 
 **Cart and delivery**
 - *"Fill the nemlig cart with the cheapest basket."*
@@ -29,14 +45,7 @@ Stores in v1: [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.b
 
 **Habits**
 - *"What did we buy in our last orders?"*
-- *"Find a lasagne recipe from the store."*
-
-What happens behind *"Fill the cheapest cart"*:
-
-1. `compare_basket` prices the list in each store and returns candidates per item.
-2. The agent picks a product per item, and asks you when it is unsure.
-3. `set_cart_quantities` sets the quantities in one store's cart. That is the only write.
-4. You open the store's website, check the cart, choose a time and pay.
+- *"Find a lasagne recipe from the store."* (nemlig)
 
 ## What it can do
 
