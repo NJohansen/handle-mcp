@@ -1,8 +1,11 @@
 # 🧺 handle-mcp
 
-[![ci](https://github.com/NJohansen/handle-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/NJohansen/handle-mcp/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)
+<p>
+<a href="https://github.com/NJohansen/handle-mcp/actions/workflows/ci.yml"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/ci/NJohansen/handle-mcp.svg?variant=outline&mode=dark"><img alt="CI" src="https://shieldcn.dev/github/ci/NJohansen/handle-mcp.svg?variant=outline&mode=light"></picture></a>
+<a href="LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-MIT-grey.svg?variant=outline&mode=dark"><img alt="License: MIT" src="https://shieldcn.dev/badge/license-MIT-grey.svg?variant=outline&mode=light"></picture></a>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/python-3.12%2B-grey.svg?variant=outline&mode=dark"><img alt="Python 3.12+" src="https://shieldcn.dev/badge/python-3.12%2B-grey.svg?variant=outline&mode=light"></picture>
+<a href="https://modelcontextprotocol.io"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/MCP-server-grey.svg?variant=outline&mode=dark"><img alt="MCP server" src="https://shieldcn.dev/badge/MCP-server-grey.svg?variant=outline&mode=light"></picture></a>
+</p>
 
 **Your AI agent plans the week's meals on a budget, finds the cheapest cart and fills it. You approve and pay.**
 
