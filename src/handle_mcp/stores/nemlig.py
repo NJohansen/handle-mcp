@@ -159,7 +159,8 @@ class NemligStore:
                 elif resp.status_code == 401:
                     raise _Unauthorized
                 elif resp.status_code >= 400:
-                    raise StoreError(f"nemlig.com afviste kaldet ({resp.status_code}): {url}")
+                    shown = url.replace(self._user_id, "<bruger>") if self._user_id else url
+                    raise StoreError(f"nemlig.com afviste kaldet ({resp.status_code}): {shown}")
                 else:
                     try:
                         return resp.json() if resp.content else None
@@ -282,6 +283,8 @@ class NemligStore:
             raise StoreError(
                 "Fandt ingen tilbudslister på nemlig.com/tilbud. Siden kan have ændret sig."
             )
+        if not self._user_id:
+            raise StoreError("nemlig gav ingen bruger. Log ind på nemlig for at se tilbud.")
         path = "/".join(str(settings[k]) for k in ("timestamp", "timeslotUtc", "deliveryZoneId"))
         products: dict[str, Product] = {}
         for name, group in spots:

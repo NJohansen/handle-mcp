@@ -484,3 +484,23 @@ async def test_list_offers_tool_never_shows_the_user_id(store, monkeypatch):
     out = await server.list_offers(["nemlig"], 5)
     text = json.dumps(out, default=str)
     assert "user-4711" not in text and "Priskup" in text
+
+
+async def test_offer_list_error_never_shows_the_user_id(store, fake):
+    url = "/webapi/ts-1/2026110316-60-180/3/user-4711/Products/GetByProductGroupId"
+    fake.scripted[url] = [404]
+    with pytest.raises(StoreError) as err:
+        await store.offers()
+    assert "user-4711" not in str(err.value) and "<bruger>" in str(err.value)
+
+
+async def test_offers_need_a_user(store, monkeypatch):
+    await store._search_settings()
+    store._user_id = ""
+    monkeypatch.setattr(store, "_search_settings", lambda: _settings(store))
+    with pytest.raises(StoreError, match="Log ind"):
+        await store.offers()
+
+
+async def _settings(store):
+    return store._settings[1]
