@@ -372,11 +372,16 @@ class NemligStore:
     async def terms(self) -> StoreTerms:
         basket = await self._basket()
         bags = _money(basket.get("TotalBagsPrice"))
+        empty = not any(int(ln.get("Quantity") or 0) > 0 for ln in basket.get("Lines") or [])
         return StoreTerms(
             store=self.name,
             home_delivery=True,
             delivery_fee=_money(basket.get("DeliveryPrice")),
-            other_fees={"poser": bags} if bags else {"poser (anslået)": _bag_fee()},
+            other_fees={"poser (anslået)": _bag_fee()}
+            if empty
+            else {"poser": bags}
+            if bags
+            else {},
             minimum_order=_money(basket.get("MinimumOrderTotal")),
         )
 

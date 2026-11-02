@@ -599,3 +599,11 @@ def test_multi_buy_for_the_amount_needed_and_a_hint():
     line = best_match("fior di latte 200 g", [eco])
     assert (line.quantity, line.line_total) == (2, Decimal(44))  # never more than needed
     assert "1 mere for 4.00 kr" in line.note
+
+
+def test_oeko_is_a_whole_word():
+    from handle_mcp.compare import is_oeko
+
+    assert is_oeko(p("x", "a", "Økologiske æg", "1"))
+    assert is_oeko(p("x", "b", "Fior di latte øko", "1"))
+    assert not is_oeko(p("x", "c", "Økonomipakke toiletpapir", "1"))

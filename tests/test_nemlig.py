@@ -225,6 +225,8 @@ async def test_cart_hides_removed_lines(store, fake):
 
 async def test_terms_estimate_bags_for_an_empty_cart(store, fake, monkeypatch):
     assert (await store.terms()).other_fees == {"poser": Decimal("6.0")}
+    fake.basket = {**fake.basket, "TotalBagsPrice": 0}  # products but no bag fee: no guess
+    assert (await store.terms()).other_fees == {}
     fake.basket = {**fake.basket, "Lines": [], "TotalBagsPrice": 0}
     assert (await store.terms()).other_fees == {"poser (anslået)": Decimal("17.85")}
     monkeypatch.setenv("HANDLE_NEMLIG_BAG_FEE", "12,50")

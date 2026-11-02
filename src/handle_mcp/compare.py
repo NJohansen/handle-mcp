@@ -56,7 +56,7 @@ FRESH = ("frugt", "grønt", "bær", "grøntsag")  # frozen loses only here: froz
 BLEND_RE = re.compile(r"\d+(?:[.,]\d+)?\s*%\s*([a-zæøå]+)", re.IGNORECASE)  # "50% grønt"
 NUTRIENTS = {"fedt", "protein", "sukker", "kakao", "alkohol", "salt", "frugt", "kulhydrat"}
 QTY_RE = re.compile(r"^\s*(\d+)\s*[x×]\s+(?=\D)", re.IGNORECASE)
-OEKO_RE = re.compile(r"\b(?:øko|økologisk|organic)", re.IGNORECASE)
+OEKO_RE = re.compile(r"\b(?:øko|økologiske?|organic)\b", re.IGNORECASE)  # not "Økonomi"
 
 
 @dataclass
