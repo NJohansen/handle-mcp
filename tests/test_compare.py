@@ -840,3 +840,60 @@ def test_without_a_fresh_hit_canned_is_not_demoted():
     paste = p("x", "p", "Hvidløgspasta", "25.00", "100 g")
     assert match.processed_rank(["hvidløg"], oil) == 0  # no 'Grønt' hit: not known produce
     assert best_match("hvidløg", [oil, paste]).product.id == "o"
+
+
+def test_ready_meal_loses_to_a_raw_cut():
+    """Seen live 2 Nov: Bilka 'laksefilet 600 g' picked 3 x 'Indbagt laksefilet m. spinat'.
+    'Laksestykke' is laks like 'laksefilet': another cut of the same fish."""
+    laks = "Kød & fisk > Fisk & skaldyr > Laks > Laksestykke"
+    products = [
+        _cat(p("x", "a", "Laksestykke", "109.95", "600 g", brand="Skagen food"), laks),
+        _cat(p("x", "b", "Laksestykke", "59.00", "300 g", available=False), laks),
+        _cat(p("x", "c", "Laksestykker", "49.95", "225 g"), laks),
+        _cat(p("x", "r", "Røget laksestykke", "55.00", "200 g"), "Pålæg > Røget laks"),
+        _cat(
+            p("x", "i", "Indbagt laksefilet m. spinat", "19.00", "250 g"),
+            "Frost > Kød & fisk > Fisk & skaldyr > Paneret & indbagt fisk > Indbagt laks",
+        ),
+    ]
+    assert best_match("laksefilet 600 g", products).product.id == "a"
+
+
+def test_baby_corn_is_not_corn():
+    """Seen live 2 Nov: Bilka 'majs 340 g' picked 3 x 'Babymajs' 125 g (fresh) over tins."""
+    tins = "Kolonial > Konserves, bouillon & krydderier > Konserveret frugt & grønt > Majs"
+    products = [
+        _cat(p("x", "1", "Majs", "12.25", "3 x 70 g"), tins),
+        _cat(p("x", "2", "Majs", "7.95", "285 g"), tins),
+        _cat(p("x", "3", "Majs", "8.00", "140 g"), tins),
+        _cat(p("x", "f", "Søde majs", "13.27", "600 g"), "Frost > Grøntsager > Ærter & majs"),
+        _cat(p("x", "b", "Babymajs", "6.50", "200 g"), tins),
+        _cat(p("x", "g", "Babymajs", "15.00", "125 g"), "Frugt & grønt > Grøntsager > Minimajs"),
+    ]
+    assert "baby" not in best_match("majs 340 g", products).product.name.lower()
+
+
+def test_thigh_cuts_are_kyllingelår():
+    """Seen live 2 Nov: nemlig 'kyllingelår 1 kg' picked a 2 kg øko frost bag at 175 kr.
+    'Kyllingeoverlår' and 'Kyllingeunderlår' are kyllingelår too, at a third of the price."""
+    meat, frost = "Kød & fisk", "Frost"
+    products = [
+        _cat(p("x", "o", "Kyllingelår øko.", "97.95", "480 g / Kalu"), meat),
+        _cat(p("x", "h", "Hele kyllingelår", "113.5", "600 g / Hopballe Mølle"), meat),
+        _cat(p("x", "u", "Kyllingeunderlår", "39.95", "700 g / Rose"), meat),
+        _cat(p("x", "r", "Kyllingeoverlår m. rygben", "29.95", "800 g / Rose"), meat),
+        _cat(p("x", "z", "Hele kyllingelår u. ryg øko.", "175.0", "2,0 kg / frost"), frost),
+    ]
+    line = best_match("kyllingelår 1 kg", products)
+    assert line.product.id in {"u", "r"} and line.line_total <= 80
+
+
+def test_pickled_cucumbers_lose_to_fresh():
+    """Seen live 2 Nov: nemlig 'agurk' picked 'Appetit agurker' (a jar in 'Kolonial')."""
+    products = [
+        _cat(p("x", "o", "Agurk øko.", "12.0", "1 stk."), "Grønt"),
+        _cat(p("x", "d", "Agurk dansk", "20.0", "1 stk."), "Grønt"),
+        _cat(p("x", "a", "Appetit agurker", "29.5", "570 g / 350 g / i skiver"), "Kolonial"),
+        _cat(p("x", "s", "Agurkesalat", "16.95", "710 g / 405 g"), "Kolonial"),
+    ]
+    assert best_match("agurk", products).product.id == "o"
