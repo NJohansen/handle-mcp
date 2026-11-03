@@ -382,8 +382,9 @@ async def test_search_uses_defaults_when_settings_fail(store, fake):
     assert fake.paths().count("/webapi/basket/GetBasket") == 2
 
 
-async def test_offers_with_failed_settings_is_a_clear_error(store, fake):
-    fake.scripted["/webapi/v2/AppSettings/Website"] = [404]
+@pytest.mark.parametrize("failing", ["/webapi/v2/AppSettings/Website", "/webapi/basket/GetBasket"])
+async def test_offers_with_failed_settings_is_a_clear_error(store, fake, failing):
+    fake.scripted[failing] = [404]
     with pytest.raises(StoreError, match="indstillinger"):
         await store.offers()
     assert "/tilbud" not in fake.paths()
