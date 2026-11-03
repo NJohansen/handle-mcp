@@ -9,7 +9,7 @@
 
 <img src="docs/hero.svg" alt="Give AI a budget, fill it cheaply, you pay and they deliver, unpack the week, enjoy dinner" width="800">
 
-**Your AI agent plans the week's meals on a budget, finds the cheapest cart and fills it. You approve and pay.**
+**Your AI agent plans the week's meals on a budget, prices them at nemlig.com and BilkaToGo and fills the cheapest cart. You approve and pay.**
 
 </div>
 
@@ -19,10 +19,10 @@ Danish grocery stores with home delivery, as an MCP server: [nemlig.com](https:/
 
 ## How it works
 
-1. **Plan.** Give your agent a budget. It plans meals around this week's offers.
-2. **Compare.** It prices the list in every store, fees included.
-3. **Fill.** It fills the cheapest cart.
-4. **Pay.** You check the cart on the store's website, pick a time and pay.
+1. **Plan.** Give your agent a budget. It reads this week's offers and recipes on nemlig.com and BilkaToGo and plans the meals around them.
+2. **Compare.** It prices the whole list in both stores: pack sizes, offers, delivery fee and minimum order.
+3. **Fill.** It puts the list in the cheapest store's cart, with your login. Only the cart, nothing else.
+4. **Pay.** You open nemlig.com or BilkaToGo, check the cart, pick a delivery time and pay.
 
 Taste, budget and meal rules live in your own prompt or skill. The server finds and counts. [Build your own skill](docs/skills.md).
 
