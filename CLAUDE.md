@@ -21,6 +21,7 @@ src/handle_mcp/
   candidates.py    the products per item the caller picks from, with flags
   match.py         words: does this product match the item?
   pricing.py       kroner: packs for the amount, offers, delivery day
+  recipe_cart.py   add_recipe_to_cart: a recipe's products as absolute cart counts
   models.py        dataclasses; money is Decimal DKK
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES
