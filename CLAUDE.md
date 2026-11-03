@@ -43,7 +43,7 @@ docs/tools.md      the tool table users read: stores per tool, what writes
 ## Tools
 
 - Every tool has annotations: `READ`, `WRITE` (absolute cart quantities) or `ADD` (adds to the cart). Nothing else.
-- A write tool says in its description that the model asks the human first ("after a yes"). The tool never asks; the model does.
+- Every write tool says "Never orders or pays" in its description. A tool that adds to the cart says "ASK THE HUMAN FIRST". The tool never asks; the model does.
 - A tool that works in one store says so in its description and in `docs/tools.md`.
 - `tests/snapshots/tools.json` is the contract. A change to a tool's name, description or args is on purpose, in its own commit, with `HANDLE_UPDATE_SNAPSHOT=1`.
 - Tool answers are small, readable JSON: money as strings in kroner (`"12.95"`), dates ISO, no raw store fields. A missing fact is `null` with a reason next to it, not a guess.
@@ -90,8 +90,8 @@ One PR per change. Run the tests before you push, show the result, wait for OK.
 
 ## Release
 
-1. Bump `version` in `pyproject.toml` (`uv lock` follows) and the pin in `docs/security.md`.
-2. Merge, then tag the merge commit on `main`: `git tag vX.Y.Z origin/main && git push origin vX.Y.Z`.
+1. Bump `version` in `pyproject.toml` (`uv lock` follows) and every pin: `grep -rn "@v" README.md docs/` (today only `docs/security.md`).
+2. Merge, then tag the merge commit on `main`: `git fetch origin main && git tag vX.Y.Z origin/main && git push origin vX.Y.Z`.
 3. Semver: a tool's args or answer shape changes in a way old skills notice → major. New tool or field → minor. Fix → patch.
 
 ## Branches, commits and PRs (gitmoji)
