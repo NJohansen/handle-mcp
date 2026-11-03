@@ -41,7 +41,8 @@ def _text(value: Decimal) -> str:
 
 def offer_product(p: dict, campaign: str) -> Product | None:
     """One product from a list, or None if it is not cheaper than its normal price."""
-    price, before = _kr(p.get("price")) or Decimal(0), _kr(p.get("priceOriginal"))
+    price = Decimal(int(p["price"])) / 100  # no price: format change, never "Gratis"
+    before = _kr(p.get("priceOriginal"))
     if before is not None and price >= before:
         return None
     limit = p.get("labelMaxQuantity") or None
@@ -95,7 +96,7 @@ class OffersMixin:
         broken = 0
         for name, items in lists:
             try:  # one broken list must not hide the others
-                found = [offer_product(p, name) for p in items[:limit]]
+                found = [o for p in items if (o := offer_product(p, name))][:limit]
             except (KeyError, TypeError, ValueError) as exc:
                 log.warning("nemlig-tilbudslisten %s har ændret format: %r", name, exc)
                 broken += 1
