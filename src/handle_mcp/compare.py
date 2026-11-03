@@ -205,9 +205,11 @@ async def search(store: Any, text: str, limit: int, sort: str = "relevance") -> 
     chicken was hit 30 of 32 for "kyllingebryst" (nemlig, 2026-11-03)."""
     if sort == "relevance":
         return await store.search(text, limit)
-    hits = await store.search(text, max(limit, SEARCH_LIMIT))
-    key = lambda p: (get(p, sort) is None, Decimal(str(get(p, sort) or 0)))
-    return sorted(hits, key=key)[:limit]
+    hits = sorted(
+        await store.search(text, max(limit, SEARCH_LIMIT)),
+        key=lambda p: (get(p, sort) is None, Decimal(str(get(p, sort) or 0))),
+    )
+    return hits[:limit]
 
 
 async def quote(store: Any, items: list[str]) -> BasketQuote:
