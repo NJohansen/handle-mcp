@@ -13,7 +13,7 @@ import sys
 from collections.abc import Awaitable, Callable
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -116,10 +116,17 @@ async def _each(names: list[str], work: Callable[[Any], Awaitable[Any]]) -> dict
 
 
 @mcp.tool(annotations=READ)
-async def search_products(query: str, stores: list[str] | None = None, limit: int = 10) -> dict:
-    """Search products in one or more stores. Returns price, price per kg/l, offers and EAN when known."""
+async def search_products(
+    query: str,
+    stores: list[str] | None = None,
+    limit: int = 10,
+    sort: Literal["relevance", "price", "unit_price"] = "relevance",
+) -> dict:
+    """Search products in one or more stores. Returns price, price per kg/l, offers and EAN when
+    known. Stores rank by relevance and put cheap products far down: when the human asks for the
+    cheapest, use sort="unit_price" (per kg/l/stk) or "price"."""
     limit = max(1, min(limit, MAX_RESULTS))
-    return _out(await _each(_names(stores), lambda s: s.search(query, limit)))
+    return _out(await _each(_names(stores), lambda s: compare.search(s, query, limit, sort)))
 
 
 @mcp.tool(annotations=READ)
