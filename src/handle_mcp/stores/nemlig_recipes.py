@@ -29,6 +29,16 @@ def recipe_slug(recipe: str) -> str:
     return slug
 
 
+def category_path(category: str) -> str:
+    """'Mad til flere dage' or 'måltidskasse' → nemlig's path: 'mad-til-flere-dage'."""
+    path = category.strip().lower().replace(" ", "-")
+    for a, b in (("æ", "ae"), ("ø", "oe"), ("å", "aa")):
+        path = path.replace(a, b)
+    if not SLUG.match(path):
+        raise StoreError(f"Kender ikke kategorien {category!r}. Brug fx aftensmad eller frokost.")
+    return path
+
+
 def _product(item: dict) -> RecipeProduct:
     p = item.get("product") or {}
     campaign = next((c.get("text") for c in p.get("campaignLines") or [] if c.get("text")), None)
@@ -140,7 +150,7 @@ class RecipesMixin:
             paths.append(path)
         params: dict[str, Any] = {"skip": 0, "take": limit, "filters": paths}
         if category:
-            params["categoryPath"] = recipe_slug(category)
+            params["categoryPath"] = category_path(category)
         data = await self._api("GET", f"{BFF}/meals/allRecipes", params=params) or {}
         found = data.get("requestedCategory") or {}
         if not isinstance(found.get("recipes"), list):
@@ -167,6 +177,8 @@ class RecipesMixin:
                 for f in group.get("filters") or []
                 if f.get("path")
             ]
+            if not found:
+                raise StoreError("nemlig-opskrifter har ændret format: ingen tags.")
             self._tag_names = [str(f.get("title") or f["path"]).strip() for f in found]
             self._tags = {
                 key.strip().lower(): f["path"]
