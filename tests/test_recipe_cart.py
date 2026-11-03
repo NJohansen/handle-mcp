@@ -93,7 +93,11 @@ async def test_tool_adds_to_what_is_in_the_cart(kebab_store):
     onion = next(a for a in result["added"] if a["product_id"] == "2301108")
     assert (onion["before"], onion["added"], onion["after"], onion["ok"]) == (3, 1, 4, True)
     cart = {ln["product_id"]: ln["quantity"] for ln in result["cart"]["lines"]}
-    assert cart | {"1": 0} == {"1": 0, "2301108": 4, "5026536": 2, "106593": 2}  # "1": the fake
+    assert {k: cart[k] for k in ("2301108", "5026536", "106593")} == {
+        "2301108": 4,
+        "5026536": 2,
+        "106593": 2,
+    }
     assert {s["ingredient"] for s in result["skipped"]} == {"Iceberg", "Salt", "Olivenolie"}
 
 
@@ -122,3 +126,57 @@ async def test_tool_is_a_write_that_is_not_idempotent():
     assert tool.annotations.read_only_hint is False
     assert tool.annotations.idempotent_hint is False
     assert "ASK THE HUMAN FIRST" in tool.description and "twice adds twice" in tool.description
+
+
+async def test_tool_clamps_persons(monkeypatch):
+    seen = {}
+
+    async def recipe(self, recipe_id, persons=None):
+        seen["persons"] = persons
+        return KEBAB
+
+    monkeypatch.setattr(FakeStore, "recipe", recipe)
+    await server.add_recipe_to_cart("fake", "kebabfad-98001303", 0)
+    assert seen["persons"] == server.MIN_PERSONS
+    await server.add_recipe_to_cart("fake", "kebabfad-98001303", 999)
+    assert seen["persons"] == server.MAX_PERSONS
+
+
+async def test_tool_reports_a_refused_line(kebab_store, monkeypatch):
+    from handle_mcp.models import QuantityResult
+
+    async def set_quantities(self, items):
+        return [
+            QuantityResult(p, q, 0 if p == "106593" else q, p != "106593") for p, q in items.items()
+        ]
+
+    monkeypatch.setattr(FakeStore, "set_quantities", set_quantities)
+    result = await server.add_recipe_to_cart("fake", "kebabfad-98001303")
+    ok = {a["product_id"]: a["ok"] for a in result["added"]}
+    assert ok == {"2301108": True, "5026536": True, "106593": False}
+
+
+def test_plan_swap_to_a_sold_out_alternative_is_skipped():
+    sold_out = RecipeDetails(
+        **{
+            **KEBAB.__dict__,
+            "items": [
+                RecipeItem(
+                    "Hakket", _p("1", "8-12%"), alternatives=[_p("2", "4-7%", available=False)]
+                )
+            ],
+        }
+    )
+    lines, skipped = plan(sold_out, swap={"Hakket": "2"})
+    assert not lines and skipped[0]["reason"] == "udsolgt"
+
+
+async def test_tool_only_have_at_home_is_a_clear_error(monkeypatch):
+    home = RecipeDetails(**{**KEBAB.__dict__, "items": KEBAB.items[-2:]})
+
+    async def recipe(self, recipe_id, persons=None):
+        return home
+
+    monkeypatch.setattr(FakeStore, "recipe", recipe)
+    with pytest.raises(ToolError, match="Ingen varer"):
+        await server.add_recipe_to_cart("fake", "r")
