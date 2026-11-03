@@ -29,7 +29,7 @@ MAX_ITEMS = 50  # per set_cart_quantities or compare_basket call
 MAX_QUANTITY = 50  # per product
 MAX_RESULTS = 25
 MAX_DAYS = 14
-MAX_PERSONS = 12  # nemlig: 2-12
+MIN_PERSONS, MAX_PERSONS = 2, 12  # nemlig: 2-12
 
 READ = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=True)
 WRITE = ToolAnnotations(
@@ -135,7 +135,7 @@ async def get_recipe(store: str, recipe: str, persons: int | None = None) -> dic
     `recipe` is the recipe's link or id from search_recipes or list_recipes. Put the products
     in the cart with set_cart_quantities after the human says yes."""
     if persons is not None:
-        persons = max(1, min(persons, MAX_PERSONS))
+        persons = max(MIN_PERSONS, min(persons, MAX_PERSONS))
     return _out(await _call(store, "recipe", recipe, persons))
 
 

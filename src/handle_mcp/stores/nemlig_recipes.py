@@ -35,7 +35,7 @@ def _product(item: dict) -> RecipeProduct:
     return RecipeProduct(
         id=str(p["id"]),
         name=p.get("title", ""),
-        price=Decimal(p.get("price") or 0) / 100,  # øre
+        price=Decimal(str(p.get("price") or 0)) / 100,  # øre
         quantity=int(item.get("quantity") or 1),
         size=p.get("description") or None,
         available=(p.get("availability") or {}).get("type", "Available") == "Available",
@@ -83,7 +83,7 @@ class RecipesMixin:
             id=slug,
             name=dialog.get("title") or details.get("title", ""),
             url=f"{SITE}/maaltider/opskrift/{slug}",
-            persons=int(dialog.get("servings") or details.get("servings") or 0),
+            persons=int(dialog.get("servings") or details.get("servings") or persons or 0),
             min_persons=limits.get("minServings"),
             max_persons=limits.get("maxServings"),
             time=f"{minutes} min" if minutes else None,

@@ -83,3 +83,16 @@ async def test_get_recipe_tool_clamps_persons(monkeypatch):
     monkeypatch.setattr("tests.conftest.FakeStore.recipe", recipe)
     await server.get_recipe("fake", "r1", 99)
     assert seen["persons"] == server.MAX_PERSONS
+    await server.get_recipe("fake", "r1", 1)
+    assert seen["persons"] == server.MIN_PERSONS
+
+
+async def test_recipe_without_price_or_servings(store, monkeypatch):
+    row = {"ingredientTitle": "Løg", "item": {"product": {"id": "1", "title": "Løg"}}}
+
+    async def api(_method, url, **_kwargs):
+        return {"includedProducts": [row]} if url.endswith("/recipeProductDialog") else {}
+
+    monkeypatch.setattr(store, "_api", api)
+    r = await store.recipe(KEBAB, 6)
+    assert (r.persons, r.items[0].product.price, r.total) == (6, Decimal(0), Decimal(0))
