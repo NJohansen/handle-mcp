@@ -6,7 +6,8 @@ import pytest
 
 from handle_mcp import server
 from handle_mcp.stores import StoreError
-from handle_mcp.stores.nemlig_recipes import recipe_slug
+from handle_mcp.stores.bilkatogo import BilkaStore
+from handle_mcp.stores.nemlig_recipes import category_path, recipe_slug
 from tests import test_nemlig
 
 fake, store = test_nemlig.fake, test_nemlig.store  # the fixtures with nemlig's fake HTTP
@@ -131,3 +132,24 @@ async def test_list_recipes_tool_picks_featured_or_tags():
     tagged = await server.list_recipes(["fake"], tags=["Familievenlig"])
     assert featured["fake"][0]["group"] == "Morgen"
     assert tagged["fake"][0]["group"] == "Aftensmad"
+
+
+def test_category_with_spaces_and_danish_letters():
+    assert category_path("Mad til flere dage") == "mad-til-flere-dage"
+    assert category_path("Måltidskasse") == "maaltidskasse"
+    with pytest.raises(StoreError, match="Kender ikke kategorien"):
+        category_path("aftens/mad")
+
+
+async def test_no_tags_from_nemlig_is_a_format_change(store, monkeypatch):
+    async def api(*_args, **_kwargs):
+        return {"filters": []}
+
+    monkeypatch.setattr(store, "_api", api)
+    with pytest.raises(StoreError, match="ændret format"):
+        await store.recipes_by_tag(["Familievenlig"])
+
+
+async def test_bilkatogo_has_no_recipes_by_tag():
+    with pytest.raises(NotImplementedError):
+        await BilkaStore().recipes_by_tag(["Familievenlig"])
