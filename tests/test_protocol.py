@@ -29,18 +29,22 @@ async def test_tool_surface_matches_the_snapshot():
     tools = sorted(await _client_tools(), key=lambda t: t["name"])
     if os.environ.get("HANDLE_UPDATE_SNAPSHOT") == "1":
         SNAPSHOT.write_text(json.dumps(tools, ensure_ascii=False, indent=1) + "\n")
+        pytest.skip("snapshot written: check the diff")
     assert tools == json.loads(SNAPSHOT.read_text()), (
         "A tool's name, description, arguments or annotations changed. If on purpose: "
         "HANDLE_UPDATE_SNAPSHOT=1 uv run pytest tests/test_protocol.py"
     )
 
 
-async def test_every_write_tool_says_so_and_asks_first():
+async def test_write_tools_are_marked_and_never_order_or_pay():
+    writes = {}
     for tool in await _client_tools():
-        hints = tool["annotations"]
-        if not hints["readOnlyHint"]:
-            assert hints["destructiveHint"] is True, tool["name"]
-            assert "order" in tool["description"].lower(), tool["name"]  # "Never orders or pays"
+        if not tool["annotations"]["readOnlyHint"]:
+            assert tool["annotations"]["destructiveHint"] is True, tool["name"]
+            assert "Never orders or pays." in tool["description"], tool["name"]
+            writes[tool["name"]] = tool["description"]
+    assert set(writes) == {"set_cart_quantities", "add_recipe_to_cart"}
+    assert "ASK THE HUMAN FIRST" in writes["add_recipe_to_cart"]  # it adds a whole recipe
 
 
 @pytest.mark.parametrize(("tool", "args"), CALLS, ids=[c[0] for c in CALLS])
@@ -55,20 +59,39 @@ async def test_every_tool_answers_json_without_personal_data(tool, args):
 
 
 @pytest.mark.parametrize(
-    ("tool", "args", "match"),
+    ("tool", "args", "text"),
     [
-        ("get_cart", {"store": "nope"}, "Ukendt butik"),
-        ("set_cart_quantities", {"store": "fake", "items": {"1": 99}}, "Antal skal være"),
-        ("set_cart_quantities", {"store": "fake", "items": {"1": "mange"}}, "items"),
-        ("add_recipe_to_cart", {"store": "fake", "recipe": "r1", "skip": ["Pizza"]}, "Pizza"),
-        ("search_products", {"query": "mælk", "stores": ["broken"]}, "500"),
+        ("get_cart", {"store": "nope"}, "Ukendt butik 'nope'. Kendte butikker: broken, fake."),
+        (
+            "set_cart_quantities",
+            {"store": "fake", "items": {"1": 99}},
+            "Antal skal være 0-50. Forkert for: 1.",
+        ),
+        (
+            "set_cart_quantities",
+            {"store": "fake", "items": {"1": "mange"}},
+            "Input should be a valid integer",  # the SDK's own argument check
+        ),
+        (
+            "add_recipe_to_cart",
+            {"store": "fake", "recipe": "r1", "skip": ["Pizza"]},
+            "Opskriften har ikke 'Pizza'. Ingredienser: mælk.",
+        ),
     ],
 )
-async def test_errors_reach_the_model_as_clear_text(tool, args, match):
+async def test_errors_reach_the_model_as_clear_text(tool, args, text):
     async with Client(server.mcp, mode="legacy") as client:
         result = await client.call_tool(tool, args)
+    assert result.is_error
+    assert text in "".join(c.text for c in result.content if c.type == "text")
+
+
+async def test_one_failing_store_is_an_answer_not_a_tool_error():
+    async with Client(server.mcp, mode="legacy") as client:
+        result = await client.call_tool("search_products", {"query": "mælk", "stores": ["broken"]})
+    assert not result.is_error
     text = "".join(c.text for c in result.content if c.type == "text")
-    assert match in text, text
+    assert json.loads(text) == {"broken": {"error": "broken: API'et svarer 500"}}
 
 
 async def test_every_tool_is_called_above():
