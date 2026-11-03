@@ -61,6 +61,8 @@ class RecipesMixin:
 
     name: str
     _api: Any
+    _tags: dict[str, str]
+    _tag_names: list[str]
 
     async def recipe(self, recipe_id: str, persons: int | None = None) -> RecipeDetails:
         slug = recipe_slug(recipe_id)
@@ -118,3 +120,55 @@ class RecipesMixin:
             for r in b["recipes"] or []
             if r.get("id")
         ][:limit]
+
+    async def recipes_by_tag(
+        self, tags: list[str], category: str | None = None, limit: int = 20
+    ) -> list[Recipe]:
+        """All of nemlig's recipes with every tag, e.g. ["Familievenlig", "Under 30 min"].
+        Tags are matched on nemlig's own list, by title or path. Category defaults to
+        nemlig's "aftensmad"."""
+        known = await self._recipe_tags()
+        paths = []
+        for tag in tags:
+            path = known.get(tag.strip().lower())
+            if not path:
+                names = ", ".join(self._tag_names)
+                raise StoreError(f"nemlig kender ikke tagget {tag!r}. Brug et af: {names}.")
+            paths.append(path)
+        params: dict[str, Any] = {"skip": 0, "take": limit, "filters": paths}
+        if category:
+            params["categoryPath"] = recipe_slug(category)
+        data = await self._api("GET", f"{BFF}/meals/allRecipes", params=params) or {}
+        found = data.get("requestedCategory") or {}
+        if not isinstance(found.get("recipes"), list):
+            raise StoreError("nemlig-opskrifter har ændret format.")
+        return [
+            Recipe(
+                store=self.name,
+                id=r["id"],
+                name=r.get("title", ""),
+                url=f"{SITE}/maaltider/opskrift/{r['id']}",
+                group=found.get("title"),
+            )
+            for r in found["recipes"]
+            if r.get("id")
+        ][:limit]
+
+    async def _recipe_tags(self) -> dict[str, str]:
+        """nemlig's tags, by lower-case title and by path → path. Cached: they rarely change."""
+        if not getattr(self, "_tags", None):
+            data = await self._api("GET", f"{BFF}/meals/allRecipes", params={"skip": 0, "take": 1})
+            found = [
+                f
+                for group in (data or {}).get("filters") or []
+                for f in group.get("filters") or []
+                if f.get("path")
+            ]
+            self._tag_names = [str(f.get("title") or f["path"]).strip() for f in found]
+            self._tags = {
+                key.strip().lower(): f["path"]
+                for f in found
+                for key in (str(f.get("title") or ""), f["path"])
+                if key.strip()
+            }
+        return self._tags
