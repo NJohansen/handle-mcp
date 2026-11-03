@@ -286,6 +286,8 @@ class NemligStore(RecipesMixin):
         """Every product on nemlig's offer lists (/tilbud): Skarp pris, Priskup, Dagstilbud,
         Undgå madspild and gifts. Read only."""
         settings = await self._search_settings()
+        if not settings["timestamp"]:  # defaults would build a broken offer-list URL
+            raise StoreError("nemlig gav ingen indstillinger til tilbud. Prøv igen om lidt.")
         page = await self._api("GET", f"{BASE}/tilbud", params={"GetAsJson": "1", "d": "1"}) or {}
         self._user_id = str((page.get("Settings") or {}).get("UserId") or self._user_id)
         spots = [
