@@ -19,7 +19,7 @@ Danish grocery stores with home delivery, as an MCP server: [nemlig.com](https:/
 
 ## How it works
 
-1. **Plan.** Give your agent a budget. It reads this week's offers and recipes on nemlig.com and BilkaToGo and plans the meals around them.
+1. **Plan.** Give your agent a budget. It reads this week's offers on nemlig.com and BilkaToGo, and nemlig's recipes, and plans the meals around them.
 2. **Compare.** It prices the whole list in both stores: pack sizes, offers, delivery fee and minimum order.
 3. **Fill.** It puts the list in the cheapest store's cart, with your login. Only the cart, nothing else.
 4. **Pay.** You open nemlig.com or BilkaToGo, check the cart, pick a delivery time and pay.
