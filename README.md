@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/hero.svg" alt="Give AI a budget, fill it cheaply, you pay and they deliver, unpack the week, enjoy dinner" width="800">
+
 # 🧺 handle-mcp
 
 <a href="https://modelcontextprotocol.io"><img src="docs/badges/mcp.svg" alt="made for MCP" height="26"></a>
@@ -9,7 +11,7 @@
 
 <img src="docs/hero.svg" alt="Give AI a budget, fill it cheaply, you pay and they deliver, unpack the week, enjoy dinner" width="800">
 
-**Your AI agent plans the week's meals on a budget, prices them at nemlig.com and BilkaToGo and fills the cheapest cart. You approve and pay.**
+**Your AI agent plans the week's meals, keeping the budget, prices them at nemlig.com and BilkaToGo and fills the cheapest cart. You approve and pay.**
 
 </div>
 
