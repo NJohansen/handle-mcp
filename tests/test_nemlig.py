@@ -500,6 +500,27 @@ def test_offer_above_the_normal_price_is_not_an_offer():
     assert offer_product(p, "Dagstilbud") is None
 
 
+def test_offer_without_price_is_a_format_change():
+    p = dict(fixture("offers_page")["pageContent"][1]["products"][2])
+    del p["price"]
+    with pytest.raises(KeyError):  # the list guard reports "ændret format", never "Gratis"
+        offer_product(p, "Dagstilbud")
+
+
+async def test_offers_limit_counts_only_real_offers(store, fake, monkeypatch):
+    page = fixture("offers_page")
+    block = next(b for b in page["pageContent"] if b.get("products"))
+    first = block["products"][0] | {"price": 99999}  # not cheaper: filtered out
+    block = block | {"products": [first, *block["products"][1:]]}
+    page = page | {"pageContent": [block]}
+
+    async def api(_method, url, **_kwargs):
+        return page if url.endswith("/page") else {"Products": {"Products": []}}
+
+    monkeypatch.setattr(store, "_api", api)
+    assert len(await store.offers(1)) == 1
+
+
 async def test_free_gift_costs_nothing_and_says_max_one(store):
     [gift] = await store.search("mums rosinboller")
     assert (gift.price, gift.before_price) == (Decimal(0), Decimal("20.45"))
