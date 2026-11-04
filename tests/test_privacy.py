@@ -1,5 +1,6 @@
 """No personal data leaves the server, whatever a store adapter returns."""
 
+import dataclasses
 import json
 from decimal import Decimal
 
@@ -101,5 +102,19 @@ def test_scrub_dawa_address_id():
     ],
 )
 def test_money_is_always_two_decimals(value, text):
-    """Grok Bot, 2026-11-04: nemlig gave "0.0", BilkaToGo "0": one format across stores."""
+    """nemlig sends "0.0" and "32.0", BilkaToGo "0" and "39.00": one format across stores."""
     assert jsonable({"price": value}) == {"price": text}
+
+
+def test_money_is_two_decimals_when_nested_and_rounded_half_up():
+    @dataclasses.dataclass
+    class Line:
+        unit_price: Decimal
+
+    out = jsonable({"fees": {"levering": Decimal(39)}, "lines": [Line(Decimal("0.125"))]})
+    assert out == {"fees": {"levering": "39.00"}, "lines": [{"unit_price": "0.13"}]}
+
+
+def test_money_that_cannot_be_quantized_is_still_shown():
+    assert jsonable(Decimal("NaN")) == "NaN"
+    assert jsonable(Decimal("1e40")) == "1E+40"
