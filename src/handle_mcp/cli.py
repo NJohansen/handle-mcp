@@ -91,7 +91,11 @@ def _login_from_env(store: str) -> int:
         return 1
     path = registry.config_set(store, email, password)
     _say(f"Logget ind på {store}. Login er gemt i {path} (kun du kan læse den).")
-    if registry.keychain_get(store):  # load_login reads the keychain first
+    try:
+        shadowed = registry.keychain_get(store) is not None
+    except registry.StoreError:  # a broken entry: load_login will complain about it too
+        shadowed = True
+    if shadowed:  # load_login reads the keychain first
         _say(
             f"OBS: nøgleringen har også et login til {store}, og det vinder over filen. "
             f"Fjern det med: handle-mcp logout {store}, og kør så --from-env igen."

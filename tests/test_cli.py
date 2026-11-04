@@ -172,3 +172,14 @@ def test_login_from_env_warns_when_the_keychain_wins(config_dir, monkeypatch, ca
 def test_missing_login_error_names_the_headless_way(config_dir):
     with pytest.raises(registry.StoreError, match="handle-mcp login fake --from-env"):
         registry.load_login("fake")
+
+
+def test_login_from_env_survives_a_broken_keychain_entry(
+    config_dir, memory_keychain, monkeypatch, capsys
+):
+    memory_keychain.secrets[(registry.KEYCHAIN_SERVICE, "fake")] = "not json"
+    monkeypatch.setenv("HANDLE_FAKE_EMAIL", "a@example.com")
+    monkeypatch.setenv("HANDLE_FAKE_PASSWORD", "rigtig")
+    assert cli.run(["login", "fake", "--from-env"]) == 0
+    assert (config_dir / "fake.json").exists()
+    assert "nøgleringen har også et login" in capsys.readouterr().err
