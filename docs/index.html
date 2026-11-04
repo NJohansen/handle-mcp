@@ -12,7 +12,7 @@
 <style>
 @font-face{font-family:Inter;src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{
-  --paper:#f4efe2;--white:#fff;--sand:#e4ddcc;--ink:#2b2d29;--stone:#74766f;--mist:#d8d4ca;
+  --paper:#fff;--white:#f2f3f0;--sand:#e3e4df;--t-green:#e8f5dc;--t-coral:#ffe7e1;--t-sun:#fff5bf;--t-sky:#e2f0ff;--t-plum:#eee8fb;--ink:#2b2d29;--stone:#74766f;--mist:#d8d4ca;
   --leaf:#86cf5c;--sky:#3a9df5;--coral:#ff6f59;--sun:#f6dc2a;--plum:#9b7be0;
   --r:44px;
   --sans:Inter,ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
@@ -27,17 +27,17 @@ p a,.small a{text-decoration:none;border-bottom:1px solid var(--stone)}
 [hidden]{display:none!important}
 
 /* nav */
-.navbar{position:sticky;top:16px;z-index:5;margin:16px auto 0;max-width:1152px;background:var(--white);border-radius:999px;display:flex;align-items:center;justify-content:space-between;padding:8px 8px 8px 10px}
+.navbar{position:sticky;top:16px;z-index:5;margin:16px auto 0;max-width:1152px;background:#fff;border:1px solid var(--sand);border-radius:999px;display:flex;align-items:center;justify-content:space-between;padding:8px 8px 8px 10px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:500;font-size:16px}
 .mark{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:var(--leaf);font-size:20px}
 .links{display:flex;align-items:center;gap:4px;list-style:none;margin:0;padding:0}
 .links a{display:block;padding:10px 16px;font-size:15px;font-weight:500;text-decoration:none;border-radius:999px}
-.links a:hover{background:var(--paper)}
-.pill{display:inline-flex;align-items:center;gap:10px;padding:11px 12px 11px 20px;border-radius:999px;font-weight:500;font-size:15px;text-decoration:none;background:var(--white);border:1px solid var(--ink);white-space:nowrap}
+.links a:hover{background:var(--white)}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:11px 12px 11px 20px;border-radius:999px;font-weight:500;font-size:15px;text-decoration:none;background:#fff;border:1px solid var(--ink);white-space:nowrap}
 .links a.pill{display:inline-flex;padding:9px 10px 9px 18px}
 .pill i{display:block;width:22px;height:22px;border-radius:50%;background:var(--sky)}
 .pill.coral{background:var(--coral);border-color:var(--coral)}
-.pill.coral i{background:var(--white)}
+.pill.coral i{background:#fff}
 .pill.ghost{border-color:var(--mist)}
 .pill.ghost i{background:var(--leaf)}
 
@@ -55,7 +55,9 @@ h2{font-weight:500;font-size:clamp(40px,6.2vw,81px);line-height:1.02;letter-spac
 .sub{text-align:center;color:var(--stone);max-width:600px;margin:0 auto 48px;font-size:19px}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .pair>*,.tiles>*,.steps>*{min-width:0}
-.card{background:var(--white);border-radius:var(--r);padding:36px}
+.card{background:var(--white);}
+.t-green{background:var(--t-green)}.t-coral{background:var(--t-coral)}.t-sun{background:var(--t-sun)}.t-sky{background:var(--t-sky)}.t-plum{background:var(--t-plum)}
+.card{border-radius:var(--r);padding:36px}
 .card h3{font-weight:500;font-size:30px;line-height:1.15;letter-spacing:-.03em;margin:0 0 10px}
 .card p{margin:0;color:var(--stone)}
 .big{font-weight:500;font-size:clamp(64px,8vw,104px);line-height:.95;letter-spacing:-.06em;margin:0 0 18px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
@@ -67,12 +69,12 @@ h2{font-weight:500;font-size:clamp(40px,6.2vw,81px);line-height:1.02;letter-spac
 .who{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin-bottom:8px}
 .you{text-align:right;margin-bottom:26px}
 .bubble{display:inline-block;max-width:600px;padding:14px 20px;border-radius:26px;text-align:left;font-size:17px}
-.you .bubble{background:var(--ink);color:var(--white);border-bottom-right-radius:8px}
-.ai .bubble{background:var(--paper);border-bottom-left-radius:8px;margin:14px 0 18px}
+.you .bubble{background:var(--ink);color:#fff;border-bottom-right-radius:8px}
+.ai .bubble{background:#fff;border-bottom-left-radius:8px;margin:14px 0 18px}
 .step{font-size:15px;color:var(--stone);margin:4px 0;display:flex;gap:10px;align-items:center}
 .step::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--leaf);flex:none}
 .step code{font:12px var(--mono);opacity:.8}
-.plan{background:var(--paper);border-radius:32px;padding:26px}
+.plan{background:#fff;border-radius:32px;padding:26px}
 .plan h4{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin:0 0 18px;font-size:20px;font-weight:500;letter-spacing:-.02em}
 .plan h4 span{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--stone)}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -84,7 +86,7 @@ h2{font-weight:500;font-size:clamp(40px,6.2vw,81px);line-height:1.02;letter-spac
 .days{margin:16px 0 0;padding:0;list-style:none;font-size:16px}
 .days li{display:flex;justify-content:space-between;gap:12px;padding:9px 4px;border-top:1px solid var(--sand)}
 .days b{display:inline-block;width:44px;color:var(--stone);font-weight:500}
-.tag{font-size:13px;font-weight:500;padding:2px 10px;border-radius:10px;border:1.5px solid var(--coral);white-space:nowrap;align-self:center}
+.tag{font-size:13px;font-weight:600;padding:3px 10px;border-radius:8px;background:var(--sun);color:#c8311b;white-space:nowrap;align-self:center;transform:rotate(-3deg)}
 .note{font-size:14px;color:var(--stone);margin:16px 0 0;text-align:center}
 
 /* steps */
@@ -99,7 +101,7 @@ h2{font-weight:500;font-size:clamp(40px,6.2vw,81px);line-height:1.02;letter-spac
 .promise svg{flex:none;width:72px;height:72px}
 
 /* start */
-pre{background:var(--paper);border-radius:20px;padding:18px 20px;overflow-x:auto;font:13.5px/1.7 var(--mono);margin:16px 0}
+pre{background:#fff;border-radius:20px;padding:18px 20px;overflow-x:auto;font:13.5px/1.7 var(--mono);margin:16px 0}
 .small{font-size:16px;color:var(--stone);margin:0}
 .solo{max-width:760px;margin:0 auto}
 
@@ -150,12 +152,12 @@ footer nav a{margin-right:18px;font-weight:500;font-size:15px}
 
     <!-- Paper-cut illustration: calendar, basket, delivery box, coins -->
     <svg class="art" viewBox="0 0 1100 400" role="img" aria-label="En kalender, en fyldt indkøbskurv, en leveringskasse og en stak mønter" fill="none" stroke="#2b2d29" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
-      <ellipse cx="550" cy="372" rx="520" ry="22" fill="#e4ddcc" stroke="none"/>
+      <ellipse cx="550" cy="372" rx="520" ry="22" fill="#eceee8" stroke="none"/>
       <g transform="rotate(-7 170 210)">
         <rect x="60" y="110" width="220" height="230" rx="28" fill="#fff"/>
         <path d="M60 170V138a28 28 0 0128-28h164a28 28 0 0128 28v32z" fill="#ff6f59"/>
         <path d="M110 92v40M230 92v40"/>
-        <g fill="#e4ddcc" stroke="none">
+        <g fill="#e3e4df" stroke="none">
           <circle cx="100" cy="210" r="10"/><circle cx="145" cy="210" r="10"/><circle cx="190" cy="210" r="10"/><circle cx="235" cy="210" r="10"/>
           <circle cx="100" cy="255" r="10"/><circle cx="190" cy="255" r="10"/><circle cx="235" cy="255" r="10"/>
           <circle cx="100" cy="300" r="10"/><circle cx="145" cy="300" r="10"/><circle cx="190" cy="300" r="10"/>
@@ -199,12 +201,12 @@ footer nav a{margin-right:18px;font-weight:500;font-size:15px}
     <h2>Kender I det her?</h2>
     <p class="sub">To ting, der koster tid og penge i de fleste familier.</p>
     <div class="pair">
-      <div class="card">
+      <div class="card t-coral">
         <div class="big"><s>6</s> 1 <small>handel om ugen</small></div>
         <h3>I handler hele tiden</h3>
         <p>En tur efter mælk, en efter aftensmad, en fordi noget mangler. Med en plan for hele ugen kommer det hele med én levering.</p>
       </div>
-      <div class="card">
+      <div class="card t-green">
         <div class="big"><s>20.</s> 31. <small>i måneden</small></div>
         <h3>Madkontoen løber tør før tid</h3>
         <p>Sig hvor meget der er til mad. Din AI planlægger ugen inden for budgettet, bygger på tilbuddene og finder den billigste butik.</p>
@@ -250,19 +252,19 @@ footer nav a{margin-right:18px;font-weight:500;font-size:15px}
     <h2>Fire skridt</h2>
     <p class="sub">De tre første klarer din AI. Det sidste gør du.</p>
     <div class="steps">
-      <div class="card">
+      <div class="card t-sun">
         <svg viewBox="0 0 64 64" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="32" cy="32" r="26" fill="#f6dc2a"/><path d="M32 16v32M39 23c-2-3-14-4-14 2 0 7 14 4 14 11 0 6-11 6-15 2"/></svg>
         <h3>Sig budgettet</h3><p>"900 kr til 4 personer." Og hvad I kan lide, og hvad I har hjemme.</p>
       </div>
-      <div class="card">
+      <div class="card t-coral">
         <svg viewBox="0 0 64 64" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="10" y="12" width="44" height="44" rx="10" fill="#fff"/><path d="M10 26v-4a10 10 0 0110-10h24a10 10 0 0110 10v4z" fill="#ff6f59"/><circle cx="24" cy="40" r="5" fill="#86cf5c"/><path d="M34 37h12M34 45h8"/></svg>
         <h3>Den planlægger</h3><p>Den læser ugens tilbud og opskrifter, og laver madplanen ud fra dem.</p>
       </div>
-      <div class="card">
+      <div class="card t-green">
         <svg viewBox="0 0 64 64" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 26h48l-6 28H14z" fill="#86cf5c"/><path d="M18 26c0-18 28-18 28 0" stroke-width="4"/><path d="M24 34v12M32 34v12M40 34v12"/></svg>
         <h3>Den fylder kurven</h3><p>Den regner hele kurven i begge butikker og fylder den billigste. Kun kurven.</p>
       </div>
-      <div class="card">
+      <div class="card t-plum">
         <svg viewBox="0 0 64 64" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M10 22h44v32H10z" fill="#9b7be0"/><path d="M10 22l-4-10h52l-4 10z" fill="#b9a2f0"/><path d="M24 38l6 6 12-12" stroke-width="4"/></svg>
         <h3>Du betaler</h3><p>Du tjekker kurven, vælger leveringstid og betaler. Maden kommer til døren.</p>
       </div>
@@ -273,11 +275,11 @@ footer nav a{margin-right:18px;font-weight:500;font-size:15px}
     <h2>Du betaler altid selv</h2>
     <p class="sub">To løfter, der står i koden. En test fejler, hvis nogen bryder dem.</p>
     <div class="pair">
-      <div class="card">
+      <div class="card t-green">
         <svg viewBox="0 0 72 72" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="14" y="30" width="44" height="34" rx="10" fill="#86cf5c"/><path d="M24 30v-8a12 12 0 0124 0v8" stroke-width="4"/><circle cx="36" cy="46" r="4" fill="#2b2d29"/></svg>
         <div><h3>Den kan aldrig betale</h3><p>Der findes ingen kode til at bestille, betale, læse kort, vælge leveringstid eller ændre adresse. Den kan kun lægge varer i kurven, og kun når du har sagt ja.</p></div>
       </div>
-      <div class="card">
+      <div class="card t-sky">
         <svg viewBox="0 0 72 72" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M10 36L36 12l26 24v26H10z" fill="#3a9df5"/><rect x="28" y="42" width="16" height="20" rx="4" fill="#fff"/></svg>
         <div><h3>Jeres data bliver hjemme</h3><p>Navn, adresse og telefon bliver fjernet, før din AI ser svar fra butikken. Login gemmes kun på din egen computer, ikke i en sky.</p></div>
       </div>
