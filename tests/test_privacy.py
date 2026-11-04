@@ -165,3 +165,14 @@ def test_free_text_under_harmless_keys_is_scrubbed():
     text = json.dumps(out, ensure_ascii=False)
     for word in ("98765432", "Kildevej 12", "2100", "anders@"):
         assert word not in text
+
+
+def test_free_text_in_dicts_under_a_free_text_key_is_scrubbed():
+    out = scrub({"messages": [{"text": "Ring 98765432"}], "warnings": {"detail": "a@b.dk"}})
+    assert out == {"messages": [{"text": f"Ring {REDACTED}"}], "warnings": {"detail": REDACTED}}
+
+
+@pytest.mark.parametrize("text", ["Varen 12345678 er udsolgt", "Max 1000 Stk pr. ordre"])
+def test_scrub_text_false_positives_are_accepted(text):
+    """An 8-digit id looks like a phone, "1000 Stk" like a postal code: hidden on purpose."""
+    assert REDACTED in scrub_text(text)

@@ -12,6 +12,8 @@ Free text from a store (warnings, messages, errors) can echo personal data
 under a harmless key. `scrub_text()` replaces emails, phone numbers and
 addresses in it. It runs on the free-text keys below and on every error text,
 not on product names: "Kildevand 0,5 l 24 stk" must pass as the store wrote it.
+False positives are accepted in free text: an 8-digit id reads as a phone number
+and "1000 Stk" as a postal code and city. Better a hidden id than a leaked phone.
 """
 
 from __future__ import annotations
@@ -116,6 +118,8 @@ def scrub_text(value: Any) -> Any:
         for pattern in _TEXT_PATTERNS:
             value = pattern.sub(REDACTED, value)
         return value
+    if isinstance(value, dict):
+        return {k: scrub_text(v) for k, v in value.items()}
     if isinstance(value, list | tuple):
         return [scrub_text(v) for v in value]
     return value
