@@ -163,6 +163,16 @@ footer{background:var(--sun);border-top:0;color:var(--ink);padding:72px 0 56px}
 footer p.big{max-width:none;font-weight:600;font-size:clamp(44px,7vw,88px);line-height:.95;letter-spacing:-.055em;margin:0 0 40px;width:100%}
 footer a{font-weight:500}
 
+/* full-bleed colour bands */
+body{overflow-x:clip}
+.band{position:relative;padding-bottom:128px;margin-top:136px;padding-top:120px}
+.band::before{content:"";position:absolute;top:0;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:var(--sky-soft)}
+.band.leaf::before{background:var(--leaf)}
+.band .chat{background:#fff}
+.band .ai .bubble{background:var(--sky-soft)}
+.band.leaf .promise{background:transparent;padding:0;border-radius:0}
+.band+section{padding-top:128px}
+
 @media (max-width:900px){
   .wrap{padding:0 20px}
   nav ul li.opt{display:none}
@@ -174,6 +184,8 @@ footer a{font-weight:500}
   .promise{padding:44px 28px;border-radius:26px}
   .chat{padding:24px;border-radius:24px}
   .stamp{right:4px}
+  .band{margin-top:104px;padding-top:88px;padding-bottom:96px}
+  .band+section{padding-top:96px}
   .fact,.fact+.fact{padding:32px;margin-top:0}
   .steps div,.steps div+div{padding:24px}
   .chat{padding:24px;border-radius:32px}
@@ -253,8 +265,8 @@ footer a{font-weight:500}
     </div>
   </section>
 
-  <section>
-    <p class="kicker sky">Sådan ser det ud</p>
+  <section class="band">
+    <p class="kicker sky" style="background:#fff">Sådan ser det ud</p>
     <h2>Du skriver én besked.</h2>
     <p class="sub">Resten klarer din AI. Den kan kun lægge varer i kurven. Betalingen er din.</p>
     <div class="chat" aria-label="Eksempel på en samtale">
@@ -286,7 +298,7 @@ footer a{font-weight:500}
     </div>
   </section>
 
-  <section>
+  <section class="band leaf">
     <div class="promise">
       <h2>Du betaler altid selv.</h2>
       <div>
