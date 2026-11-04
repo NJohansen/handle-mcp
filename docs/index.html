@@ -13,7 +13,7 @@
 @font-face{font-family:Inter;src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{
   --bg:#fff;--soft:#f4f4f1;--line:#e6e6e1;--ink:#1d1e1b;--mute:#6d6e69;
-  --green:#2f8f46;--leaf:#8ed462;--leaf-soft:#eef8e6;
+  --green:#2f8f46;--leaf:#8ed462;--leaf-soft:#eef8e6;--sky:#2ba0ff;--sky-soft:#e6f3ff;--coral:#ff705d;--coral-soft:#ffece8;--sun:#f5e211;--sun-soft:#fdf8c9;
   --sans:Inter,ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
 }
@@ -101,7 +101,7 @@ h2{font-weight:600;font-size:clamp(38px,5.4vw,68px);line-height:1;letter-spacing
 .steps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink);margin-top:56px}
 .steps div{padding:28px 28px 0 0}
 .steps div+div{padding-left:28px;border-left:1px solid var(--line)}
-.steps span{display:block;font:500 14px var(--mono);color:var(--green);margin-bottom:40px}
+.steps span{display:block}
 .steps h3{font-weight:600;font-size:24px;letter-spacing:-.025em;margin:0 0 8px}
 .steps p{margin:0;color:var(--mute);font-size:16px}
 
@@ -125,32 +125,74 @@ footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
 footer a{margin-right:20px}
 footer p{margin:0;max-width:560px}
 
+/* MindMarket-style layer: pill nav, dot buttons, tinted cards, chips, colour bands */
+.navwrap{position:sticky;top:14px;z-index:10;padding-top:14px}
+nav{height:auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 10px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:var(--leaf);font:700 17px var(--sans);color:var(--ink)}
+nav ul{gap:6px}
+nav ul a{display:block;padding:10px 16px;border-radius:999px}
+nav ul a:hover{background:var(--soft)}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:12px 12px 12px 22px;border-radius:999px;background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.btn i{display:block;width:22px;height:22px;border-radius:50%;background:var(--sky)}
+.btn.coral{background:var(--coral);box-shadow:none}
+.btn.coral i{background:#fff}
+.btn.line{box-shadow:inset 0 0 0 1px var(--line)}
+.btn.line i{background:var(--leaf)}
+nav ul a.btn{padding:9px 10px 9px 18px;color:var(--ink);background:#fff}
+nav ul a.btn:hover{background:#fff}
+.eyebrow b{color:var(--ink)}
+.kicker{display:inline-block;padding:4px 12px;border-radius:10px;border:1.5px solid var(--leaf);color:var(--ink)}
+.kicker.sky{border-color:var(--sky)}.kicker.coral{border-color:var(--coral)}.kicker.sun{border-color:var(--sun)}
+.facts{border-top:0;gap:20px}
+.fact,.fact+.fact{border-radius:50px;padding:44px;border-left:0}
+.fact:first-child{background:var(--coral-soft)}.fact+.fact{background:var(--leaf-soft)}
+.num s{color:#b4b5ae;text-decoration-color:var(--coral)}
+.fact p{color:#55564f}
+.chat{border-radius:50px;background:var(--sky-soft);padding:48px}
+.steps{border-top:0;gap:16px}
+.steps div,.steps div+div{border-left:0;border-radius:40px;padding:30px}
+.steps div:nth-child(1){background:var(--sun-soft)}.steps div:nth-child(2){background:var(--sky-soft)}.steps div:nth-child(3){background:var(--leaf-soft)}.steps div:nth-child(4){background:var(--coral-soft)}
+.steps span{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#fff;color:var(--ink);font:600 14px var(--sans);margin-bottom:36px}
+.steps p{color:#55564f}
+.promise{background:var(--leaf);color:var(--ink);border-radius:50px}
+.promise h2{color:var(--ink)}
+.promise p{color:#2f4a22}
+pre{background:var(--soft);border-radius:24px}
+footer{background:var(--sun);border-top:0;color:var(--ink);padding:72px 0 56px}
+footer p.big{max-width:none;font-weight:600;font-size:clamp(44px,7vw,88px);line-height:.95;letter-spacing:-.055em;margin:0 0 40px;width:100%}
+footer a{font-weight:500}
+
 @media (max-width:900px){
   .wrap{padding:0 20px}
   nav ul li.opt{display:none}
   .hero{grid-template-columns:1fr;gap:56px;padding-top:40px}
   .facts,.promise,.start{grid-template-columns:1fr}
   .fact,.fact+.fact{padding:32px 0 8px;border-left:0}
-  .fact+.fact{border-top:1px solid var(--line);margin-top:32px}
-  .steps{grid-template-columns:1fr 1fr;row-gap:36px}
+  .steps{grid-template-columns:1fr 1fr;gap:12px}
   .steps div,.steps div+div{padding:24px 16px 0 0;border-left:0}
   .promise{padding:44px 28px;border-radius:26px}
   .chat{padding:24px;border-radius:24px}
   .stamp{right:4px}
+  .fact,.fact+.fact{padding:32px;margin-top:0}
+  .steps div,.steps div+div{padding:24px}
+  .chat{padding:24px;border-radius:32px}
+  .promise{border-radius:36px}
+  nav ul li.opt{display:none}
   section{padding-top:104px}
 }
 </style>
 </head>
 <body>
 
-<header class="wrap">
+<header class="wrap navwrap">
   <nav>
-    <a class="brand" href="./">handle-mcp</a>
+    <a class="brand" href="./"><span class="logo">h</span>handle-mcp</a>
     <ul>
       <li class="opt"><a href="#hvorfor">Hvorfor</a></li>
       <li class="opt"><a href="#saadan">Sådan virker det</a></li>
       <li class="opt"><a href="https://github.com/NJohansen/handle-mcp">GitHub</a></li>
-      <li><a class="btn" href="#kom-i-gang">Kom i gang</a></li>
+      <li><a class="btn" href="#kom-i-gang">Kom i gang <i></i></a></li>
     </ul>
   </nav>
 </header>
@@ -162,8 +204,8 @@ footer p{margin:0;max-width:560px}
       <h1>Én kurv.<br>Hele ugen.</h1>
       <p class="lead"><strong>Slut med at handle 5-6 gange om ugen. Slut med en madkonto, der er tom før tid.</strong> Din AI laver madplanen ud fra jeres budget og ugens tilbud, og fylder den billigste kurv. Du betaler selv.</p>
       <div class="ctas">
-        <a class="btn" href="#kom-i-gang">Kom i gang</a>
-        <a class="btn line" href="https://github.com/NJohansen/handle-mcp">Se koden</a>
+        <a class="btn coral" href="#kom-i-gang">Kom i gang <i></i></a>
+        <a class="btn line" href="https://github.com/NJohansen/handle-mcp">Se koden <i></i></a>
       </div>
     </div>
 
@@ -183,7 +225,7 @@ footer p{margin:0;max-width:560px}
         <div class="row off" style="animation-delay:2.95s"><span>&nbsp; 3 for 48</span><span>−12,00</span></div>
         <div class="row" style="animation-delay:3.20s"><span>Broccoli 2 stk</span><span>30,00</span></div>
         <div class="row free" style="animation-delay:3.45s"><span>Kaffe 400 g · gratis</span><span>0,00</span></div>
-        <div class="row muted" style="animation-delay:3.70s"><span>+ 21 varer</span><span>615,79</span></div>
+        <div class="row muted" style="animation-delay:3.70s"><span>+ 19 varer</span><span>615,79</span></div>
         <div class="row" style="animation-delay:3.95s"><span>Levering</span><span>29,00</span></div>
         <hr style="animation-delay:4.20s">
         <div class="row total win" style="animation-delay:4.45s"><span>nemlig.com</span><span>842,00</span></div>
@@ -212,7 +254,7 @@ footer p{margin:0;max-width:560px}
   </section>
 
   <section>
-    <p class="kicker">Sådan ser det ud</p>
+    <p class="kicker sky">Sådan ser det ud</p>
     <h2>Du skriver én besked.</h2>
     <p class="sub">Resten klarer din AI. Den kan kun lægge varer i kurven. Betalingen er din.</p>
     <div class="chat" aria-label="Eksempel på en samtale">
@@ -234,13 +276,13 @@ footer p{margin:0;max-width:560px}
   </section>
 
   <section id="saadan">
-    <p class="kicker">Sådan virker det</p>
+    <p class="kicker sun">Sådan virker det</p>
     <h2>Fire skridt. Det sidste er dit.</h2>
     <div class="steps">
-      <div><span>01</span><h3>Sig budgettet</h3><p>"900 kr til 4 personer." Og hvad I kan lide, og hvad I har hjemme.</p></div>
-      <div><span>02</span><h3>Den planlægger</h3><p>Den læser tilbud i begge butikker, finder gratis varer og bruger butikkens opskrifter.</p></div>
-      <div><span>03</span><h3>Den fylder kurven</h3><p>Den regner hele kurven i begge butikker, med levering, og fylder den billigste.</p></div>
-      <div><span>04</span><h3>Du betaler</h3><p>Du tjekker kurven, vælger leveringstid og betaler. Maden kommer til døren.</p></div>
+      <div><span>1</span><h3>Sig budgettet</h3><p>"900 kr til 4 personer." Og hvad I kan lide, og hvad I har hjemme.</p></div>
+      <div><span>2</span><h3>Den planlægger</h3><p>Den læser tilbud i begge butikker, finder gratis varer og bruger butikkens opskrifter.</p></div>
+      <div><span>3</span><h3>Den fylder kurven</h3><p>Den regner hele kurven i begge butikker, med levering, og fylder den billigste.</p></div>
+      <div><span>4</span><h3>Du betaler</h3><p>Du tjekker kurven, vælger leveringstid og betaler. Maden kommer til døren.</p></div>
     </div>
   </section>
 
@@ -259,7 +301,7 @@ footer p{margin:0;max-width:560px}
   <section id="kom-i-gang">
     <div class="start">
       <div>
-        <p class="kicker">Kom i gang</p>
+        <p class="kicker coral">Kom i gang</p>
         <h2>Fem minutter.</h2>
         <p class="sub" style="margin-bottom:0">Ærligt: i dag kræver det lidt teknik. Du skal bruge en AI-assistent, der kan bruge værktøjer (fx Claude), og terminalen.</p>
       </div>
@@ -271,12 +313,12 @@ claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp 
         <!-- Hidden until the Tally URL exists: set href, then remove "hidden". -->
         <div class="extra" hidden>
           <p class="small" style="margin-bottom:14px">Uden terminal? Vi arbejder på en nemmere vej. Skriv dig op, så får du besked.</p>
-          <a class="btn" href="#" data-placeholder="tally">Skriv mig op</a>
+          <a class="btn coral" href="#" data-placeholder="tally">Skriv mig op <i></i></a>
         </div>
         <!-- Hidden until the Buy Me a Coffee URL exists: set href, then remove "hidden". -->
         <div class="extra" hidden>
           <p class="small" style="margin-bottom:14px">Gratis, og det bliver det ved med. Sparer den jer tid eller penge? En kop kaffe holder projektet i gang.</p>
-          <a class="btn line" href="#" data-placeholder="coffee">Giv en kop kaffe</a>
+          <a class="btn line" href="#" data-placeholder="coffee">Giv en kop kaffe <i></i></a>
         </div>
       </div>
     </div>
@@ -285,6 +327,7 @@ claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp 
 
 <footer>
   <div class="wrap">
+    <p class="big">Handl én gang.<br>Spis hele ugen.</p>
     <p>Ikke officiel. Bruger butikkernes egne hjemmesider, så det kan gå i stykker uden varsel. Ikke tilknyttet nemlig.com eller Salling Group.</p>
     <div><a href="https://github.com/NJohansen/handle-mcp">GitHub</a><a href="https://github.com/NJohansen/handle-mcp/blob/main/docs/security.md">Sikkerhed</a><a href="https://github.com/NJohansen/handle-mcp/blob/main/LICENSE">MIT-licens</a></div>
   </div>
