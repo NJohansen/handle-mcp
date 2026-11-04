@@ -64,18 +64,15 @@ def run(args: list[str]) -> int:
 
 
 def _logout(store: str) -> int:
-    removed_file = registry.config_delete(store)
+    removed = ["config-filen"] if registry.config_delete(store) else []
     try:
-        removed = registry.keychain_delete(store)
+        if registry.keychain_delete(store):
+            removed.append("nøgleringen")
     except KeyringError as exc:
-        if removed_file:
-            _say("Login slettet fra config-filen.")
-            return 0
-        _say(f"Ingen nøglering på denne maskine: {exc}")
-        return 1
-    if removed_file:
-        _say("Login slettet fra config-filen.")
-    _say("Login slettet fra nøgleringen." if removed else "Der var intet login i nøgleringen.")
+        if not removed:
+            _say(f"Ingen nøglering på denne maskine: {exc}")
+            return 1
+    _say(f"Login slettet fra {' og '.join(removed)}." if removed else "Der var intet gemt login.")
     return 0
 
 
@@ -94,6 +91,11 @@ def _login_from_env(store: str) -> int:
         return 1
     path = registry.config_set(store, email, password)
     _say(f"Logget ind på {store}. Login er gemt i {path} (kun du kan læse den).")
+    if registry.keychain_get(store):  # load_login reads the keychain first
+        _say(
+            f"OBS: nøgleringen har også et login til {store}, og det vinder over filen. "
+            f"Fjern det med: handle-mcp logout {store}, og kør så --from-env igen."
+        )
     return 0
 
 

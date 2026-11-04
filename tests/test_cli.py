@@ -123,10 +123,50 @@ def test_login_from_env_without_env_vars_says_which(config_dir, monkeypatch, cap
     assert "HANDLE_FAKE_EMAIL" in capsys.readouterr().err
 
 
-def test_logout_removes_the_file_too(config_dir):
+def test_logout_removes_the_file_too(config_dir, capsys):
     registry.config_set("fake", "a@example.com", "x")
     assert cli.run(["logout", "fake"]) == 0
     assert not (config_dir / "fake.json").exists()
+    assert "slettet fra config-filen." in capsys.readouterr().err  # one line, not two
+
+
+def test_logout_removes_file_and_keychain_in_one_line(config_dir, capsys):
+    registry.config_set("fake", "a@example.com", "x")
+    registry.keychain_set("fake", "a@example.com", "x")
+    assert cli.run(["logout", "fake"]) == 0
+    assert "slettet fra config-filen og nøgleringen." in capsys.readouterr().err
+
+
+def test_logout_file_only_without_a_keychain(config_dir, monkeypatch, capsys):
+    from keyring.errors import NoKeyringError
+
+    def no_keychain(*_args):
+        raise NoKeyringError("no backend")
+
+    monkeypatch.setattr(registry.keyring, "delete_password", no_keychain)
+    registry.config_set("fake", "a@example.com", "x")
+    assert cli.run(["logout", "fake"]) == 0
+    assert "slettet fra config-filen." in capsys.readouterr().err
+
+
+def test_login_from_env_tightens_an_existing_wide_file(config_dir, monkeypatch):
+    config_dir.mkdir()
+    old = config_dir / "fake.json"
+    old.write_text('{"email": "old@example.com", "password": "gammelt-og-langt-kodeord"}')
+    old.chmod(0o644)
+    monkeypatch.setenv("HANDLE_FAKE_EMAIL", "a@example.com")
+    monkeypatch.setenv("HANDLE_FAKE_PASSWORD", "rigtig")
+    assert cli.run(["login", "fake", "--from-env"]) == 0
+    assert old.stat().st_mode & 0o777 == 0o600
+    assert old.read_text() == '{"email": "a@example.com", "password": "rigtig"}'  # no old tail
+
+
+def test_login_from_env_warns_when_the_keychain_wins(config_dir, monkeypatch, capsys):
+    registry.keychain_set("fake", "old@example.com", "rigtig")
+    monkeypatch.setenv("HANDLE_FAKE_EMAIL", "a@example.com")
+    monkeypatch.setenv("HANDLE_FAKE_PASSWORD", "rigtig")
+    assert cli.run(["login", "fake", "--from-env"]) == 0
+    assert "nøgleringen har også et login" in capsys.readouterr().err
 
 
 def test_missing_login_error_names_the_headless_way(config_dir):

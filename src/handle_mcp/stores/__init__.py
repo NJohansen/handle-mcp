@@ -93,19 +93,20 @@ def config_set(store: str, email: str, password: str) -> Path:
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     CONFIG_DIR.chmod(stat.S_IRWXU)
     path = CONFIG_DIR / f"{store}.json"
-    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, stat.S_IRUSR | stat.S_IWUSR)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT, stat.S_IRUSR | stat.S_IWUSR)
+    os.fchmod(fd, stat.S_IRUSR | stat.S_IWUSR)  # an existing wider file: tighten before writing
+    os.ftruncate(fd, 0)
     with os.fdopen(fd, "w") as f:
         json.dump({"email": email, "password": password}, f)
-    path.chmod(stat.S_IRUSR | stat.S_IWUSR)  # also when the file existed with wider rights
     return path
 
 
 def config_delete(store: str) -> bool:
     """True if ~/.config/handle-mcp/<store>.json was removed."""
-    path = CONFIG_DIR / f"{store}.json"
-    if not path.exists():
+    try:
+        (CONFIG_DIR / f"{store}.json").unlink()
+    except FileNotFoundError:
         return False
-    path.unlink()
     return True
 
 
