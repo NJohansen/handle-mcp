@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>handle-mcp: én kurv, hele ugen</title>
+<title>handle-mcp: tom madkonto den 20.?</title>
 <meta name="description" content="Slut med at handle 5-6 gange om ugen, og med en madkonto der er tom før tid. Din AI laver madplanen ud fra budget og tilbud hos nemlig.com og BilkaToGo og fylder den billigste kurv. Du betaler selv.">
-<meta property="og:title" content="handle-mcp: én kurv, hele ugen">
+<meta property="og:title" content="handle-mcp: tom madkonto den 20.?">
 <meta property="og:description" content="Én handel om ugen. Et budget der holder. Din AI planlægger og fylder kurven, du betaler selv.">
 <meta name="color-scheme" content="light">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧺</text></svg>">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%238ed462'/%3E%3Cpath d='M8 10.5a4 4 0 018 0' fill='none' stroke='%231d1e1b' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M4.5 10.5h15l-1.8 7.6a1.5 1.5 0 01-1.46 1.15H7.76A1.5 1.5 0 016.3 18.1z' fill='%231d1e1b'/%3E%3C/svg%3E">
 <style>
 @font-face{font-family:Inter;src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{
@@ -129,16 +129,18 @@ footer p{margin:0;max-width:560px}
 .navwrap{position:sticky;top:14px;z-index:10;padding-top:14px}
 nav{height:auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 10px}
 .brand{display:flex;align-items:center;gap:10px}
-.logo{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:var(--leaf);font:700 17px var(--sans);color:var(--ink)}
+.logo{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:var(--leaf)}
+.logo svg{width:26px;height:26px}
 nav ul{gap:6px}
 nav ul a{display:block;padding:10px 16px;border-radius:999px}
 nav ul a:hover{background:var(--soft)}
 .btn{display:inline-flex;align-items:center;gap:12px;padding:12px 12px 12px 22px;border-radius:999px;background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.btn i{display:block;width:22px;height:22px;border-radius:50%;background:var(--sky)}
+.btn i{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--sky);color:#fff}
+.btn i svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .btn.coral{background:var(--coral);box-shadow:none}
-.btn.coral i{background:#fff}
+.btn.coral i{background:#fff;color:var(--ink)}
 .btn.line{box-shadow:inset 0 0 0 1px var(--line)}
-.btn.line i{background:var(--leaf)}
+.btn.line i{background:var(--leaf);color:var(--ink)}
 nav ul a.btn{padding:9px 10px 9px 18px;color:var(--ink);background:#fff}
 nav ul a.btn:hover{background:#fff}
 .eyebrow b{color:var(--ink)}
@@ -168,10 +170,13 @@ body{overflow-x:clip}
 .band{position:relative;padding-bottom:128px;margin-top:136px;padding-top:120px}
 .band::before{content:"";position:absolute;top:0;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:var(--sky-soft)}
 .band.leaf::before{background:var(--leaf)}
+.band.coral::before{background:var(--coral-soft)}
+.band.coral .fact,.band.coral .fact+.fact{background:#fff}
 .band .chat{background:#fff}
 .band .ai .bubble{background:var(--sky-soft)}
 .band.leaf .promise{background:transparent;padding:0;border-radius:0}
 .band+section{padding-top:128px}
+.band+.band{margin-top:0}
 
 @media (max-width:900px){
   .wrap{padding:0 20px}
@@ -193,18 +198,40 @@ body{overflow-x:clip}
   nav ul li.opt{display:none}
   section{padding-top:104px}
 }
+
+.agent{max-width:860px;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.agent .bar{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);font-size:13px;color:var(--mute)}
+.agent .dots{display:flex;gap:6px}.agent .dots i{width:11px;height:11px;border-radius:50%;background:var(--line)}
+.agent .title{font-weight:600;color:var(--ink)}
+.agent .conn{margin-left:auto;display:flex;align-items:center;gap:6px}.agent .conn i{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.agent .log{padding:28px 28px 8px;display:flex;flex-direction:column;gap:16px}
+.agent .you{text-align:right}
+.agent .bubble{display:inline-block;max-width:600px;padding:12px 18px;border-radius:18px;text-align:left;font-size:16px}
+.agent .you .bubble{background:var(--soft);color:var(--ink);border-bottom-right-radius:6px}
+.agent .ai .bubble{background:none;padding:0;max-width:none;font-size:16px}
+.tools{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tool{display:grid;grid-template-columns:22px auto 1fr 18px;gap:10px;align-items:center;padding:9px 14px;font:13px/1.4 var(--mono);color:var(--mute)}
+.tool+.tool{border-top:1px solid var(--line)}
+.tool b{color:var(--ink);font-weight:600}.tool span{white-space:nowrap}
+.tool em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.tool .ti{color:var(--sky);font-size:15px}
+.tool .ok svg{width:14px;height:14px;fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.agent .input{display:flex;align-items:center;margin:16px 20px 20px;padding:8px 8px 8px 18px;border:1px solid var(--line);border-radius:999px;color:var(--mute);font-size:15px}
+.agent .input i{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--ink);display:grid;place-items:center}
+.agent .input svg{width:13px;height:13px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:700px){.agent .log{padding:20px 16px 4px}.tool{grid-template-columns:18px 1fr 16px}.tool em{grid-column:2}.agent .conn{display:none}}
 </style>
 </head>
 <body>
 
 <header class="wrap navwrap">
   <nav>
-    <a class="brand" href="./"><span class="logo">h</span>handle-mcp</a>
+    <a class="brand" href="./"><span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 10.5a4.5 4.5 0 019 0" fill="none" stroke="#1d1e1b" stroke-width="2.2" stroke-linecap="round"/><path d="M4 10.5h16l-1.9 8.1a1.5 1.5 0 01-1.46 1.15H7.36A1.5 1.5 0 015.9 18.6z" fill="#1d1e1b"/><path d="M10 13.5v3.2M14 13.5v3.2" stroke="#8ed462" stroke-width="1.8" stroke-linecap="round"/></svg></span>handle-mcp</a>
     <ul>
       <li class="opt"><a href="#hvorfor">Hvorfor</a></li>
       <li class="opt"><a href="#saadan">Sådan virker det</a></li>
       <li class="opt"><a href="https://github.com/NJohansen/handle-mcp">GitHub</a></li>
-      <li><a class="btn" href="#kom-i-gang">Kom i gang <i></i></a></li>
+      <li><a class="btn" href="#kom-i-gang">Kom i gang <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2v8M2.5 6.5L6 10l3.5-3.5"/></svg></i></a></li>
     </ul>
   </nav>
 </header>
@@ -213,11 +240,11 @@ body{overflow-x:clip}
   <div class="hero">
     <div>
       <p class="eyebrow"><b>Gratis og open source</b> · nemlig.com og BilkaToGo</p>
-      <h1>Én kurv.<br>Hele ugen.</h1>
-      <p class="lead"><strong>Slut med at handle 5-6 gange om ugen. Slut med en madkonto, der er tom før tid.</strong> Din AI laver madplanen ud fra jeres budget og ugens tilbud, og fylder den billigste kurv. Du betaler selv.</p>
+      <h1>Tom madkonto<br>den 20.?</h1>
+      <p class="lead"><strong>Og sjette tur i butikken i denne uge?</strong> Din AI laver madplanen ud fra jeres budget og ugens tilbud, og fylder den billigste kurv. Én levering, hele ugen. Du betaler selv.</p>
       <div class="ctas">
-        <a class="btn coral" href="#kom-i-gang">Kom i gang <i></i></a>
-        <a class="btn line" href="https://github.com/NJohansen/handle-mcp">Se koden <i></i></a>
+        <a class="btn coral" href="#kom-i-gang">Kom i gang <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2v8M2.5 6.5L6 10l3.5-3.5"/></svg></i></a>
+        <a class="btn line" href="https://github.com/NJohansen/handle-mcp">Se koden <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4 3.5h4.5V8"/></svg></i></a>
       </div>
     </div>
 
@@ -248,8 +275,8 @@ body{overflow-x:clip}
     </div>
   </div>
 
-  <section id="hvorfor">
-    <h2>To ting, der koster tid og penge i de fleste familier.</h2>
+  <section id="hvorfor" class="band coral">
+    <h2>Kender I det her?</h2>
     <div class="facts">
       <div class="fact">
         <div class="num"><s>6</s>1<small>handel om ugen</small></div>
@@ -265,28 +292,28 @@ body{overflow-x:clip}
   </section>
 
   <section class="band">
-    <h2>Du skriver én besked.</h2>
-    <p class="sub">Resten klarer din AI. Den kan kun lægge varer i kurven. Betalingen er din.</p>
-    <div class="chat" aria-label="Eksempel på en samtale">
-      <div class="you">
-        <div class="who">Dig</div>
-        <div class="bubble">Der er 900 kr til mad i denne uge. Lav en madplan til 4 ud fra tilbuddene, og fyld den billigste kurv.</div>
+    <h2>Sådan ser det ud</h2>
+    <p class="sub">Du skriver én besked. Den tjekker begge butikker og fylder kurven. Betalingen er din.</p>
+    <div class="agent" aria-label="Eksempel på en samtale med en AI-assistent">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">AI-assistent</span><span class="conn"><i></i>handle-mcp tilsluttet</span></div>
+      <div class="log">
+        <div class="you"><div class="bubble">Der er 900 kr til mad i denne uge. Lav en madplan til 4 ud fra tilbuddene, og fyld den billigste kurv.</div></div>
+        <div class="tools">
+          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · list_offers</span><em>nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · list_recipes</span><em>nemlig.com · Familievenlig</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · get_recipe</span><em>3 opskrifter · 4 personer</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · compare_basket</span><em>31 varer · nemlig.com 842 kr · BilkaToGo 879 kr</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · set_cart_quantities</span><em>31 varer i kurven hos nemlig.com</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+        </div>
+        <div class="ai"><div class="bubble">Fem aftener: kyllingekarry, laks med ris, rugbrødsaften, spaghetti med kødsovs og hjemmelavet pizza. Bygget på ugens tilbud i begge butikker, og en gratis pose kaffe kommer med. nemlig.com er 37 kr billigere end BilkaToGo, og I har 58 kr tilbage. Kurven er klar: åbn den, vælg en tid og betal.</div></div>
       </div>
-      <div class="ai">
-        <div class="who">AI</div>
-        <div class="call"><b>list_offers</b> · nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare</div>
-        <div class="call"><b>list_recipes</b> · nemlig.com · Familievenlig</div>
-        <div class="call"><b>get_recipe</b> · 3 opskrifter · 4 personer</div>
-        <div class="call"><b>compare_basket</b> · 31 varer · nemlig.com 842 kr · BilkaToGo 879 kr</div>
-        <div class="call"><b>set_cart_quantities</b> · 31 varer i kurven hos nemlig.com</div>
-        <div class="bubble">Fem aftener: kyllingekarry, laks med ris, rugbrødsaften, spaghetti med kødsovs og hjemmelavet pizza. Bygget på ugens tilbud i begge butikker, og en gratis pose kaffe kommer med. nemlig.com er 37 kr billigere end BilkaToGo, og I har 58 kr tilbage. Kurven er klar: åbn den, vælg en tid og betal.</div>
-      </div>
-      <p class="note">Et eksempel. Rigtige svar bruger butikkernes priser lige nu.</p>
+      <div class="input"><span>Skriv en besked …</span><i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5"/></svg></i></div>
     </div>
+    <p class="note">Et eksempel. Rigtige svar bruger butikkernes priser lige nu.</p>
   </section>
 
   <section id="saadan">
-    <h2>Fire skridt. Det sidste er dit.</h2>
+    <h2>Sådan virker det</h2>
     <div class="steps">
       <div><span>1</span><h3>Sig budgettet</h3><p>"900 kr til 4 personer." Og hvad I kan lide, og hvad I har hjemme.</p></div>
       <div><span>2</span><h3>Den planlægger</h3><p>Den læser tilbud i begge butikker, finder gratis varer og bruger butikkens opskrifter.</p></div>
@@ -297,7 +324,7 @@ body{overflow-x:clip}
 
   <section class="band leaf">
     <div class="promise">
-      <h2>Du betaler altid selv.</h2>
+      <h2>Du har styr på pengene</h2>
       <div>
         <h3>Den kan aldrig betale</h3>
         <p>Der findes ingen kode til at bestille, betale, læse kort, vælge leveringstid eller ændre adresse. En test fejler, hvis nogen tilføjer den.</p>
@@ -310,7 +337,7 @@ body{overflow-x:clip}
   <section id="kom-i-gang">
     <div class="start">
       <div>
-        <h2>Fem minutter.</h2>
+        <h2>Kom i gang</h2>
         <p class="sub" style="margin-bottom:0">Ærligt: i dag kræver det lidt teknik. Du skal bruge en AI-assistent, der kan bruge værktøjer (fx Claude), og terminalen.</p>
       </div>
       <div>
@@ -321,12 +348,12 @@ claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp 
         <!-- Hidden until the Tally URL exists: set href, then remove "hidden". -->
         <div class="extra" hidden>
           <p class="small" style="margin-bottom:14px">Uden terminal? Vi arbejder på en nemmere vej. Skriv dig op, så får du besked.</p>
-          <a class="btn coral" href="#" data-placeholder="tally">Skriv mig op <i></i></a>
+          <a class="btn coral" href="#" data-placeholder="tally">Skriv mig op <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5"/></svg></i></a>
         </div>
         <!-- Hidden until the Buy Me a Coffee URL exists: set href, then remove "hidden". -->
         <div class="extra" hidden>
           <p class="small" style="margin-bottom:14px">Gratis, og det bliver det ved med. Sparer den jer tid eller penge? En kop kaffe holder projektet i gang.</p>
-          <a class="btn line" href="#" data-placeholder="coffee">Giv en kop kaffe <i></i></a>
+          <a class="btn line" href="#" data-placeholder="coffee">Giv en kop kaffe <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5"/></svg></i></a>
         </div>
       </div>
     </div>
