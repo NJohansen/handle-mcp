@@ -29,7 +29,7 @@ from handle_mcp.models import (
     QuantityResult,
     StoreTerms,
 )
-from handle_mcp.stores import StoreError, has_login, load_login
+from handle_mcp.stores import StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
 from handle_mcp.stores.nemlig_offers import OffersMixin
 from handle_mcp.stores.nemlig_recipes import RecipesMixin
@@ -110,6 +110,7 @@ def _discount_price(campaign: dict | None) -> Decimal | None:
 
 
 DK = ZoneInfo("Europe/Copenhagen")
+AUTH_COOKIE = ".ASPXAUTH"  # set by /webapi/login, lives 1 year
 
 
 def _until(campaign: dict | None) -> date | None:
@@ -223,6 +224,8 @@ class NemligStore(RecipesMixin, OffersMixin):
     async def _login(self) -> None:
         login = load_login(self.name)
         self._bearer = self._xsrf = None
+        if "session" in login:  # saved by `handle-mcp login`: no password (docs/adr/0003)
+            return await self._resume(login["session"])
         try:
             await self._renew_token()
             result = await self._send(
@@ -244,6 +247,29 @@ class NemligStore(RecipesMixin, OffersMixin):
         await self._renew_token()  # tokens change after login
         self._logged_in = True
         log.info("logged in to nemlig.com")
+        if session := self.session():  # an old saved password is replaced by the session
+            save_session(self.name, login["email"], session)
+
+    async def _resume(self, session: dict) -> None:
+        """Log in with the saved login cookie. A dead cookie gives an anonymous basket
+        (no email), not a 401: check it, never shop anonymously by mistake."""
+        if not session.get(AUTH_COOKIE):
+            raise expired(self.name)
+        self._client.cookies.set(AUTH_COOKIE, session[AUTH_COOKIE], domain=".nemlig.com")
+        try:
+            await self._renew_token()
+            basket = await self._send("GET", f"{BASE}/webapi/basket/GetBasket")
+        except _Unauthorized:
+            raise expired(self.name) from None
+        if not (basket or {}).get("Email"):
+            raise expired(self.name)
+        self._logged_in = True
+        log.info("resumed the nemlig.com session")
+
+    def session(self) -> dict[str, str] | None:
+        """The login cookie (1 year), saved instead of the password."""
+        value = next((c.value for c in self._client.cookies.jar if c.name == AUTH_COOKIE), None)
+        return {AUTH_COOKIE: value} if value else None
 
     async def _search_settings(self) -> dict[str, Any]:
         """Timestamp, timeslot and zone for search, from /webapi/ only: page URLs such as
