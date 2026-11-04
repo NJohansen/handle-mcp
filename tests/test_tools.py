@@ -128,3 +128,14 @@ async def test_search_by_price_puts_a_free_gift_first(monkeypatch):
     monkeypatch.setattr("tests.conftest.FakeStore.search", hits)
     result = await server.search_products("brød", ["fake"], 2, sort="price")
     assert [p["id"] for p in result["fake"]] == ["gift", "bread"]
+
+
+async def test_get_cart_without_a_store_gives_every_cart():
+    carts = await server.get_cart()
+    assert set(carts) == {"broken", "fake"}
+    assert carts["fake"]["store"] == "fake" and "lines" in carts["fake"]
+
+
+async def test_get_cart_with_a_store_keeps_its_shape():
+    cart = await server.get_cart("fake")
+    assert cart["store"] == "fake" and "lines" in cart
