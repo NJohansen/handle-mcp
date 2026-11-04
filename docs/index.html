@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>handle-mcp: tom madkonto den 20.?</title>
+<title>HandleMCP: tom madkonto den 20.?</title>
 <meta name="description" content="Slut med at handle 5-6 gange om ugen, og med en madkonto der er tom før tid. Din AI laver madplanen ud fra budget og tilbud hos nemlig.com og BilkaToGo og fylder den billigste kurv. Du betaler selv.">
-<meta property="og:title" content="handle-mcp: tom madkonto den 20.?">
+<meta property="og:title" content="HandleMCP: tom madkonto den 20.?">
 <meta property="og:description" content="Én handel om ugen. Et budget der holder. Din AI planlægger og fylder kurven, du betaler selv.">
 <meta name="color-scheme" content="light">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%238ed462'/%3E%3Cpath d='M8 10.5a4 4 0 018 0' fill='none' stroke='%231d1e1b' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M4.5 10.5h15l-1.8 7.6a1.5 1.5 0 01-1.46 1.15H7.76A1.5 1.5 0 016.3 18.1z' fill='%231d1e1b'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232f8f46'/%3E%3Cpath d='M11.2 11.5V10a4.8 4.8 0 019.6 0v1.5' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M8.6 11h14.8a1 1 0 011 .92l.9 12A2 2 0 0123.3 26H8.7a2 2 0 01-2-2.08l.9-12A1 1 0 018.6 11zM12.4 14.8v7.8h2.2v-2.9h2.8v2.9h2.2v-7.8h-2.2v2.9h-2.8v-2.9z'/%3E%3C/svg%3E">
 <style>
 @font-face{font-family:Inter;src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{
@@ -26,7 +26,7 @@ a{color:inherit}
 
 /* nav */
 nav{display:flex;align-items:center;justify-content:space-between;height:76px}
-.brand{font-weight:600;letter-spacing:-.02em;text-decoration:none;font-size:18px}
+.brand{font-weight:700;letter-spacing:-.03em;text-decoration:none;font-size:18px}
 nav ul{display:flex;align-items:center;gap:28px;list-style:none;margin:0;padding:0;font-size:15px}
 nav ul a{text-decoration:none;color:var(--mute)}
 nav ul a:hover{color:var(--ink)}
@@ -129,8 +129,9 @@ footer p{margin:0;max-width:560px}
 .navwrap{position:sticky;top:14px;z-index:10;padding-top:14px}
 nav{height:auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 10px}
 .brand{display:flex;align-items:center;gap:10px}
-.logo{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:var(--leaf)}
-.logo svg{width:26px;height:26px}
+.logo{display:block;width:36px;height:36px}
+.logo svg{display:block;width:36px;height:36px}
+.brand b{color:var(--green);font-weight:inherit}
 nav ul{gap:6px}
 nav ul a{display:block;padding:10px 16px;border-radius:999px}
 nav ul a:hover{background:var(--soft)}
@@ -226,7 +227,7 @@ body{overflow-x:clip}
 
 <header class="wrap navwrap">
   <nav>
-    <a class="brand" href="./"><span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 10.5a4.5 4.5 0 019 0" fill="none" stroke="#1d1e1b" stroke-width="2.2" stroke-linecap="round"/><path d="M4 10.5h16l-1.9 8.1a1.5 1.5 0 01-1.46 1.15H7.36A1.5 1.5 0 015.9 18.6z" fill="#1d1e1b"/><path d="M10 13.5v3.2M14 13.5v3.2" stroke="#8ed462" stroke-width="1.8" stroke-linecap="round"/></svg></span>handle-mcp</a>
+    <a class="brand" href="./"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#2f8f46"/><path d="M11.2 11.5V10a4.8 4.8 0 019.6 0v1.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path fill="#fff" fill-rule="evenodd" d="M8.6 11h14.8a1 1 0 011 .92l.9 12A2 2 0 0123.3 26H8.7a2 2 0 01-2-2.08l.9-12A1 1 0 018.6 11zM12.4 14.8v7.8h2.2v-2.9h2.8v2.9h2.2v-7.8h-2.2v2.9h-2.8v-2.9z"/></svg></span><span>Handle<b>MCP</b></span></a>
     <ul>
       <li class="opt"><a href="#hvorfor">Hvorfor</a></li>
       <li class="opt"><a href="#saadan">Sådan virker det</a></li>
@@ -295,7 +296,7 @@ body{overflow-x:clip}
     <h2>Sådan ser det ud</h2>
     <p class="sub">Du skriver én besked. Den tjekker begge butikker og fylder kurven. Betalingen er din.</p>
     <div class="agent" aria-label="Eksempel på en samtale med en AI-assistent">
-      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">AI-assistent</span><span class="conn"><i></i>handle-mcp tilsluttet</span></div>
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">AI-assistent</span><span class="conn"><i></i>HandleMCP tilsluttet</span></div>
       <div class="log">
         <div class="you"><div class="bubble">Der er 900 kr til mad i denne uge. Lav en madplan til 4 ud fra tilbuddene, og fyld den billigste kurv.</div></div>
         <div class="tools">
@@ -341,7 +342,7 @@ body{overflow-x:clip}
         <p class="sub" style="margin-bottom:0">Ærligt: i dag kræver det lidt teknik. Du skal bruge en AI-assistent, der kan bruge værktøjer (fx Claude), og terminalen.</p>
       </div>
       <div>
-        <p class="small" style="margin-bottom:16px">Installer <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>. Gem dit nemlig-login, og tilføj handle-mcp til Claude:</p>
+        <p class="small" style="margin-bottom:16px">Installer <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>. Gem dit nemlig-login, og tilføj HandleMCP til Claude:</p>
 <pre>uvx --from git+https://github.com/NJohansen/handle-mcp handle-mcp login nemlig
 claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp handle-mcp</pre>
         <p class="small">BilkaToGo og Claude Desktop: se <a href="https://github.com/NJohansen/handle-mcp/blob/main/docs/setup.md">vejledningen</a> (på engelsk).</p>
