@@ -635,40 +635,42 @@ def no_login(monkeypatch, tmp_path):
 
 
 async def test_offers_work_without_a_login(store, fake, no_login):
-    """Grok Bot's setup, 2026-11-04: offers are public, so no login must be needed."""
+    """Headless setup, 2026-11-04: the offer lists are public, so no login must be needed.
+    The gift search is skipped: nemlig's search gateway answers 500 to an anonymous token."""
     offers = await store.offers(10)
-    assert {p.campaign for p in offers} >= {"Skarp pris", "Priskup", "Gratis"}
+    assert {p.campaign for p in offers} >= {"Skarp pris", "Priskup"}
     assert "/webapi/login" not in fake.paths()
     assert "/webapi/basket/GetBasket" not in fake.paths()
+    assert "/searchgateway/api/search" not in fake.paths()
     (page,) = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
     assert page.headers["Authorization"] == "Bearer bearer-1"  # the anonymous token
     assert "timeslotId" not in page.url.params
 
 
-async def test_search_works_without_a_login(store, fake, no_login):
-    hits = await store.search("mælk")
-    assert hits and "/webapi/login" not in fake.paths()
-    assert fake.paths().count("/webapi/Token") == 1  # one anonymous token, then reused
+async def test_search_needs_a_login(store, fake, no_login):
+    """Live 2026-11-04: searchgateway answers 500 to an anonymous token, so say so up front."""
+    with pytest.raises(StoreError, match="kræver login"):
+        await store.search("mælk")
+    assert fake.paths() == []
 
 
 async def test_anonymous_token_is_renewed_once_when_it_expires(store, fake, no_login):
-    await store.search("mælk")
-    fake.scripted["/searchgateway/api/search"] = [401]  # the token expired: one renewal
-    hits = await store.search("mælk")
-    assert hits and fake.paths().count("/webapi/Token") == 2
-    fake.scripted["/searchgateway/api/search"] = [401, 401]  # still refused: a clear error
+    await store.offers(5)
+    fake.scripted["/productbff/api/web/page"] = [401]  # the token expired: one renewal
+    assert await store.offers(5) and fake.paths().count("/webapi/Token") == 2
+    fake.scripted["/productbff/api/web/page"] = [401, 401]  # still refused: a clear error
     with pytest.raises(StoreError, match="uden login"):
-        await store.search("mælk")
+        await store.offers(5)
 
 
-async def test_settings_from_an_anonymous_search_are_refetched_after_login(
+async def test_settings_from_anonymous_offers_are_refetched_after_login(
     store, fake, no_login, monkeypatch
 ):
-    await store.search("mælk")
+    await store.offers(5)
     assert "/webapi/basket/GetBasket" not in fake.paths()
     monkeypatch.setenv("HANDLE_NEMLIG_EMAIL", "kunde@example.com")
     monkeypatch.setenv("HANDLE_NEMLIG_PASSWORD", "hemmeligt")
-    await store.search("mælk")
+    await store.offers(5)
     assert "/webapi/basket/GetBasket" in fake.paths()  # the household's zone and time now
 
 

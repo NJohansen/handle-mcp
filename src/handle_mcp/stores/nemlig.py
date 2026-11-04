@@ -193,9 +193,10 @@ class NemligStore(RecipesMixin, OffersMixin):
         return self._logged_in or has_login(self.name)
 
     async def _public(self, method: str, url: str, **kwargs: Any) -> Any:
-        """A call that needs no login (search, offers): logged in when a login is saved, so
+        """A call that needs no login (offers, settings): logged in when a login is saved, so
         prices and delivery time fit the household; else with an anonymous token, renewed
-        once when nemlig says it has expired."""
+        once when nemlig says it has expired. Search is not such a call: with an anonymous
+        token nemlig's search gateway answers 500 (live 2026-11-04)."""
         if self._has_login():
             return await self._api(method, url, **kwargs)
         for last in (False, True):
@@ -277,9 +278,13 @@ class NemligStore(RecipesMixin, OffersMixin):
     # --- Store methods ----------------------------------------------------
 
     async def search(self, query: str, limit: int = 10) -> list[Product]:
+        if not self._has_login():
+            raise StoreError(
+                "nemlig-søgning kræver login (tilbud gør ikke). Gem et login: handle-mcp login nemlig"
+            )
         params = {"query": query, "take": limit, "skip": 0, "recipeCount": 0}
         params |= await self._search_settings()
-        data = await self._public("GET", SEARCH, params=params)
+        data = await self._api("GET", SEARCH, params=params)
         try:
             hits = data["Products"]["Products"]
         except (KeyError, TypeError) as exc:

@@ -78,6 +78,7 @@ class OffersMixin:
     """offers() for NemligStore. Uses its `_public` (login optional) and `search`."""
 
     _public: Any
+    _has_login: Any
     _timeslot_id: Any
     search: Any
 
@@ -113,11 +114,13 @@ class OffersMixin:
             raise StoreError("nemligs tilbudslister har ændret format.")
         # "En gave til dig" is often empty (live 2026-11-02), but a search for "gratis" finds the
         # free gifts (ProductCampaignFreeProduct). A free-text search, so it may change.
-        try:
-            gifts = [p for p in await self.search("gratis", 50) if p.campaign == "Gratis"]
-        except StoreError as exc:
-            log.warning("nemlig-gaver fejlede: %s", exc)
-            gifts = []
+        # Search needs a login; without one the lists above are the whole answer.
+        gifts: list[Product] = []
+        if self._has_login():
+            try:
+                gifts = [p for p in await self.search("gratis", 50) if p.campaign == "Gratis"]
+            except StoreError as exc:
+                log.warning("nemlig-gaver fejlede: %s", exc)
         for gift in gifts:
             products.setdefault(gift.id, gift)
         return list(products.values())
