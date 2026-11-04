@@ -3,142 +3,233 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>handle-mcp: din AI klarer ugens indkøb</title>
-<meta name="description" content="Din AI laver ugens madplan ud fra jeres budget, finder tilbuddene hos nemlig.com og BilkaToGo og fylder den billigste kurv. I tjekker og betaler selv.">
-<meta property="og:title" content="handle-mcp: din AI klarer ugens indkøb">
-<meta property="og:description" content="Madplan på budget, billigste kurv hos nemlig.com eller BilkaToGo. Den kan aldrig bestille eller betale. Det gør I.">
+<title>handle-mcp: én kurv, hele ugen</title>
+<meta name="description" content="Slut med at handle 5-6 gange om ugen, og med en madkonto der er tom før tid. Din AI laver madplanen ud fra budget og tilbud hos nemlig.com og BilkaToGo og fylder den billigste kurv. I betaler selv.">
+<meta property="og:title" content="handle-mcp: én kurv, hele ugen">
+<meta property="og:description" content="Én handel om ugen. Et budget der holder. Din AI planlægger og fylder kurven, du betaler selv.">
+<meta name="color-scheme" content="light">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧺</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fbf6ee;--card:#fffdf9;--tint:#f4ead9;--line:#eadfcd;--ink:#2b2420;--muted:#6f6359;--soft:#9c8f83;
-  --accent:#d9603b;--accent-ink:#fff;--leaf:#4f7a52;--leaf-tint:#e7efe2;--you:#2b2420;--you-ink:#fffdf9;
-  --sans:ui-rounded,"SF Pro Rounded",-apple-system,"Segoe UI",Nunito,Helvetica,Arial,sans-serif;
+  --paper:#f4efe2;--white:#fff;--sand:#e4ddcc;--ink:#2b2d29;--stone:#74766f;--mist:#d8d4ca;
+  --leaf:#86cf5c;--sky:#3a9df5;--coral:#ff6f59;--sun:#f6dc2a;--plum:#9b7be0;
+  --r:44px;
+  --sans:Inter,ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme:dark){
-  :root{--bg:#1d1916;--card:#25201c;--tint:#2e2722;--line:#3a322b;--ink:#f3ebe1;--muted:#bcae9f;--soft:#8d8073;
-  --accent:#ec7a53;--accent-ink:#1d1916;--leaf:#8fbf8f;--leaf-tint:#27321f;--you:#f3ebe1;--you-ink:#1d1916}
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans)}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 18px/1.5 var(--sans)}
 a{color:inherit}
-.wrap{max-width:980px;margin:0 auto;padding:0 24px}
-nav{display:flex;align-items:center;justify-content:space-between;height:72px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;text-decoration:none;font-size:18px}
-.brand span{font-size:24px}
-nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:15px}
-nav ul a{color:var(--muted);text-decoration:none}
-nav ul a:hover{color:var(--ink)}
-.hero{padding:80px 0 24px;text-align:center}
-.kicker{display:inline-block;background:var(--leaf-tint);color:var(--leaf);font-weight:600;font-size:14px;padding:6px 14px;border-radius:999px;margin-bottom:24px}
-h1{font-size:clamp(40px,7vw,70px);line-height:1.05;letter-spacing:-.03em;font-weight:800;margin:0 auto 22px;max-width:820px}
-h1 em{font-style:normal;color:var(--accent)}
-.lead{font-size:20px;color:var(--muted);max-width:620px;margin:0 auto 34px}
-.btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:26px}
-.btn{display:inline-block;padding:14px 26px;border-radius:999px;border:2px solid var(--line);text-decoration:none;font-weight:700;font-size:16px;background:var(--card)}
-.btn.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.btn:hover{transform:translateY(-1px)}
-.strip{font-size:15px;color:var(--soft);margin:0}
-.strip b{color:var(--ink);font-weight:600}
-/* chat demo */
-.chat{margin:56px auto 0;max-width:820px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 20px 50px -30px rgba(80,50,20,.35);text-align:left}
-.who{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-bottom:6px}
-.you{text-align:right;margin-bottom:22px}
-.bubble{display:inline-block;max-width:580px;padding:13px 18px;border-radius:18px;text-align:left}
-.you .bubble{background:var(--you);color:var(--you-ink);border-bottom-right-radius:6px}
-.ai .bubble{background:var(--tint);border-bottom-left-radius:6px;margin:12px 0 16px}
-.step{font-size:14px;color:var(--muted);margin:3px 0;display:flex;gap:8px;align-items:baseline}
-.step::before{content:"✓";color:var(--leaf);font-weight:700}
-.step code{font:12px var(--mono);color:var(--soft)}
-.result{border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--bg)}
-.result h3{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin:0 0 16px;font-size:19px;font-weight:800}
-.result h3 span{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--soft)}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.tile small{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
-.tile strong{display:block;font-size:28px;font-weight:800;letter-spacing:-.02em;margin:2px 0}
-.tile em{font-style:normal;font-size:14px;color:var(--muted)}
-.tile.win{border-color:var(--leaf);background:var(--leaf-tint)}
-.tile.win strong{color:var(--leaf)}
-.days{margin:16px 0 0;padding:0;list-style:none;font-size:15px}
-.days li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px dashed var(--line)}
-.days b{display:inline-block;width:42px;color:var(--soft);font-weight:700}
-.tag{font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap}
-.note{font-size:13px;color:var(--soft);margin:14px 0 0;text-align:center}
-/* sections */
-section{padding:96px 0 0}
-h2{font-size:clamp(30px,4.4vw,40px);letter-spacing:-.025em;font-weight:800;margin:0 0 10px;text-align:center}
-.sub{color:var(--muted);margin:0 auto 40px;max-width:620px;text-align:center}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+p a,.small a{text-decoration:none;border-bottom:1px solid var(--stone)}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
 [hidden]{display:none!important}
-.grid2:has(>[hidden]){grid-template-columns:1fr;max-width:640px;margin:0 auto}
-.grid2>*,.grid3>*,.grid4>*,.tiles>*{min-width:0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px}
-.card .ico{font-size:30px;line-height:1;margin-bottom:12px}
-.card h3{margin:0 0 6px;font-size:19px;font-weight:800}
-.card p{margin:0;color:var(--muted);font-size:16px}
-.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:14px;margin-bottom:12px}
-.card ul{margin:10px 0 0;padding:0 0 0 18px;color:var(--muted);font-size:15px}
-.card ul li{margin:3px 0}
-.promise{background:var(--leaf-tint);border:none}
-.promise h3{color:var(--leaf)}
-.honest{max-width:720px;margin:0 auto}
-pre{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;overflow-x:auto;font:13.5px/1.7 var(--mono);margin:14px 0}
-.small{font-size:15px;color:var(--muted)}
-.cta .btn{margin-top:18px}
-footer.wrap{margin-top:110px;border-top:1px solid var(--line);padding:30px 0 50px;font-size:14px;color:var(--soft);text-align:center}
-footer p{margin:0 0 6px}
-@media (max-width:760px){
-  body{font-size:16px}
-  nav ul li.opt{display:none}
-  .hero{padding:40px 0 16px}
+
+/* nav */
+.navbar{position:sticky;top:16px;z-index:5;margin:16px auto 0;max-width:1152px;background:var(--white);border-radius:999px;display:flex;align-items:center;justify-content:space-between;padding:8px 8px 8px 10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:500;font-size:16px}
+.mark{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:var(--leaf);font-size:20px}
+.links{display:flex;align-items:center;gap:4px;list-style:none;margin:0;padding:0}
+.links a{display:block;padding:10px 16px;font-size:15px;font-weight:500;text-decoration:none;border-radius:999px}
+.links a:hover{background:var(--paper)}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:11px 12px 11px 20px;border-radius:999px;font-weight:500;font-size:15px;text-decoration:none;background:var(--white);border:1px solid var(--ink);white-space:nowrap}
+.links a.pill{display:inline-flex;padding:9px 10px 9px 18px}
+.pill i{display:block;width:22px;height:22px;border-radius:50%;background:var(--sky)}
+.pill.coral{background:var(--coral);border-color:var(--coral)}
+.pill.coral i{background:var(--white)}
+.pill.ghost{border-color:var(--mist)}
+.pill.ghost i{background:var(--leaf)}
+
+/* hero */
+.hero{text-align:center;padding-top:96px}
+h1{font-weight:500;font-size:clamp(64px,11.5vw,144px);line-height:.95;letter-spacing:-.06em;margin:0 0 32px}
+.lead{font-size:20px;max-width:660px;margin:0 auto 34px}
+.lead span{color:var(--stone)}
+.ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.art{display:block;width:100%;height:auto;margin:56px auto 0;max-width:1100px}
+
+/* sections */
+section.wrap{padding-top:120px}
+h2{font-weight:500;font-size:clamp(40px,6.2vw,81px);line-height:1.02;letter-spacing:-.055em;margin:0 0 20px;text-align:center}
+.sub{text-align:center;color:var(--stone);max-width:600px;margin:0 auto 48px;font-size:19px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.pair>*,.tiles>*,.steps>*{min-width:0}
+.card{background:var(--white);border-radius:var(--r);padding:36px}
+.card h3{font-weight:500;font-size:30px;line-height:1.15;letter-spacing:-.03em;margin:0 0 10px}
+.card p{margin:0;color:var(--stone)}
+.big{font-weight:500;font-size:clamp(64px,8vw,104px);line-height:.95;letter-spacing:-.06em;margin:0 0 18px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.big s{color:var(--stone);text-decoration-thickness:6px;text-decoration-color:var(--coral)}
+.big small{font-size:.3em;letter-spacing:-.02em;color:var(--stone)}
+
+/* chat */
+.chat{background:var(--white);border-radius:var(--r);padding:36px;max-width:880px;margin:0 auto}
+.who{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin-bottom:8px}
+.you{text-align:right;margin-bottom:26px}
+.bubble{display:inline-block;max-width:600px;padding:14px 20px;border-radius:26px;text-align:left;font-size:17px}
+.you .bubble{background:var(--ink);color:var(--white);border-bottom-right-radius:8px}
+.ai .bubble{background:var(--paper);border-bottom-left-radius:8px;margin:14px 0 18px}
+.step{font-size:15px;color:var(--stone);margin:4px 0;display:flex;gap:10px;align-items:center}
+.step::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--leaf);flex:none}
+.step code{font:12px var(--mono);opacity:.8}
+.plan{background:var(--paper);border-radius:32px;padding:26px}
+.plan h4{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin:0 0 18px;font-size:20px;font-weight:500;letter-spacing:-.02em}
+.plan h4 span{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--stone)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tile{background:var(--white);border-radius:22px;padding:16px 18px}
+.tile small{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--stone)}
+.tile strong{display:block;font-size:30px;font-weight:500;letter-spacing:-.04em;margin:2px 0}
+.tile em{font-style:normal;font-size:14px;color:var(--stone)}
+.tile.win{outline:2px solid var(--leaf)}
+.days{margin:16px 0 0;padding:0;list-style:none;font-size:16px}
+.days li{display:flex;justify-content:space-between;gap:12px;padding:9px 4px;border-top:1px solid var(--sand)}
+.days b{display:inline-block;width:44px;color:var(--stone);font-weight:500}
+.tag{font-size:13px;font-weight:500;padding:2px 10px;border-radius:10px;border:1.5px solid var(--coral);white-space:nowrap;align-self:center}
+.note{font-size:14px;color:var(--stone);margin:16px 0 0;text-align:center}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.steps .card{padding:28px;border-radius:36px}
+.steps svg{width:64px;height:64px;margin-bottom:16px}
+.steps h3{font-size:22px;margin-bottom:6px}
+.steps p{font-size:16px}
+
+/* promise */
+.promise .card{display:flex;gap:22px;align-items:flex-start}
+.promise svg{flex:none;width:72px;height:72px}
+
+/* start */
+pre{background:var(--paper);border-radius:20px;padding:18px 20px;overflow-x:auto;font:13.5px/1.7 var(--mono);margin:16px 0}
+.small{font-size:16px;color:var(--stone);margin:0}
+.solo{max-width:760px;margin:0 auto}
+
+/* footer */
+footer{margin-top:120px;background:var(--sun);padding:72px 0 56px}
+footer .wrap{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:flex-end}
+footer h2{text-align:left;margin:0;font-size:clamp(40px,6vw,72px)}
+footer p{margin:10px 0 0;font-size:15px;max-width:520px}
+footer nav a{margin-right:18px;font-weight:500;font-size:15px}
+
+@media (max-width:820px){
+  body{font-size:17px}
+  .links li.opt{display:none}
+  .hero{padding-top:88px}
+  section.wrap{padding-top:88px}
   .lead{font-size:18px}
-  .chat{padding:18px;border-radius:20px}
-  .tiles,.grid3,.grid2{grid-template-columns:1fr}
-  .grid4{grid-template-columns:1fr}
+  .pair,.tiles{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .card,.chat{padding:24px;border-radius:32px}
   .step code{display:none}
+  .promise .card{flex-direction:column}
 }
+@media (max-width:520px){.steps{grid-template-columns:1fr}.navbar{margin:12px 12px 0}.wrap{padding:0 16px}}
 </style>
 </head>
 <body>
-<header class="wrap">
-  <nav>
-    <a class="brand" href="./"><span>🧺</span>handle-mcp</a>
-    <ul>
+
+<div class="wrap">
+  <header class="navbar">
+    <a class="brand" href="./"><span class="mark">🧺</span>handle-mcp</a>
+    <ul class="links">
+      <li class="opt"><a href="#hvorfor">Hvorfor</a></li>
       <li class="opt"><a href="#saadan">Sådan virker det</a></li>
-      <li class="opt"><a href="#jer">Hvad I får</a></li>
-      <li><a href="https://github.com/NJohansen/handle-mcp">GitHub</a></li>
+      <li class="opt"><a href="https://github.com/NJohansen/handle-mcp">GitHub</a></li>
+      <li><a class="pill" href="#kom-i-gang">Kom i gang <i></i></a></li>
     </ul>
-  </nav>
-</header>
+  </header>
+</div>
 
-<main class="wrap">
-  <div class="hero">
-    <div class="kicker">Gratis · Open source · Til nemlig.com og BilkaToGo</div>
-    <h1>Ugens indkøb, <em>uden at tænke på det.</em></h1>
-    <p class="lead">Giv din AI et budget. Den laver madplanen ud fra ugens tilbud, finder den billigste butik og fylder kurven. I tjekker og betaler selv.</p>
-    <div class="btns">
-      <a class="btn main" href="#kom-i-gang">Kom i gang</a>
-      <a class="btn" href="https://github.com/NJohansen/handle-mcp">Se koden</a>
+<main>
+  <div class="wrap hero">
+    <h1>Én kurv.<br>Hele ugen.</h1>
+    <p class="lead">Slut med at handle 5-6 gange om ugen. Slut med en madkonto, der er tom før tid. <span>Din AI laver madplanen ud fra jeres budget og ugens tilbud, og fylder den billigste kurv hos nemlig.com eller BilkaToGo. Du betaler selv, og maden kommer til døren.</span></p>
+    <div class="ctas">
+      <a class="pill coral" href="#kom-i-gang">Kom i gang <i></i></a>
+      <a class="pill ghost" href="https://github.com/NJohansen/handle-mcp">Se koden <i></i></a>
     </div>
-    <p class="strip">Virker med <b>Claude</b> og andre AI-assistenter med MCP · <b>nemlig.com + BilkaToGo</b> med levering · Kan <b>aldrig</b> betale</p>
 
+    <!-- Paper-cut illustration: calendar, basket, delivery box, coins -->
+    <svg class="art" viewBox="0 0 1100 400" role="img" aria-label="En kalender, en fyldt indkøbskurv, en leveringskasse og en stak mønter" fill="none" stroke="#2b2d29" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <ellipse cx="550" cy="372" rx="520" ry="22" fill="#e4ddcc" stroke="none"/>
+      <g transform="rotate(-7 170 210)">
+        <rect x="60" y="110" width="220" height="230" rx="28" fill="#fff"/>
+        <path d="M60 170V138a28 28 0 0128-28h164a28 28 0 0128 28v32z" fill="#ff6f59"/>
+        <path d="M110 92v40M230 92v40"/>
+        <g fill="#e4ddcc" stroke="none">
+          <circle cx="100" cy="210" r="10"/><circle cx="145" cy="210" r="10"/><circle cx="190" cy="210" r="10"/><circle cx="235" cy="210" r="10"/>
+          <circle cx="100" cy="255" r="10"/><circle cx="190" cy="255" r="10"/><circle cx="235" cy="255" r="10"/>
+          <circle cx="100" cy="300" r="10"/><circle cx="145" cy="300" r="10"/><circle cx="190" cy="300" r="10"/>
+        </g>
+        <circle cx="145" cy="255" r="22" fill="#86cf5c"/>
+        <path d="M134 255l8 8 15-16"/>
+      </g>
+      <path d="M470 210c-10-80 10-150 40-170 18 30 10 110-10 170z" fill="#86cf5c"/>
+      <path d="M500 210c10-70 50-120 80-130 5 35-25 100-60 135z" fill="#5fb246"/>
+      <g transform="rotate(8 635 135)">
+        <rect x="600" y="60" width="70" height="150" rx="12" fill="#fff"/>
+        <path d="M600 92h70"/>
+        <rect x="612" y="110" width="46" height="40" rx="8" fill="#3a9df5"/>
+      </g>
+      <path d="M690 220c20-90 50-140 80-150 12 10 0 90-40 160z" fill="#f6dc2a"/>
+      <path d="M722 150l18 6M712 180l18 6"/>
+      <circle cx="430" cy="196" r="36" fill="#ff6f59"/>
+      <path d="M420 162c6-10 16-12 24-8"/>
+      <path d="M560 230l40-120 18 6-30 120z" fill="#ff9a3c"/>
+      <path d="M602 110c4-18 14-26 26-30M606 112c12-12 26-14 36-10"/>
+      <path d="M380 210h420l-36 150H416z" fill="#f6dc2a"/>
+      <path d="M392 250h396M402 292h376M410 330h360"/>
+      <path d="M470 210l14 150M560 210l4 150M650 210l-4 150M730 210l-12 150"/>
+      <rect x="370" y="196" width="440" height="26" rx="10" fill="#ff6f59"/>
+      <path d="M420 196c0-110 340-110 340 0" stroke-width="10"/>
+      <g transform="rotate(5 940 270)">
+        <path d="M850 210h190v140H850z" fill="#9b7be0"/>
+        <path d="M850 210l-20-40h190l20 40z" fill="#b9a2f0"/>
+        <path d="M930 170v80"/>
+        <rect x="880" y="270" width="80" height="46" rx="10" fill="#fff"/>
+        <path d="M894 293h52"/>
+      </g>
+      <ellipse cx="800" cy="356" rx="34" ry="12" fill="#f6dc2a"/>
+      <ellipse cx="800" cy="344" rx="34" ry="12" fill="#f6dc2a"/>
+      <ellipse cx="804" cy="330" rx="34" ry="12" fill="#f6dc2a"/>
+      <path d="M330 70v28M316 84h28M1000 90v24M988 102h24M790 40v20M780 50h20" stroke-width="5"/>
+    </svg>
+  </div>
+
+  <section id="hvorfor" class="wrap">
+    <h2>Kender I det her?</h2>
+    <p class="sub">To ting, der koster tid og penge i de fleste familier.</p>
+    <div class="pair">
+      <div class="card">
+        <div class="big"><s>6</s> 1 <small>handel om ugen</small></div>
+        <h3>I handler hele tiden</h3>
+        <p>En tur efter mælk, en efter aftensmad, en fordi noget mangler. Med en plan for hele ugen kommer det hele med én levering.</p>
+      </div>
+      <div class="card">
+        <div class="big"><s>20.</s> 31. <small>i måneden</small></div>
+        <h3>Madkontoen løber tør før tid</h3>
+        <p>Sig hvor meget der er til mad. Din AI planlægger ugen inden for budgettet, bygger på tilbuddene og finder den billigste butik.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Sådan ser det ud</h2>
+    <p class="sub">Du skriver én besked. Resten klarer din AI.</p>
     <div class="chat" aria-label="Eksempel på en samtale">
       <div class="you">
         <div class="who">Dig</div>
-        <div class="bubble">Lav ugens madplan til 4 for max 900 kr. Byg på tilbuddene, og fyld den billigste kurv.</div>
+        <div class="bubble">Der er 900 kr til mad i denne uge. Lav en madplan til 4 ud fra tilbuddene, og fyld den billigste kurv.</div>
       </div>
       <div class="ai">
         <div class="who">AI</div>
         <div class="step">Læste ugens tilbud i begge butikker <code>list_offers</code></div>
         <div class="step">Regnede hele kurven i begge butikker, med levering <code>compare_basket</code></div>
         <div class="step">Lagde 31 varer i kurven hos nemlig.com <code>set_cart_quantities</code></div>
-        <div class="bubble">Fem aftener, bygget på kylling og laks på tilbud, og en gratis vare med. nemlig.com er billigst i denne uge. Kurven er klar: åbn den, vælg en tid og betal.</div>
-        <div class="result">
-          <h3>Ugens madplan <span>5 AFTENER · 4 PERSONER</span></h3>
+        <div class="bubble">Fem aftener, bygget på kylling og laks på tilbud. nemlig.com er billigst i denne uge, og I har 58 kr tilbage. Kurven er klar: åbn den, vælg en tid og betal.</div>
+        <div class="plan">
+          <h4>Ugens madplan <span>5 AFTENER · 4 PERSONER</span></h4>
           <div class="tiles">
             <div class="tile win"><small>nemlig.com</small><strong>842 kr</strong><em>med levering · kurven er fyldt</em></div>
             <div class="tile"><small>BilkaToGo</small><strong>879 kr</strong><em>med levering</em></div>
@@ -155,81 +246,85 @@ footer p{margin:0 0 6px}
       </div>
       <p class="note">Et eksempel. Rigtige svar bruger butikkernes priser lige nu.</p>
     </div>
-  </div>
-
-  <section id="saadan">
-    <h2>Sådan virker det</h2>
-    <p class="sub">Fire skridt. De tre første klarer din AI. Det sidste gør du.</p>
-    <div class="grid4">
-      <div class="card"><div class="num">1</div><h3>Sig dit budget</h3><p>"Max 900 kr til 4 personer." Fortæl, hvad I kan lide, og hvad I har hjemme.</p></div>
-      <div class="card"><div class="num">2</div><h3>Den planlægger</h3><p>Den læser ugens tilbud og opskrifter, og laver madplanen ud fra dem.</p></div>
-      <div class="card"><div class="num">3</div><h3>Den fylder kurven</h3><p>Den regner hele kurven i begge butikker og fylder den billigste. Kun kurven.</p></div>
-      <div class="card"><div class="num">4</div><h3>Du betaler</h3><p>Du åbner butikken, tjekker kurven, vælger leveringstid og betaler. Maden kommer til døren.</p></div>
-    </div>
   </section>
 
-  <section id="jer">
-    <h2>Hvad I får</h2>
-    <p class="sub">Mindre tid på indkøb. Flere penge tilbage. Og det I faktisk skal bruge.</p>
-    <div class="grid3">
+  <section id="saadan" class="wrap">
+    <h2>Fire skridt</h2>
+    <p class="sub">De tre første klarer din AI. Det sidste gør du.</p>
+    <div class="steps">
       <div class="card">
-        <div class="ico">💰</div><h3>I sparer penge</h3>
-        <ul><li>Madplanen starter i ugens tilbud</li><li>Gratis varer kommer med</li><li>Hele kurven regnes i begge butikker, med levering og minimumskøb</li><li>Den viser de billigste leveringstider</li></ul>
+        <svg viewBox="0 0 64 64" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="32" cy="32" r="26" fill="#f6dc2a"/><path d="M32 16v32M39 23c-2-3-14-4-14 2 0 7 14 4 14 11 0 6-11 6-15 2"/></svg>
+        <h3>Sig budgettet</h3><p>"900 kr til 4 personer." Og hvad I kan lide, og hvad I har hjemme.</p>
       </div>
       <div class="card">
-        <div class="ico">🧠</div><h3>I slipper for at tænke</h3>
-        <ul><li>Ingen søndagsaften med "hvad skal vi have?"</li><li>Opskrifter med de rigtige varer til jeres antal</li><li>Den kan se, hvad I plejer at købe</li></ul>
+        <svg viewBox="0 0 64 64" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="10" y="12" width="44" height="44" rx="10" fill="#fff"/><path d="M10 26v-4a10 10 0 0110-10h24a10 10 0 0110 10v4z" fill="#ff6f59"/><circle cx="24" cy="40" r="5" fill="#86cf5c"/><path d="M34 37h12M34 45h8"/></svg>
+        <h3>Den planlægger</h3><p>Den læser ugens tilbud og opskrifter, og laver madplanen ud fra dem.</p>
       </div>
       <div class="card">
-        <div class="ico">🥕</div><h3>I får det, I skal bruge</h3>
-        <ul><li>Rette mængder: pakker i stedet for løsvægt, når det er billigst</li><li>Den bruger det, I har hjemme, først</li><li>Den spørger, når den er i tvivl</li></ul>
+        <svg viewBox="0 0 64 64" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 26h48l-6 28H14z" fill="#86cf5c"/><path d="M18 26c0-18 28-18 28 0" stroke-width="4"/><path d="M24 34v12M32 34v12M40 34v12"/></svg>
+        <h3>Den fylder kurven</h3><p>Den regner hele kurven i begge butikker og fylder den billigste. Kun kurven.</p>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M10 22h44v32H10z" fill="#9b7be0"/><path d="M10 22l-4-10h52l-4 10z" fill="#b9a2f0"/><path d="M24 38l6 6 12-12" stroke-width="4"/></svg>
+        <h3>Du betaler</h3><p>Du tjekker kurven, vælger leveringstid og betaler. Maden kommer til døren.</p>
       </div>
     </div>
   </section>
 
-  <section>
-    <h2>I betaler altid selv</h2>
+  <section class="wrap promise">
+    <h2>Du betaler altid selv</h2>
     <p class="sub">To løfter, der står i koden. En test fejler, hvis nogen bryder dem.</p>
-    <div class="grid2">
-      <div class="card promise"><div class="ico">🔒</div><h3>Den kan aldrig betale</h3><p>Der findes ingen kode til at bestille, betale, læse kort, vælge leveringstid eller ændre adresse. Den kan kun lægge varer i kurven, og kun når du har sagt ja.</p></div>
-      <div class="card promise"><div class="ico">🙈</div><h3>Jeres data bliver hjemme</h3><p>Navn, adresse og telefon bliver fjernet, før din AI ser svar fra butikken. Login gemmes kun på din egen computer, ikke i en sky.</p></div>
+    <div class="pair">
+      <div class="card">
+        <svg viewBox="0 0 72 72" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="14" y="30" width="44" height="34" rx="10" fill="#86cf5c"/><path d="M24 30v-8a12 12 0 0124 0v8" stroke-width="4"/><circle cx="36" cy="46" r="4" fill="#2b2d29"/></svg>
+        <div><h3>Den kan aldrig betale</h3><p>Der findes ingen kode til at bestille, betale, læse kort, vælge leveringstid eller ændre adresse. Den kan kun lægge varer i kurven, og kun når du har sagt ja.</p></div>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 72 72" fill="none" stroke="#2b2d29" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M10 36L36 12l26 24v26H10z" fill="#3a9df5"/><rect x="28" y="42" width="16" height="20" rx="4" fill="#fff"/></svg>
+        <div><h3>Jeres data bliver hjemme</h3><p>Navn, adresse og telefon bliver fjernet, før din AI ser svar fra butikken. Login gemmes kun på din egen computer, ikke i en sky.</p></div>
+      </div>
     </div>
   </section>
 
-  <section id="kom-i-gang">
+  <section id="kom-i-gang" class="wrap">
     <h2>Kom i gang</h2>
     <p class="sub">Ærligt: i dag kræver det lidt teknik. Du skal bruge en AI-assistent, der kan bruge værktøjer (fx Claude), og fem minutter i terminalen.</p>
-    <div class="grid2">
+    <div class="solo">
       <div class="card">
-        <h3>Jeg kan godt lidt teknik</h3>
+        <h3>Fem minutter</h3>
         <p class="small">Installer <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>. Gem dit nemlig-login, og tilføj handle-mcp til Claude:</p>
 <pre>uvx --from git+https://github.com/NJohansen/handle-mcp handle-mcp login nemlig
 claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp handle-mcp</pre>
         <p class="small">BilkaToGo og Claude Desktop: se <a href="https://github.com/NJohansen/handle-mcp/blob/main/docs/setup.md">vejledningen</a> (på engelsk).</p>
       </div>
       <!-- Hidden until the Tally URL exists: set href, then remove "hidden". -->
-      <div class="card cta" hidden>
-        <h3>Jeg vil have det nemt</h3>
-        <p class="small">Vi arbejder på en vej uden terminal. Skriv dig op, så får du besked, når den er klar.</p>
-        <a class="btn main" href="#" data-placeholder="tally">Skriv mig op</a>
+      <div class="card" style="margin-top:20px" hidden>
+        <h3>Uden terminal?</h3>
+        <p class="small" style="margin-bottom:18px">Vi arbejder på en nemmere vej. Skriv dig op, så får du besked.</p>
+        <a class="pill coral" href="#" data-placeholder="tally">Skriv mig op <i></i></a>
       </div>
-    </div>
-  </section>
-
-  <!-- Hidden until the Buy Me a Coffee URL exists: set href, then remove "hidden". -->
-  <section hidden>
-    <div class="card cta" style="text-align:center;max-width:620px;margin:0 auto">
-      <div class="ico">☕</div>
-      <h3>Gratis, og det bliver det ved med</h3>
-      <p class="small">Sparer den jer tid eller penge? En kop kaffe holder projektet i gang.</p>
-      <a class="btn" href="#" data-placeholder="coffee">Giv en kop kaffe</a>
+      <!-- Hidden until the Buy Me a Coffee URL exists: set href, then remove "hidden". -->
+      <div class="card" style="margin-top:20px" hidden>
+        <h3>Gratis, og det bliver det ved med</h3>
+        <p class="small" style="margin-bottom:18px">Sparer den jer tid eller penge? En kop kaffe holder projektet i gang.</p>
+        <a class="pill ghost" href="#" data-placeholder="coffee">Giv en kop kaffe <i></i></a>
+      </div>
     </div>
   </section>
 </main>
 
-<footer class="wrap">
-  <p>Ikke officiel. Bruger butikkernes egne hjemmesider, så det kan gå i stykker uden varsel. Ikke tilknyttet nemlig.com eller Salling Group.</p>
-  <p><a href="https://github.com/NJohansen/handle-mcp">GitHub</a> · <a href="https://github.com/NJohansen/handle-mcp/blob/main/docs/security.md">Sikkerhed</a> · <a href="https://github.com/NJohansen/handle-mcp/blob/main/LICENSE">MIT-licens</a></p>
+<footer>
+  <div class="wrap">
+    <div>
+      <h2>Handl én gang.<br>Spis hele ugen.</h2>
+      <p>Ikke officiel. Bruger butikkernes egne hjemmesider, så det kan gå i stykker uden varsel. Ikke tilknyttet nemlig.com eller Salling Group.</p>
+    </div>
+    <nav>
+      <a href="https://github.com/NJohansen/handle-mcp">GitHub</a>
+      <a href="https://github.com/NJohansen/handle-mcp/blob/main/docs/security.md">Sikkerhed</a>
+      <a href="https://github.com/NJohansen/handle-mcp/blob/main/LICENSE">MIT-licens</a>
+    </nav>
+  </div>
 </footer>
 </body>
 </html>
