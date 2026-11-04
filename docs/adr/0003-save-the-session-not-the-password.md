@@ -14,6 +14,7 @@ On macOS any process running as the user can read a keychain item made by the `s
 ## Consequences
 
 - A login every time a session expires: about once a year at nemlig. Bilka's `login_token` lifetime is set by the store; we check it live.
-- A dead nemlig cookie gives an anonymous basket, not a 401. After resuming a session the store checks that the basket has an email, so it never shops anonymously by mistake.
+- A dead nemlig cookie gives an anonymous basket, not a 401. With a saved session the store checks that every basket it reads has an email, also before it changes quantities, so it never shops anonymously by mistake.
+- A Gigya rate limit or server error is "try again later", not an expired session.
 - Old entries with a password still work. After the next login with them, the store replaces the password with the session (`stores.save_session`).
 - Env vars `HANDLE_<STORE>_EMAIL`/`_PASSWORD` still hold a password. They are the human's own choice; nothing is saved from them except by `--from-env`, which saves the session.

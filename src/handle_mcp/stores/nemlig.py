@@ -131,6 +131,7 @@ class NemligStore(RecipesMixin, OffersMixin):
         self._bearer: str | None = None
         self._xsrf: str | None = None
         self._logged_in = False
+        self._resumed = False  # logged in with a saved session, not a password
         self._settings: tuple[float, dict[str, Any], bool] | None = None  # (at, values, logged)
         self._slot_id = ""  # the basket's delivery time, for productbff calls
         self._lock = asyncio.Lock()
@@ -181,6 +182,8 @@ class NemligStore(RecipesMixin, OffersMixin):
             try:
                 return await self._send(method, url, **kwargs)
             except _Unauthorized:
+                if renew is None and self._resumed:
+                    raise expired(self.name) from None
                 if renew is None:
                     raise StoreError("nemlig.com afviser login. Tjek email og kodeord.") from None
                 try:
@@ -263,7 +266,7 @@ class NemligStore(RecipesMixin, OffersMixin):
             raise expired(self.name) from None
         if not (basket or {}).get("Email"):
             raise expired(self.name)
-        self._logged_in = True
+        self._logged_in = self._resumed = True
         log.info("resumed the nemlig.com session")
 
     def session(self) -> dict[str, str] | None:
@@ -358,7 +361,13 @@ class NemligStore(RecipesMixin, OffersMixin):
         )
 
     async def _basket(self) -> dict:
-        return await self._api("GET", f"{BASE}/webapi/basket/GetBasket") or {}
+        return self._own(await self._api("GET", f"{BASE}/webapi/basket/GetBasket") or {})
+
+    def _own(self, basket: dict) -> dict:
+        """A saved cookie that dies mid-run gives an anonymous basket, not a 401: stop there."""
+        if self._resumed and not basket.get("Email"):
+            raise expired(self.name)
+        return basket
 
     def _cart(self, basket: dict) -> Cart:
         lines = [
@@ -404,6 +413,8 @@ class NemligStore(RecipesMixin, OffersMixin):
         return self._cart(await self._basket())
 
     async def set_quantities(self, items: dict[str, int]) -> list[QuantityResult]:
+        if self._resumed:
+            await self._basket()  # never fill an anonymous basket
         results = []
         for product_id, quantity in items.items():
             payload = {

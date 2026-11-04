@@ -41,6 +41,7 @@ GIGYA = "https://accounts.eu1.gigya.com"
 # Public keys from bilkatogo.dk's own JavaScript. Not secrets: every visitor's browser sends them.
 GIGYA_API_KEY = "3_tA6BbV434FQqN73HnUG1KA3qFv8KiG4OqLu9eWPh7sKRqRizH5Vfv5Larmgrb4I2"
 GIGYA_BAD_LOGIN = 403042
+GIGYA_RATE_LIMIT = 403048  # with 5xxxxx (Gigya's server errors): try later, the login is fine
 API = "https://api.bilkatogo.dk/api"
 ALGOLIA = "https://f9vbjlr1bk-dsn.algolia.net/1/indexes/*/queries"
 ALGOLIA_HEADERS = {
@@ -167,7 +168,10 @@ class BilkaStore:
         data = self._json(await self._send("POST", f"{GIGYA}/{method}", data=form), method)
         if data.get("errorCode") == GIGYA_BAD_LOGIN:
             raise _GigyaRefused("BilkaToGo afviser login. Tjek email og kodeord.")
-        if data.get("errorCode", 0) != 0:
+        code = data.get("errorCode", 0)
+        if code == GIGYA_RATE_LIMIT or (isinstance(code, int) and code >= 500000):
+            raise StoreError("BilkaToGo-login svarer ikke lige nu. Prøv igen om lidt.")
+        if code != 0:
             raise _GigyaRefused(
                 f"BilkaToGo login fejlede: {data.get('errorMessage', data['errorCode'])}"
             )

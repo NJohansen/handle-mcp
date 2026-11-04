@@ -185,6 +185,23 @@ async def test_dead_session_says_log_in_again(store, fake, saved):
     assert "/webapi/login" not in fake.paths()
 
 
+async def test_session_that_dies_mid_run_never_fills_an_anonymous_basket(store, fake, saved):
+    registry.keychain_set("nemlig", "kunde@example.com", {".ASPXAUTH": "auth-1"})
+    await store.get_cart()
+    store._client.cookies.clear()  # nemlig drops the login: baskets turn anonymous, no 401
+    with pytest.raises(StoreError, match="udløbet"):
+        await store.set_quantities({"1": 2})
+    assert "/webapi/basket/AddToBasket" not in fake.paths()
+
+
+async def test_session_refused_on_every_call_says_log_in_again(store, fake, saved):
+    registry.keychain_set("nemlig", "kunde@example.com", {".ASPXAUTH": "auth-1"})
+    await store.get_cart()
+    fake.scripted["/webapi/basket/GetBasket"] = [401, 401, 401]
+    with pytest.raises(StoreError, match="udløbet"):
+        await store.get_cart()
+
+
 async def test_an_old_saved_password_is_replaced_by_the_session(store, fake, saved):
     saved.secrets[(registry.KEYCHAIN_SERVICE, "nemlig")] = json.dumps(
         {"email": "kunde@example.com", "password": "hemmeligt"}

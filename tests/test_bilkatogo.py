@@ -133,6 +133,16 @@ async def test_dead_session_says_log_in_again(store, fake, saved):
     assert "/accounts.login" not in fake.paths()
 
 
+@pytest.mark.parametrize("code", [403048, 500001])
+async def test_gigya_busy_is_not_an_expired_session(store, fake, saved, code):
+    """Rate limit or Gigya's own server error: the session is fine, try later."""
+    registry.keychain_set("bilkatogo", "kunde@example.com", {"login_token": "st2.fake-login-token"})
+    fake.scripted["/accounts.getJWT"] = [{"errorCode": code, "errorMessage": "busy"}]
+    with pytest.raises(StoreError, match="Prøv igen om lidt") as err:
+        await store.get_cart()
+    assert "udløbet" not in str(err.value)
+
+
 async def test_an_old_saved_password_is_replaced_by_the_session(store, fake, saved):
     key = (registry.KEYCHAIN_SERVICE, "bilkatogo")
     saved.secrets[key] = json.dumps({"email": "kunde@example.com", "password": "hemmeligt"})
