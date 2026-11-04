@@ -198,18 +198,18 @@ class NemligStore(RecipesMixin, OffersMixin):
         once when nemlig says it has expired."""
         if self._has_login():
             return await self._api(method, url, **kwargs)
-        for renew in (self._renew_token, None):
-            async with self._lock:
-                if not self._bearer:
-                    await self._renew_token()
+        for last in (False, True):
             try:
+                async with self._lock:
+                    if not self._bearer:
+                        await self._renew_token()
                 return await self._send(method, url, **kwargs)
             except _Unauthorized:
-                if renew is None:
+                if last:
                     raise StoreError(
                         "nemlig.com afviser kaldet uden login. Gem et login: handle-mcp login nemlig"
                     ) from None
-                self._bearer = None  # expired: the loop fetches a fresh one
+                self._bearer = None  # expired: the next round fetches a fresh one
         raise AssertionError("unreachable")
 
     async def _renew_token(self) -> None:
