@@ -29,7 +29,7 @@ from handle_mcp.models import (
     QuantityResult,
     StoreTerms,
 )
-from handle_mcp.stores import StoreError, load_login
+from handle_mcp.stores import StoreError, has_login, load_login
 from handle_mcp.stores._http import request
 from handle_mcp.stores.nemlig_offers import OffersMixin
 from handle_mcp.stores.nemlig_recipes import RecipesMixin
@@ -188,6 +188,24 @@ class NemligStore(RecipesMixin, OffersMixin):
                     continue
         raise AssertionError("unreachable")
 
+    def _has_login(self) -> bool:
+        return has_login(self.name)
+
+    async def _public(self, method: str, url: str, **kwargs: Any) -> Any:
+        """A call that needs no login (search, offers): logged in when a login is saved, so
+        prices and delivery time fit the household; else with an anonymous token."""
+        if self._has_login():
+            return await self._api(method, url, **kwargs)
+        async with self._lock:
+            if not self._bearer:
+                await self._renew_token()
+        try:
+            return await self._send(method, url, **kwargs)
+        except _Unauthorized:
+            raise StoreError(
+                "nemlig.com afviser kaldet uden login. Gem et login: handle-mcp login nemlig"
+            ) from None
+
     async def _renew_token(self) -> None:
         self._bearer = None
         token = await self._send("GET", f"{BASE}/webapi/Token")
@@ -227,8 +245,9 @@ class NemligStore(RecipesMixin, OffersMixin):
             return self._settings[1]
         app, basket = {}, {}
         try:
-            app = await self._api("GET", f"{BASE}/webapi/v2/AppSettings/Website") or {}
-            basket = await self._basket()
+            app = await self._public("GET", f"{BASE}/webapi/v2/AppSettings/Website") or {}
+            if self._has_login():  # without one, nemlig answers for a default zone and time
+                basket = await self._basket()
         except StoreError as exc:  # search still works, only less exact
             log.warning("nemlig: søger med standardværdier: %s", exc)
         settings = {
@@ -236,7 +255,7 @@ class NemligStore(RecipesMixin, OffersMixin):
             "timeslotUtc": basket.get("TimeslotUtc", ""),
             "deliveryZoneId": basket.get("DeliveryZoneId") or 1,
         }
-        if basket:  # a failed call is tried again next time
+        if basket or (app and not self._has_login()):  # a failed call is tried again next time
             self._settings = (time.monotonic(), settings)
             self._slot_id = str((basket.get("DeliveryTimeSlot") or {}).get("Id") or "")
         return settings
@@ -252,7 +271,7 @@ class NemligStore(RecipesMixin, OffersMixin):
     async def search(self, query: str, limit: int = 10) -> list[Product]:
         params = {"query": query, "take": limit, "skip": 0, "recipeCount": 0}
         params |= await self._search_settings()
-        data = await self._api("GET", SEARCH, params=params)
+        data = await self._public("GET", SEARCH, params=params)
         try:
             hits = data["Products"]["Products"]
         except (KeyError, TypeError) as exc:

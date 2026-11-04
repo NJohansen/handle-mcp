@@ -625,3 +625,32 @@ async def test_sorted_search_finds_the_cheapest_far_down(store, fake):
     assert search.url.params["take"] == str(compare.SEARCH_LIMIT)
     by_price = await compare.search(store, "kyllingebryst", 5, "price")
     assert [p.price for p in by_price] == sorted(p.price for p in by_price)  # cold cuts first
+
+
+@pytest.fixture
+def no_login(monkeypatch, tmp_path):
+    monkeypatch.delenv("HANDLE_NEMLIG_EMAIL")
+    monkeypatch.delenv("HANDLE_NEMLIG_PASSWORD")
+    monkeypatch.setattr(registry, "CONFIG_DIR", tmp_path)
+
+
+async def test_offers_work_without_a_login(store, fake, no_login):
+    """Grok Bot's setup, 2026-11-04: offers are public, so no login must be needed."""
+    offers = await store.offers(10)
+    assert {p.campaign for p in offers} >= {"Skarp pris", "Priskup", "Gratis"}
+    assert "/webapi/login" not in fake.paths()
+    assert "/webapi/basket/GetBasket" not in fake.paths()
+    (page,) = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
+    assert page.headers["Authorization"] == "Bearer bearer-1"  # the anonymous token
+    assert "timeslotId" not in page.url.params
+
+
+async def test_search_works_without_a_login(store, fake, no_login):
+    hits = await store.search("mælk")
+    assert hits and "/webapi/login" not in fake.paths()
+    assert fake.paths().count("/webapi/Token") == 1  # one anonymous token, then reused
+
+
+async def test_cart_still_needs_a_login(store, fake, no_login):
+    with pytest.raises(registry.StoreError, match="Intet login til nemlig"):
+        await store.get_cart()

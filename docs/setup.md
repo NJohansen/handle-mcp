@@ -25,6 +25,8 @@ HANDLE_NEMLIG_EMAIL=you@example.com HANDLE_NEMLIG_PASSWORD='...' \
 
 The env vars are only needed for that one command; the MCP server reads the file afterwards. `handle-mcp logout <store>` removes the file. Nothing is written when the login fails.
 
+Without any login, `search_products` and `list_offers` still work for nemlig. BilkaToGo needs a login for everything: the store, prices and offers follow your delivery address.
+
 **2. BilkaToGo:** choose home delivery (not pickup) once on bilkatogo.dk. The server reads the store and fees from your cart.
 
 **3. Add it to your MCP client.** Claude Code:

@@ -75,19 +75,20 @@ def offer_product(p: dict, campaign: str) -> Product | None:
 
 
 class OffersMixin:
-    """offers() for NemligStore. Uses its logged-in `_api` and `search`."""
+    """offers() for NemligStore. Uses its `_public` (login optional) and `search`."""
 
-    _api: Any
+    _public: Any
     _timeslot_id: Any
     search: Any
 
     async def offers(self, limit: int = 25) -> list[Product]:
         """Every product on nemlig's offer lists (/tilbud): Skarp pris, Priskup, Dagstilbud,
-        Undgå madspild and gifts. `limit` is per list. Read only."""
+        Undgå madspild and gifts. `limit` is per list. Read only. Works without a login:
+        the offers are public; with one, they fit the household's delivery time."""
         params = {"path": "/tilbud"}
         if slot := await self._timeslot_id():
             params["timeslotId"] = slot  # sic: the page call spells it so, the dialog not
-        page = await self._api("GET", f"{BFF}/page", params=params) or {}
+        page = await self._public("GET", f"{BFF}/page", params=params) or {}
         lists = [
             (OFFER_LISTS[head], block.get("products") or [])
             for block in page.get("pageContent") or []
