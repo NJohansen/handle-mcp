@@ -1,9 +1,12 @@
 """Command line for a human in a terminal: save or remove a store login.
 
-    handle-mcp login nemlig     asks for email and password, checks them, saves in the keychain
-    handle-mcp logout nemlig    removes the login from the keychain
+    handle-mcp login nemlig             asks for email and password, checks them, saves in the keychain
+    handle-mcp login nemlig --from-env  reads HANDLE_NEMLIG_EMAIL/_PASSWORD, checks them, saves
+                                        in ~/.config/handle-mcp/nemlig.json (chmod 600). For a
+                                        headless machine or an AI agent with no terminal.
+    handle-mcp logout nemlig            removes the login from the keychain and the file
 
-The password is never echoed, logged or written to disk in clear text.
+The password is never echoed or logged. Only `--from-env` writes it to disk, owner-readable only.
 """
 
 from __future__ import annotations
@@ -24,18 +27,19 @@ def _say(text: str) -> None:
 
 def run(args: list[str]) -> int:
     known = ", ".join(sorted(registry.STORES))
+    from_env = "--from-env" in args
+    args = [a for a in args if a != "--from-env"]
     if len(args) != 2 or args[0] not in ("login", "logout") or args[1] not in registry.STORES:
-        _say(f"Brug: handle-mcp login <butik>  eller  handle-mcp logout <butik>\nButikker: {known}")
+        _say(
+            "Brug: handle-mcp login <butik> [--from-env]  eller  handle-mcp logout <butik>\n"
+            f"Butikker: {known}"
+        )
         return 2
     command, store = args
     if command == "logout":
-        try:
-            removed = registry.keychain_delete(store)
-        except KeyringError as exc:
-            _say(f"Ingen nøglering på denne maskine: {exc}")
-            return 1
-        _say("Login slettet fra nøgleringen." if removed else "Der var intet login i nøgleringen.")
-        return 0
+        return _logout(store)
+    if from_env:
+        return _login_from_env(store)
 
     _say(f"Log ind på {store}. Brug den email og det kodeord, du bruger på butikkens hjemmeside.")
     sys.stderr.write(f"Email til {store}: ")
@@ -56,6 +60,40 @@ def run(args: list[str]) -> int:
         _say(f"Kunne ikke gemme i nøgleringen: {exc}")
         return 1
     _say(f"Logget ind på {store}. Login er gemt i nøgleringen.")
+    return 0
+
+
+def _logout(store: str) -> int:
+    removed_file = registry.config_delete(store)
+    try:
+        removed = registry.keychain_delete(store)
+    except KeyringError as exc:
+        if removed_file:
+            _say("Login slettet fra config-filen.")
+            return 0
+        _say(f"Ingen nøglering på denne maskine: {exc}")
+        return 1
+    if removed_file:
+        _say("Login slettet fra config-filen.")
+    _say("Login slettet fra nøgleringen." if removed else "Der var intet login i nøgleringen.")
+    return 0
+
+
+def _login_from_env(store: str) -> int:
+    """No terminal, no keychain: a headless box or an AI agent. The env vars are read once,
+    checked against the store and saved in a file only the owner can read."""
+    prefix = f"HANDLE_{store.upper()}_"
+    email, password = os.environ.get(prefix + "EMAIL"), os.environ.get(prefix + "PASSWORD")
+    if not email or not password:
+        _say(f"Sæt {prefix}EMAIL og {prefix}PASSWORD, og kør igen. Intet er gemt.")
+        return 1
+    try:  # check first, save after: a failed check never touches a saved login
+        _check(store, email, password)
+    except registry.StoreError as exc:
+        _say(f"Login blev ikke gemt: {exc}\nEt tidligere gemt login er uændret.")
+        return 1
+    path = registry.config_set(store, email, password)
+    _say(f"Logget ind på {store}. Login er gemt i {path} (kun du kan læse den).")
     return 0
 
 
