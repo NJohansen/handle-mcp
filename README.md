@@ -39,7 +39,7 @@ Then ask:
 - *"What is on offer this week? Any free gifts?"*
 - *"Which delivery times are cheapest tomorrow?"*
 
-BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <store> --from-env`): [setup](docs/setup.md). nemlig's offers and search work with no login at all.
+BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <store> --from-env`): [setup](docs/setup.md). nemlig's offers work with no login at all.
 
 ## Tools
 
