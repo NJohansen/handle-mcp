@@ -651,6 +651,27 @@ async def test_search_works_without_a_login(store, fake, no_login):
     assert fake.paths().count("/webapi/Token") == 1  # one anonymous token, then reused
 
 
+async def test_anonymous_token_is_renewed_once_when_it_expires(store, fake, no_login):
+    await store.search("mælk")
+    fake.scripted["/searchgateway/api/search"] = [401]  # the token expired: one renewal
+    hits = await store.search("mælk")
+    assert hits and fake.paths().count("/webapi/Token") == 2
+    fake.scripted["/searchgateway/api/search"] = [401, 401]  # still refused: a clear error
+    with pytest.raises(StoreError, match="uden login"):
+        await store.search("mælk")
+
+
+async def test_settings_from_an_anonymous_search_are_refetched_after_login(
+    store, fake, no_login, monkeypatch
+):
+    await store.search("mælk")
+    assert "/webapi/basket/GetBasket" not in fake.paths()
+    monkeypatch.setenv("HANDLE_NEMLIG_EMAIL", "kunde@example.com")
+    monkeypatch.setenv("HANDLE_NEMLIG_PASSWORD", "hemmeligt")
+    await store.search("mælk")
+    assert "/webapi/basket/GetBasket" in fake.paths()  # the household's zone and time now
+
+
 async def test_cart_still_needs_a_login(store, fake, no_login):
     with pytest.raises(registry.StoreError, match="Intet login til nemlig"):
         await store.get_cart()
