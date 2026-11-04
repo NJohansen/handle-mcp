@@ -156,3 +156,13 @@ async def test_get_cart_with_an_empty_store_name_is_an_error():
 async def test_get_cart_with_a_store_keeps_its_shape():
     cart = await server.get_cart("fake")
     assert cart["store"] == "fake" and "lines" in cart
+
+
+async def test_every_product_has_the_offer_fields_null_when_unknown():
+    """Grok Bot, 2026-11-04: offer_until and before_price must always be there."""
+    for answer in (await server.list_offers(), await server.search_products("mælk")):
+        for products in answer.values():
+            if isinstance(products, dict):  # a store's error
+                continue
+            for product in products:
+                assert "before_price" in product and "offer_until" in product, product
