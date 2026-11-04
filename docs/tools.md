@@ -2,7 +2,7 @@
 
 | Tool | Writes? | Butikker | What |
 |---|---|---|---|
-| `search_products(query, stores?)` | no | nemlig, BilkaToGo | Price, price per kg/l, offers, EAN when known. nemlig works without a login, BilkaToGo needs one |
+| `search_products(query, stores?)` | no | nemlig, BilkaToGo | Price, price per kg/l, offers, EAN when known. Both stores need a login |
 | `search_recipes(query, stores?)` | no | nemlig | The store's own recipes: name and link. `get_recipe` gives time, persons and products |
 | `list_recipes(stores?, tags?, category?, limit?)` | no | nemlig | This week's featured recipes (nemlig "Ugens udvalgte"), or with `tags` all recipes that have every tag, e.g. `["Familievenlig", "Budgetvenlig"]` or `["Under 30 min", "Kylling"]`. `category`: aftensmad (default), frokost, madpakke, ... An unknown tag answers with nemlig's list |
 | `get_recipe(store, recipe, persons?)` | no | nemlig | The products behind the store's "Se varer og læg i kurv": per ingredient the product, packs for `persons`, price and alternatives. `have_at_home` items (salt, oil) are left out of `total`. Fill the cart with `add_recipe_to_cart` after a yes |
