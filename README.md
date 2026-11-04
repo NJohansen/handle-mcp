@@ -7,7 +7,7 @@
 <a href="https://modelcontextprotocol.io"><img src="docs/badges/mcp.svg" alt="made for MCP" height="26"></a>
 <img src="docs/badges/stores.svg" alt="stores: nemlig, BilkaToGo" height="26">
 <img src="docs/badges/python.svg" alt="built with Python 3.12+" height="26">
-<a href="LICENSE"><img src="docs/badges/license.svg" alt="license MIT" height="26"></a>
+<a href="LICENSE"><img src="docs/badges/license.svg" alt="license AGPL-3.0" height="26"></a>
 
 **Your AI agent plans the week's meals on a budget, prices them at nemlig.com and BilkaToGo and fills the cheapest cart. You approve and pay.**
 
@@ -66,6 +66,12 @@ Full arguments and fields: [docs/tools.md](docs/tools.md).
 
 Unofficial. Uses the stores' private website APIs, so it can break any day. Not affiliated with nemlig.com or Salling Group.
 
-[MIT](LICENSE)
+## License
+
+[AGPL-3.0](LICENSE). Copyright (c) 2026 Niclas Johansen.
+
+Gratis til privat brug. Du må bruge, ændre og dele koden. Kører en virksomhed handle-mcp som en tjeneste for andre, skal den dele hele sin kode under samme licens. Version 1.0.0 og ældre er udgivet under MIT.
+
+Third-party code and fixtures keep their own MIT licenses: see [CREDITS.md](CREDITS.md).
 
 Free, and it stays free. If it saves you time or money: <a href="https://buymeacoffee.com/niclasjohansen"><img src="docs/badges/coffee.svg" alt="buy me a coffee" height="26" align="absmiddle"></a>
