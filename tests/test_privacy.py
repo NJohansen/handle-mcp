@@ -1,11 +1,12 @@
 """No personal data leaves the server, whatever a store adapter returns."""
 
 import json
+from decimal import Decimal
 
 import pytest
 
 from handle_mcp import server
-from handle_mcp.privacy import REDACTED, scrub
+from handle_mcp.privacy import REDACTED, jsonable, scrub
 from tests.conftest import LEAK
 
 CALLS = [
@@ -88,3 +89,17 @@ def test_scrub_dawa_address_id():
     out = scrub(cart)
     assert out["dawa_uid"] == REDACTED
     assert out["stat"] == {"price": 1}
+
+
+@pytest.mark.parametrize(
+    ("value", "text"),
+    [
+        (Decimal(0), "0.00"),
+        (Decimal("0.0"), "0.00"),
+        (Decimal(39), "39.00"),
+        (Decimal("12.95"), "12.95"),
+    ],
+)
+def test_money_is_always_two_decimals(value, text):
+    """Grok Bot, 2026-11-04: nemlig gave "0.0", BilkaToGo "0": one format across stores."""
+    assert jsonable({"price": value}) == {"price": text}

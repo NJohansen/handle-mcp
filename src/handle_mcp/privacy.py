@@ -110,8 +110,8 @@ def jsonable(value: Any) -> Any:
         return {k: jsonable(v) for k, v in value.items()}
     if isinstance(value, list | tuple):
         return [jsonable(v) for v in value]
-    if isinstance(value, Decimal):
-        return str(value)
+    if isinstance(value, Decimal):  # money: always "39.00", whatever the store sent
+        return f"{value.quantize(Decimal('0.01'))}"
     if isinstance(value, datetime | date):
         return value.isoformat()
     return value
