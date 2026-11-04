@@ -94,7 +94,8 @@ def config_set(store: str, email: str, password: str) -> Path:
     CONFIG_DIR.chmod(stat.S_IRWXU)
     path = CONFIG_DIR / f"{store}.json"
     fd = os.open(path, os.O_WRONLY | os.O_CREAT, stat.S_IRUSR | stat.S_IWUSR)
-    os.fchmod(fd, stat.S_IRUSR | stat.S_IWUSR)  # an existing wider file: tighten before writing
+    if hasattr(os, "fchmod"):  # an existing wider file: tighten before writing (not on Windows)
+        os.fchmod(fd, stat.S_IRUSR | stat.S_IWUSR)
     os.ftruncate(fd, 0)
     with os.fdopen(fd, "w") as f:
         json.dump({"email": email, "password": password}, f)
