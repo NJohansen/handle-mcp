@@ -98,16 +98,22 @@ def _slot(day: str | None, start: str | None, end: str | None) -> tuple[datetime
         return None, None
 
 
-def _chosen_slot(data: dict) -> tuple[datetime | None, datetime | None]:
-    """The delivery time chosen in the cart. Bilka keeps the slot of the last order in the
-    cart ("Ons. 04/09" seen on 2026-11-04): a slot that has ended is not a choice."""
+def _slot_ended(data: dict) -> bool:
+    """Bilka keeps the slot of the last order in the cart ("Ons. 04/09" seen weeks later).
+    True only when the slot parses and has ended; an unreadable slot is kept, not hidden."""
     chosen = data.get("deliveryDate") or {}
-    start, end = _slot(
+    _start, end = _slot(
         chosen.get("deliveryDate"), chosen.get("intervalStart"), chosen.get("intervalEnd")
     )
-    if end and end < datetime.now(TZ):
+    return bool(end and end < datetime.now(TZ))
+
+
+def _chosen_slot(data: dict) -> tuple[datetime | None, datetime | None]:
+    """The delivery time chosen in the cart; none when it has ended."""
+    if _slot_ended(data):
         return None, None
-    return start, end
+    chosen = data.get("deliveryDate") or {}
+    return _slot(chosen.get("deliveryDate"), chosen.get("intervalStart"), chosen.get("intervalEnd"))
 
 
 def _lines(groups: list[dict]) -> list[CartLine]:
@@ -335,8 +341,8 @@ class BilkaStore:
             if stat.get(key)
         }
         chosen_text = (data.get("deliveryDate") or {}).get("delivery_message") or None
-        if _chosen_slot(data) == (None, None):
-            chosen_text = None  # a slot that has ended: "Ons. 04/09" shown weeks later
+        if _slot_ended(data):
+            chosen_text = None  # the slot of a past order is no choice
         warnings = [] if _is_home(address) else [NOT_HOME]
         if stat.get("minimum_left_text"):
             warnings.append(re.sub(r"<[^>]+>", "", stat["minimum_left_text"]))
