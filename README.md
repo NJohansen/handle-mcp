@@ -70,7 +70,7 @@ Unofficial. Uses the stores' private website APIs, so it can break any day. Not 
 
 [AGPL-3.0](LICENSE). Copyright (c) 2026 Niclas Johansen.
 
-Gratis til privat brug. Du må bruge, ændre og dele koden. Kører en virksomhed handle-mcp som en tjeneste for andre, skal den dele hele sin kode under samme licens. Version 1.0.0 og ældre er udgivet under MIT.
+Gratis at bruge, ændre og dele, også i firmaer. Kører nogen en ændret version som tjeneste for andre, skal de dele deres ændringer under samme licens. Version 1.0.0 og ældre er udgivet under MIT. Hvorfor: [ADR 0002](docs/adr/0002-agpl-license.md).
 
 Third-party code and fixtures keep their own MIT licenses: see [CREDITS.md](CREDITS.md).
 
