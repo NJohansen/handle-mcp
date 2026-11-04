@@ -1,7 +1,7 @@
 name: claude
-# Write @claude in a PR or issue comment to ask a question or get a review.
-# It reads and comments. It cannot push: on a PR the workspace holds the PR's code,
-# and that code may hold instructions meant for the agent.
+# Write @claude in a PR or issue comment to ask a question or request a change.
+# Never on a PR from a fork: the workspace holds the PR's code, which may hold
+# instructions meant for the agent, and the agent can push.
 on:
   issue_comment:
     types: [created]
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       issues: write
       id-token: write  # the action trades this for its GitHub App token
@@ -36,5 +36,3 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           additional_permissions: |
             actions: read
-          claude_args: |
-            --allowedTools "mcp__github_comment__update_claude_comment,mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh issue comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh issue view:*),Read,Glob,Grep"
