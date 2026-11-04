@@ -13,7 +13,7 @@
 @font-face{font-family:Inter;src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{
   --bg:#fff;--soft:#f4f4f1;--line:#e6e6e1;--ink:#1d1e1b;--mute:#6d6e69;
-  --red:#e3402b;
+  --green:#2f8f46;--leaf:#8ed462;--leaf-soft:#eef8e6;
   --sans:Inter,ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
 }
@@ -37,7 +37,7 @@ nav ul a.btn{padding:10px 18px;color:#fff}
 /* hero */
 .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:64px;align-items:center;padding:72px 0 40px}
 .eyebrow{font-size:14px;font-weight:500;color:var(--mute);margin:0 0 22px}
-.eyebrow b{color:var(--red);font-weight:600}
+.eyebrow b{color:var(--green);font-weight:600}
 h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spacing:-.055em;margin:0 0 28px}
 .lead{font-size:20px;line-height:1.5;max-width:520px;margin:0 0 36px;color:var(--mute)}
 .lead strong{color:var(--ink);font-weight:500}
@@ -53,22 +53,26 @@ h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spac
 .receipt .head b{display:block;font-size:15px;letter-spacing:.12em}
 .receipt .row{display:flex;justify-content:space-between;gap:12px}
 .receipt .row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.receipt .off{color:var(--red)}
+.receipt .off{color:var(--green)}
 .receipt hr{border:0;border-top:1px dashed #b9bab4;margin:10px 0}
 .receipt .total{font-weight:700;font-size:16px}
 .receipt .muted{color:var(--mute)}
-.stamp{position:absolute;right:-18px;bottom:-26px;transform:rotate(-9deg);border:2.5px solid var(--red);color:var(--red);border-radius:10px;padding:8px 14px;font:700 15px/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.75)}
+.receipt .note{font-size:12px;line-height:1.6;color:var(--mute);margin-bottom:4px}
+.receipt .free{color:var(--green);font-weight:700}
+.receipt .win span:last-child::before{content:"✓ ";color:var(--green)}
+.stamp{position:absolute;right:-18px;bottom:-26px;transform:rotate(-7deg);background:var(--leaf);color:var(--ink);border-radius:999px;padding:10px 18px 10px 14px;font:600 15px/1.2 var(--sans);display:flex;align-items:center;gap:8px}
+.stamp i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--leaf);font-style:normal;font-size:13px}
 /* prints once on load */
 @media (prefers-reduced-motion:no-preference){
   .receipt>*{opacity:0;animation:line .35s ease-out forwards}
-  .stamp{opacity:0;animation:stamp .45s cubic-bezier(.2,.9,.3,1.3) forwards;animation-delay:4.4s}
+  .stamp{opacity:0;animation:stamp .45s cubic-bezier(.2,.9,.3,1.3) forwards;animation-delay:5.4s}
 }
 @keyframes line{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-@keyframes stamp{from{opacity:0;transform:rotate(-9deg) scale(1.6)}to{opacity:1;transform:rotate(-9deg) scale(1)}}
+@keyframes stamp{from{opacity:0;transform:rotate(-7deg) scale(1.5)}to{opacity:1;transform:rotate(-7deg) scale(1)}}
 
 /* sections */
 section{padding-top:136px}
-.kicker{font-size:14px;font-weight:500;color:var(--red);margin:0 0 14px}
+.kicker{font-size:14px;font-weight:500;color:var(--green);margin:0 0 14px}
 h2{font-weight:600;font-size:clamp(38px,5.4vw,68px);line-height:1;letter-spacing:-.045em;margin:0 0 20px;max-width:820px}
 .sub{color:var(--mute);max-width:560px;margin:0 0 56px;font-size:19px}
 
@@ -77,7 +81,7 @@ h2{font-weight:600;font-size:clamp(38px,5.4vw,68px);line-height:1;letter-spacing
 .fact{padding:36px 40px 8px 0}
 .fact+.fact{padding-left:40px;border-left:1px solid var(--line)}
 .num{font-weight:600;font-size:clamp(72px,10vw,140px);line-height:.9;letter-spacing:-.06em;margin:0 0 22px;display:flex;align-items:baseline;gap:.18em}
-.num s{color:#c9cac4;text-decoration-thickness:.07em;text-decoration-color:var(--red)}
+.num s{color:#c9cac4;text-decoration-thickness:.07em;text-decoration-color:var(--green)}
 .num small{white-space:nowrap;font-size:.16em;font-weight:500;letter-spacing:-.01em;color:var(--mute)}
 .fact h3{font-weight:600;font-size:24px;letter-spacing:-.025em;margin:0 0 8px}
 .fact p{margin:0;color:var(--mute);max-width:440px}
@@ -97,7 +101,7 @@ h2{font-weight:600;font-size:clamp(38px,5.4vw,68px);line-height:1;letter-spacing
 .steps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink);margin-top:56px}
 .steps div{padding:28px 28px 0 0}
 .steps div+div{padding-left:28px;border-left:1px solid var(--line)}
-.steps span{display:block;font:500 14px var(--mono);color:var(--red);margin-bottom:40px}
+.steps span{display:block;font:500 14px var(--mono);color:var(--green);margin-bottom:40px}
 .steps h3{font-weight:600;font-size:24px;letter-spacing:-.025em;margin:0 0 8px}
 .steps p{margin:0;color:var(--mute);font-size:16px}
 
@@ -163,26 +167,30 @@ footer p{margin:0;max-width:560px}
       </div>
     </div>
 
-    <div class="receipt-wrap" role="img" aria-label="Eksempel på ugens kurv som kvittering: 842 kr i alt, 58 kr under budget">
+    <div class="receipt-wrap" role="img" aria-label="Eksempel på ugens kurv som kvittering: tilbud fra begge butikker, opskrifter fra nemlig.com, en gratis vare, nemlig.com 842 kr mod BilkaToGo 879 kr, 58 kr under budget">
       <div class="receipt">
-        <div class="head" style="animation-delay:.2s"><b>UGENS KURV</b>nemlig.com · 5 aftener · 4 pers.</div>
-        <div class="row" style="animation-delay:.6s"><span>Kyllingelår 1 kg</span><span>59,00</span></div>
-        <div class="row off" style="animation-delay:.9s"><span>&nbsp; tilbud</span><span>−20,00</span></div>
-        <div class="row" style="animation-delay:1.2s"><span>Laks 600 g</span><span>84,53</span></div>
-        <div class="row off" style="animation-delay:1.5s"><span>&nbsp; −30 %</span><span>−36,22</span></div>
-        <div class="row" style="animation-delay:1.8s"><span>Kikærter 2 stk</span><span>14,00</span></div>
-        <div class="row" style="animation-delay:2.1s"><span>Kokosmælk 2 stk</span><span>17,90</span></div>
-        <div class="row" style="animation-delay:2.4s"><span>Mozzarella 3 stk</span><span>60,00</span></div>
-        <div class="row off" style="animation-delay:2.7s"><span>&nbsp; 3 for 48</span><span>−12,00</span></div>
-        <div class="row" style="animation-delay:3s"><span>Broccoli 2 stk</span><span>30,00</span></div>
-        <div class="row muted" style="animation-delay:3.3s"><span>+ 22 varer</span><span>615,79</span></div>
-        <div class="row" style="animation-delay:3.5s"><span>Levering</span><span>29,00</span></div>
-        <hr style="animation-delay:3.7s">
-        <div class="row total" style="animation-delay:3.8s"><span>I ALT</span><span>842,00</span></div>
-        <div class="row muted" style="animation-delay:4s"><span>Budget</span><span>900,00</span></div>
-        <div class="row muted" style="animation-delay:4.1s"><span>Tilbage</span><span>58,00</span></div>
+        <div class="head" style="animation-delay:0.20s"><b>UGENS KURV</b>5 aftener · 4 pers.</div>
+        <div class="note" style="animation-delay:0.45s">Tilbud tjekket: nemlig.com + BilkaToGo</div>
+        <div class="note" style="animation-delay:0.70s">Opskrifter: karry, laks, pizza (nemlig.com)</div>
+        <hr style="animation-delay:0.95s">
+        <div class="row" style="animation-delay:1.20s"><span>Kyllingelår 1 kg</span><span>59,00</span></div>
+        <div class="row off" style="animation-delay:1.45s"><span>&nbsp; tilbud</span><span>−20,00</span></div>
+        <div class="row" style="animation-delay:1.70s"><span>Laks 600 g</span><span>84,53</span></div>
+        <div class="row off" style="animation-delay:1.95s"><span>&nbsp; −30 %</span><span>−36,22</span></div>
+        <div class="row" style="animation-delay:2.20s"><span>Kikærter 2 stk</span><span>14,00</span></div>
+        <div class="row" style="animation-delay:2.45s"><span>Kokosmælk 2 stk</span><span>17,90</span></div>
+        <div class="row" style="animation-delay:2.70s"><span>Mozzarella 3 stk</span><span>60,00</span></div>
+        <div class="row off" style="animation-delay:2.95s"><span>&nbsp; 3 for 48</span><span>−12,00</span></div>
+        <div class="row" style="animation-delay:3.20s"><span>Broccoli 2 stk</span><span>30,00</span></div>
+        <div class="row free" style="animation-delay:3.45s"><span>Kaffe 400 g · gratis</span><span>0,00</span></div>
+        <div class="row muted" style="animation-delay:3.70s"><span>+ 21 varer</span><span>615,79</span></div>
+        <div class="row" style="animation-delay:3.95s"><span>Levering</span><span>29,00</span></div>
+        <hr style="animation-delay:4.20s">
+        <div class="row total win" style="animation-delay:4.45s"><span>nemlig.com</span><span>842,00</span></div>
+        <div class="row muted" style="animation-delay:4.70s"><span>BilkaToGo</span><span>879,00</span></div>
+        <div class="row muted" style="animation-delay:4.95s"><span>Budget 900 · tilbage</span><span>58,00</span></div>
       </div>
-      <div class="stamp">Du betaler selv</div>
+      <div class="stamp"><i>✓</i>Du betaler selv</div>
     </div>
   </div>
 
@@ -214,10 +222,12 @@ footer p{margin:0;max-width:560px}
       </div>
       <div class="ai">
         <div class="who">AI</div>
-        <div class="call"><b>list_offers</b> · ugens tilbud i begge butikker</div>
+        <div class="call"><b>list_offers</b> · nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare</div>
+        <div class="call"><b>list_recipes</b> · nemlig.com · Familievenlig</div>
+        <div class="call"><b>get_recipe</b> · 3 opskrifter · 4 personer</div>
         <div class="call"><b>compare_basket</b> · 31 varer · nemlig.com 842 kr · BilkaToGo 879 kr</div>
         <div class="call"><b>set_cart_quantities</b> · 31 varer i kurven hos nemlig.com</div>
-        <div class="bubble">Fem aftener: kyllingekarry, laks med ris, rugbrødsaften, spaghetti med kødsovs og hjemmelavet pizza. Bygget på ugens tilbud. nemlig.com er billigst, og I har 58 kr tilbage. Kurven er klar: åbn den, vælg en tid og betal.</div>
+        <div class="bubble">Fem aftener: kyllingekarry, laks med ris, rugbrødsaften, spaghetti med kødsovs og hjemmelavet pizza. Bygget på ugens tilbud i begge butikker, og en gratis pose kaffe kommer med. nemlig.com er 37 kr billigere end BilkaToGo, og I har 58 kr tilbage. Kurven er klar: åbn den, vælg en tid og betal.</div>
       </div>
       <p class="note">Et eksempel. Rigtige svar bruger butikkernes priser lige nu.</p>
     </div>
@@ -228,7 +238,7 @@ footer p{margin:0;max-width:560px}
     <h2>Fire skridt. Det sidste er dit.</h2>
     <div class="steps">
       <div><span>01</span><h3>Sig budgettet</h3><p>"900 kr til 4 personer." Og hvad I kan lide, og hvad I har hjemme.</p></div>
-      <div><span>02</span><h3>Den planlægger</h3><p>Den læser ugens tilbud og opskrifter, og laver madplanen ud fra dem.</p></div>
+      <div><span>02</span><h3>Den planlægger</h3><p>Den læser tilbud i begge butikker, finder gratis varer og bruger butikkens opskrifter.</p></div>
       <div><span>03</span><h3>Den fylder kurven</h3><p>Den regner hele kurven i begge butikker, med levering, og fylder den billigste.</p></div>
       <div><span>04</span><h3>Du betaler</h3><p>Du tjekker kurven, vælger leveringstid og betaler. Maden kommer til døren.</p></div>
     </div>
