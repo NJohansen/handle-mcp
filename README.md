@@ -2,8 +2,6 @@
 
 <img src="docs/hero.svg" alt="Give AI a budget, fill it cheaply, you pay and they deliver, unpack the week, enjoy dinner" width="800">
 
-<img src="docs/logo.svg" alt="" height="56">
-
 # handle-mcp
 
 <a href="https://modelcontextprotocol.io"><img src="docs/badges/mcp.svg" alt="made for MCP" height="26"></a>
@@ -31,6 +29,8 @@ Danish grocery stores with home delivery, as an MCP server: [nemlig.com](https:/
 Taste, budget and meal rules live in your own prompt or skill. The server finds and counts. [Build your own skill](docs/skills.md).
 
 ## Try it
+
+Works on macOS, Linux and Windows (x64), with Python 3.12+ and [uv](https://docs.astral.sh/uv/). Windows on ARM is not supported yet: a dependency (`cryptography`) has no ready-made build for it.
 
 ```sh
 uvx --from git+https://github.com/NJohansen/handle-mcp@v1.2.1 handle-mcp login nemlig
