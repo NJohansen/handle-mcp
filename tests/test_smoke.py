@@ -32,6 +32,11 @@ def test_server_imports_without_system_time_zones():
     env = {**os.environ, "PYTHONTZPATH": ""}
     code = "import handle_mcp.server, handle_mcp.compare"
     result = subprocess.run(
-        [sys.executable, "-c", code], check=False, env=env, capture_output=True, text=True
+        [sys.executable, "-c", code],
+        check=False,
+        timeout=60,
+        env=env,
+        capture_output=True,
+        text=True,
     )
     assert result.returncode == 0, result.stderr
