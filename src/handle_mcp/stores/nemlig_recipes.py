@@ -154,7 +154,7 @@ class RecipesMixin:
             id=slug,
             name=dialog.get("title") or details.get("title", ""),
             url=f"{SITE}/maaltider/opskrift/{slug}",
-            persons=int(dialog.get("servings") or details.get("servings") or persons or 0),
+            persons=_int(dialog.get("servings")) or _int(details.get("servings")) or persons or 0,
             min_persons=limits.get("minServings"),
             max_persons=limits.get("maxServings"),
             time=f"{minutes} min" if minutes else None,

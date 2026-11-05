@@ -118,7 +118,7 @@ async def test_recipe_with_odd_servings_or_images_does_not_crash(store, monkeypa
 
     async def api(_method, url, **_kwargs):
         if url.endswith("/recipeProductDialog"):
-            return {"includedProducts": [row], "servings": 4}
+            return {"includedProducts": [row], "servings": "4-6"}
         return {
             "servings": "4-6",
             "images": [{"source": "http://x/plain.jpg"}, {"source": None}],
@@ -127,7 +127,7 @@ async def test_recipe_with_odd_servings_or_images_does_not_crash(store, monkeypa
 
     monkeypatch.setattr(store, "_api", api)
     r = await store.recipe(KEBAB, 4)
-    assert (r.ingredients_persons, r.image, r.method) == (None, None, [])
+    assert (r.persons, r.ingredients_persons, r.image, r.method) == (4, None, None, [])
 
 
 async def test_recipe_without_photo_or_method(store, monkeypatch):
