@@ -380,14 +380,14 @@ main{position:relative}
     </div>
 
     <div class="demo" id="demo">
-      <div class="chips" role="tablist" aria-label="Eksempler">
-        <button class="chip" role="tab" type="button"><i></i>Lav madplan</button>
-        <button class="chip" role="tab" type="button"><i></i>Vis opskrifter</button>
-        <button class="chip" role="tab" type="button"><i></i>Find billigste</button>
+      <div class="chips" aria-label="Eksempler">
+        <button class="chip" type="button" aria-pressed="false"><i></i>Lav madplan</button>
+        <button class="chip" type="button" aria-pressed="false"><i></i>Vis opskrifter</button>
+        <button class="chip" type="button" aria-pressed="false"><i></i>Find billigste</button>
       </div>
       <div class="agent" aria-label="Eksempel på en samtale med en AI-assistent">
         <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">AI-assistent</span><span class="conn"><i></i>HandleMCP tilsluttet</span></div>
-        <div class="log" aria-live="polite"></div>
+        <div class="log"></div>
         <div class="input"><span>Skriv en besked …</span><i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5"/></svg></i></div>
       </div>
     </div>
@@ -418,15 +418,15 @@ main{position:relative}
     <div class="agent" aria-label="Eksempel på en samtale med en AI-assistent">
       <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">AI-assistent</span><span class="conn"><i></i>HandleMCP tilsluttet</span></div>
       <div class="log">
-        <div class="you"><div class="bubble">Der er 900 kr til mad i denne uge. Lav en madplan til 4 ud fra tilbuddene, og fyld den billigste kurv.</div></div>
+        <div class="you"><div class="bubble">Der er 700 kr til mad i denne uge. Lav en madplan til 4 ud fra tilbuddene, og fyld den billigste kurv.</div></div>
         <div class="tools">
           <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · list_offers</span><em>nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
           <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · list_recipes</span><em>nemlig.com · Familievenlig</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
           <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · get_recipe</span><em>3 opskrifter · 4 personer</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
-          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · compare_basket</span><em>31 varer · nemlig.com 842 kr · BilkaToGo 879 kr</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
-          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · set_cart_quantities</span><em>31 varer i kurven hos nemlig.com</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · compare_basket</span><em>28 varer · nemlig.com 693 kr · BilkaToGo 741 kr</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · set_cart_quantities</span><em>28 varer i kurven hos nemlig.com</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
         </div>
-        <div class="ai"><div class="bubble">Fem aftener: kyllingekarry, laks med ris, rugbrødsaften, spaghetti med kødsovs og hjemmelavet pizza. Bygget på ugens tilbud i begge butikker, og en gratis pose kaffe kommer med. nemlig.com er 37 kr billigere end BilkaToGo, og I har 58 kr tilbage. Kurven er klar: åbn den, vælg en tid og betal.</div></div>
+        <div class="ai"><div class="bubble">Hele ugen: one pot-lasagne i stor portion, rugbrødsaften med frikadeller, sprøde kyllingenuggets, laks i citronsauce og harira. Bygget på ugens tilbud i begge butikker, og gratis rosinboller kommer med. nemlig.com er 48 kr billigere end BilkaToGo, og I har 7 kr tilbage. Kurven er klar: åbn den, vælg en tid og betal.</div></div>
       </div>
       <div class="input"><span>Skriv en besked …</span><i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5"/></svg></i></div>
     </div>
@@ -530,7 +530,7 @@ const card=(r,i)=>`<div class="rcard" data-i="${i}"><div class="img"><img src="$
 const cases=[
  {you:'Der er 700 kr til mad i denne uge. Lav en madplan til 4 ud fra det vi har og ugens tilbud.',
   tools:[['doc','Læser jeres lager','røde linser, ris, 300 g laks i fryseren'],['','<b>handle</b> · list_offers','nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare'],['','<b>handle</b> · compare_basket','28 varer · nemlig.com 693 kr · BilkaToGo 741 kr']],
-  ai:'Fem aftener, bygget på 1 kg kylling til 100 kr og gratis rosinboller. Linserne og laksen fra fryseren bruges først, det sparer 84 kr. nemlig.com: <b>693 kr, 7 kr under budget.</b>',
+  ai:'Hele ugen, to aftener er rester. Bygget på 1 kg kylling til 100 kr og gratis rosinboller. Linserne og laksen fra fryseren bruges først, det sparer 84 kr. nemlig.com: <b>693 kr, 7 kr under budget.</b>',
   html:'<div class="plan"><b>Tir</b><span>One pot-lasagne med kylling (stor portion)</span><b>Ons</b><span>Lasagne, dag 2</span><b>Tor</b><span>Rugbrødsaften med frikadeller</span><b>Fre</b><span>Sprøde kyllingenuggets</span><b>Lør</b><span>Laks i citronsauce <span class="lager">· fra fryseren</span></span><b>Søn</b><span>Harira på jeres linser <span class="lager">· fra lageret</span></span></div>'},
  {you:'Vis mig de tre retter, børnene ikke har prøvet før.',
   tools:[['','<b>handle</b> · list_recipes','nemlig.com · Familievenlig · 48 opskrifter'],['','<b>handle</b> · get_recipe','3 opskrifter · 4 personer · trin, tid og pris']],
@@ -543,14 +543,14 @@ const cases=[
   ai:'nemlig.com er <b>48 kr billigere</b> i denne uge. Forskellen er kyllingen, skyren og en gratis vare. Kurven er fyldt. Åbn den, vælg en tid og betal.',
   html:'<div class="cmp"><div class="store win"><div class="tag">Billigst ✓</div><div class="tot">693 kr</div>nemlig.com<ul><li><span>Kyllingeinderfilet 1 kg</span><span>100,00</span></li><li><span>Skyr 2 kg</span><span>40,00</span></li><li class="free"><span>Rosinboller</span><span>gratis</span></li><li><span>Levering</span><span>29,00</span></li><li><span>+ 25 varer</span><span>524,00</span></li></ul></div><div class="store"><div class="tag">&nbsp;</div><div class="tot">741 kr</div>BilkaToGo<ul><li><span>Kyllingeinderfilet 1 kg</span><span>129,00</span></li><li><span>Skyr 2 kg</span><span>52,00</span></li><li><span>Rosinboller</span><span>18,00</span></li><li><span>Levering</span><span>39,00</span></li><li><span>+ 25 varer</span><span>503,00</span></li></ul></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Se kurv hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a><span class="pay">Du betaler selv. HandleMCP bestiller aldrig.</span></div>'}];
 let run=0;
-async function play(i){const id=++run;chips.forEach((c,j)=>{c.classList.toggle('on',j===i);c.setAttribute('aria-selected',j===i);c.classList.remove('next')});log.innerHTML='';const c=cases[i];
+async function play(i){const id=++run;chips.forEach((c,j)=>{c.classList.toggle('on',j===i);c.setAttribute('aria-pressed',j===i);c.classList.remove('next')});log.innerHTML='';log.setAttribute('aria-busy','true');const c=cases[i];
  const you=el('<div class="you"><div class="bubble"></div></div>');log.appendChild(you);const b=you.firstChild;
  if(still.matches)b.textContent=c.you;else{for(const ch of c.you){if(id!==run)return;b.textContent+=ch;await wait(11)}}
  const th=el('<div class="think"><i></i><i></i><i></i></div>');log.appendChild(th);await wait(450);if(id!==run)return;th.remove();const tools=el('<div class="tools"></div>');log.appendChild(tools);
  for(const t of c.tools){const row=el(`<div class="tool"><span class="ti${t[0]?' doc':''}">${t[0]?'≡':'⚙'}</span><span>${t[1]}</span><em>${t[2]}</em><span class="wait"></span></div>`);tools.appendChild(row);await wait(430);if(id!==run)return;row.lastChild.outerHTML=OK}
  await wait(300);if(id!==run)return;const ai=el('<div class="ai"><div class="bubble"><span class="txt cur"></span></div></div>');log.appendChild(ai);const tx=ai.querySelector('.txt');
  if(still.matches)tx.innerHTML=c.ai;else{const parts=c.ai.split(/(<[^>]+>|\s+)/).filter(Boolean);let acc='';for(const w of parts){if(id!==run)return;acc+=w;tx.innerHTML=acc;if(!/^\s+$/.test(w)&&!w.startsWith('<'))await wait(26)}}
- tx.classList.remove('cur');if(c.html){await wait(150);if(id!==run)return;tx.insertAdjacentHTML('afterend',`<div class="fade">${c.html}</div>`)}if(c.after)c.after(ai);
+ tx.classList.remove('cur');if(c.html){await wait(150);if(id!==run)return;tx.insertAdjacentHTML('afterend',`<div class="fade">${c.html}</div>`)}if(c.after)c.after(ai);log.removeAttribute('aria-busy');
  const n=chips[i+1];if(n)n.classList.add('next');dispatchEvent(new Event('resize'))}
 chips.forEach((c,i)=>c.addEventListener('click',()=>play(i)));
 setTimeout(()=>play(0),document.documentElement.classList.contains('pl')?1900:300);
