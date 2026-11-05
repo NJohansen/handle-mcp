@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import re
 import time
 import uuid
 from datetime import date, datetime, timedelta
@@ -110,6 +111,8 @@ def _discount_price(campaign: dict | None) -> Decimal | None:
 
 
 DK = ZoneInfo("Europe/Copenhagen")
+LOGIN_FLAGS = {"CheckForExistingProducts": True, "DoMerge": True}
+LOGIN_FLAGS |= {"AppInstalled": False, "SaveExistingBasket": False}
 AUTH_COOKIE = ".ASPXAUTH"  # set by /webapi/login, lives 1 year
 
 
@@ -164,8 +167,9 @@ class NemligStore(RecipesMixin, OffersMixin):
             raise StoreError("nemlig.com har kø lige nu (queue-it). Prøv igen om lidt.")
         if resp.status_code == 401:
             raise _Unauthorized
-        if resp.status_code >= 400:
-            raise StoreError(f"nemlig.com afviste kaldet ({resp.status_code}): {url}")
+        if resp.status_code >= 400:  # the URL may hold ids: stderr only, path without query
+            log.warning("nemlig.com %s %s -> %s", method, resp.url.path, resp.status_code)
+            raise StoreError(f"nemlig.com afviste kaldet ({resp.status_code}).")
         try:
             return resp.json() if resp.content else None
         except ValueError as exc:
@@ -182,10 +186,9 @@ class NemligStore(RecipesMixin, OffersMixin):
             try:
                 return await self._send(method, url, **kwargs)
             except _Unauthorized:
-                if renew is None and self._resumed:
-                    raise expired(self.name) from None
                 if renew is None:
-                    raise StoreError("nemlig.com afviser login. Tjek email og kodeord.") from None
+                    bad = StoreError("nemlig.com afviser login. Tjek email og kodeord.")
+                    raise (expired(self.name) if self._resumed else bad) from None
                 try:
                     await renew()
                 except _Unauthorized:
@@ -234,14 +237,7 @@ class NemligStore(RecipesMixin, OffersMixin):
             result = await self._send(
                 "POST",
                 f"{BASE}/webapi/login",
-                json={
-                    "Username": login["email"],
-                    "Password": login["password"],
-                    "CheckForExistingProducts": True,
-                    "DoMerge": True,
-                    "AppInstalled": False,
-                    "SaveExistingBasket": False,
-                },
+                json={"Username": login["email"], "Password": login["password"]} | LOGIN_FLAGS,
             )
         except _Unauthorized:
             raise StoreError("nemlig.com afviser login. Tjek email og kodeord.") from None
@@ -527,6 +523,8 @@ class NemligStore(RecipesMixin, OffersMixin):
         return [self._order(o) for o in (data or {}).get("Orders", [])]
 
     async def order(self, order_id: str) -> Order:
+        if not re.fullmatch(r"[0-9]{1,20}", order_id):  # it goes into the URL path
+            raise StoreError("Ordrenummeret skal være tal, som i get_orders.")
         data = await self._api("GET", f"{BASE}/webapi/v2/order/GetOrderHistory/{order_id}") or {}
         lines = [
             CartLine(
