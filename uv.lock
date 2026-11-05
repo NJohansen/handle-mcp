@@ -244,7 +244,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.27" },
     { name = "keyring", specifier = ">=25" },
     { name = "mcp", specifier = ">=2.3,<3" },
-    { name = "tzdata" },
+    { name = "tzdata", specifier = ">=2024.1" },
 ]
 
 [package.metadata.requires-dev]
