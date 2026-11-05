@@ -12,7 +12,7 @@ import re
 from decimal import Decimal
 from typing import Any
 
-from handle_mcp.models import Recipe, RecipeDetails, RecipeItem, RecipeProduct
+from handle_mcp.models import Recipe, RecipeDetails, RecipeItem, RecipeProduct, RecipeSection
 from handle_mcp.stores import StoreError
 
 SITE = "https://www.nemlig.com"
@@ -64,6 +64,32 @@ def _items(rows: list[dict], have_at_home: bool) -> list[RecipeItem]:
         for row in rows
         if (row.get("item") or {}).get("product", {}).get("id")
     ]
+
+
+def _text(value: Any) -> str | None:
+    return value.strip() or None if isinstance(value, str) else None
+
+
+def _method(details: dict) -> list[RecipeSection]:
+    """recipeDetails `instructions`: sections ("Kebabfad", "Salat") with steps in order."""
+    sections = []
+    for group in details.get("instructions") or []:
+        steps = [t for s in group.get("steps") or [] if (t := _text(s.get("description")))]
+        if steps:
+            sections.append(RecipeSection(title=_text(group.get("title")), steps=steps))
+    return sections
+
+
+def _image(details: dict) -> str | None:
+    """The dish's photo: the first https image. The byline's portrait is not the dish."""
+    return next(
+        (
+            s
+            for i in details.get("images") or []
+            if (s := _text(i.get("source"))) and s.startswith("https://")
+        ),
+        None,
+    )
 
 
 class RecipesMixin:
@@ -124,12 +150,19 @@ class RecipesMixin:
             min_persons=limits.get("minServings"),
             max_persons=limits.get("maxServings"),
             time=f"{minutes} min" if minutes else None,
+            description=_text(details.get("description")),
+            image=_image(details),
             ingredients=[
                 i["text"]
                 for group in details.get("ingredients") or []
                 for i in group.get("ingredients") or []
                 if i.get("text")
             ],
+            # recipeDetails has no servings parameter: its text is always for the recipe's own
+            # servings, while the products follow `persons` (live, 2026-11-05).
+            ingredients_persons=int(details["servings"]) if details.get("servings") else None,
+            method=_method(details),
+            tip=_text(details.get("tip")),
             items=items,
             total=sum(
                 (i.product.price * i.product.quantity for i in items if not i.have_at_home),
