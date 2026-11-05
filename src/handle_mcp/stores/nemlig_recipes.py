@@ -70,6 +70,14 @@ def _text(value: Any) -> str | None:
     return value.strip() or None if isinstance(value, str) else None
 
 
+def _int(value: Any) -> int | None:
+    """A count the store may send as "4", 4 or junk: junk is None, never a crash."""
+    try:
+        return int(value) or None
+    except (TypeError, ValueError):
+        return None
+
+
 def _method(details: dict) -> list[RecipeSection]:
     """recipeDetails `instructions`: sections ("Kebabfad", "Salat") with steps in order."""
     sections = []
@@ -160,7 +168,7 @@ class RecipesMixin:
             ],
             # recipeDetails has no servings parameter: its text is always for the recipe's own
             # servings, while the products follow `persons` (live, 2026-11-05).
-            ingredients_persons=int(details["servings"]) if details.get("servings") else None,
+            ingredients_persons=_int(details.get("servings")),
             method=_method(details),
             tip=_text(details.get("tip")),
             items=items,
