@@ -54,7 +54,7 @@ nav ul a:hover{color:var(--ink)}
 nav ul a.btn{padding:10px 18px;color:#fff}
 
 /* hero */
-.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:72px 0 40px}
+.hero{display:grid;grid-template-columns:1fr 1.08fr;gap:48px;align-items:center;padding:72px 0 40px}
 .eyebrow{font-size:14px;font-weight:500;color:var(--mute);margin:0 0 22px}
 .eyebrow b{color:var(--green);font-weight:600}
 h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spacing:-.055em;margin:0 0 28px}
@@ -62,67 +62,80 @@ h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spac
 .lead strong{color:var(--ink);font-weight:500}
 .ctas{display:flex;gap:10px;flex-wrap:wrap}
 
-/* demo: agent window in the hero */
+/* demo: agent app in the hero. Left: the use cases. Right: the conversation. */
 .demo{width:100%;min-width:0}
-.chips{display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap}
-.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:500 14px/1.2 var(--sans);color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .2s,color .2s,border-color .2s}
-.chip:hover{background:var(--soft)}
-.chip i{width:8px;height:8px;border-radius:50%;background:var(--line)}
-.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}.chip.on i{background:var(--leaf)}
-.chip.next i{background:var(--leaf);animation:pulse 1.2s ease-in-out infinite}
-@keyframes pulse{50%{transform:scale(1.8);opacity:.5}}
 .demo .agent{max-width:none;background:#faf9f5;border-color:#e3e0d6;border-radius:16px;box-shadow:0 1px 2px rgba(28,36,30,.04),0 18px 48px -24px rgba(28,36,30,.25)}
 .demo .agent .bar{background:#faf9f5;border-bottom:1px solid #ebe8df;padding:10px 14px;justify-content:center;position:relative}
 .demo .bar .dots{position:absolute;left:14px;top:50%;transform:translateY(-50%)}
 .demo .bar .dots i{width:12px;height:12px}.demo .bar .dots i:nth-child(1){background:#fe5f57}.demo .bar .dots i:nth-child(2){background:#febc2e}.demo .bar .dots i:nth-child(3){background:#28c840}
 .demo .bar .title{font-weight:500;font-size:13px;color:var(--mute)}.demo .bar .conn{display:none}
-.demo .agent .log{min-height:400px;padding:22px 22px 6px;gap:14px}
-.demo .you .bubble{background:#efece3;border-radius:16px;padding:10px 16px;font-size:15px;max-width:82%}
-.demo .ai{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
-.demo .ai::before{content:"";width:22px;height:22px;margin-top:1px;background:#d97757;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14 9l7.5 3-7.5 3-2 7.5-2-7.5L2.5 12 10 9z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14 9l7.5 3-7.5 3-2 7.5-2-7.5L2.5 12 10 9z'/%3E%3C/svg%3E") center/contain no-repeat}
-.demo .ai .bubble{font-size:15px;line-height:1.55;min-width:0}
-.demo .tools{border:0;background:none;display:flex;flex-direction:column;gap:6px;margin-left:32px}
+.demo .body{display:grid;grid-template-columns:172px 1fr;min-height:520px}
+.demo .side{border-right:1px solid #ebe8df;padding:14px 8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.demo .side .grp{font:600 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#9a9890;padding:4px 10px 10px}
+.demo .item{display:grid;grid-template-columns:16px 1fr;gap:3px 8px;align-items:center;text-align:left;width:100%;border:0;background:none;border-radius:10px;padding:9px 10px;font:500 13.5px/1.25 var(--sans);color:var(--ink);cursor:pointer;transition:background .15s}
+.demo .item:hover{background:#f1efe7}
+.demo .item .ic{width:16px;height:16px;border-radius:50%;border:1.5px solid #c9c6ba;display:grid;place-items:center}
+.demo .item .ic svg{width:9px;height:9px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.demo .item.done .ic{background:var(--green);border-color:var(--green)}.demo .item.done .ic svg{opacity:1}
+.demo .item.on{background:#efece3}
+.demo .item.on.run .ic{border-color:var(--line);border-top-color:var(--green);animation:spin .8s linear infinite}
+.demo .item.next .ic{border-color:var(--leaf);animation:pulse 1.2s ease-in-out infinite}
+.demo .item small{grid-column:2;display:block;font-weight:400;font-size:12px;color:#9a9890;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@keyframes pulse{50%{transform:scale(1.35);opacity:.5}}
+.demo .main{display:flex;flex-direction:column;min-width:0}
+.demo .agent .log{flex:1;min-height:0;padding:18px 20px 6px;gap:12px}
+.demo .ttl{font-weight:600;font-size:14px;color:var(--ink);margin:0 0 2px}
+.demo .agent .you{text-align:left}
+.demo .you .bubble{display:block;background:#f1efe7;border:1px solid #e6e3d9;border-radius:12px;padding:10px 14px;font-size:14.5px;line-height:1.45;max-width:none}
+.demo .ai{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start}
+.demo .ai::before{content:"";width:20px;height:20px;margin-top:2px;background:#d97757;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14 9l7.5 3-7.5 3-2 7.5-2-7.5L2.5 12 10 9z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14 9l7.5 3-7.5 3-2 7.5-2-7.5L2.5 12 10 9z'/%3E%3C/svg%3E") center/contain no-repeat}
+.demo .ai .bubble{font-size:14.5px;line-height:1.5;min-width:0}
+.demo .tools{border:0;background:none;display:flex;flex-direction:column;gap:6px;margin-left:30px}
 .demo .tool{display:block;padding:0;font:13px/1.4 var(--sans);background:#f3f1ea;border:1px solid #e6e3d9;border-radius:10px;overflow:hidden}
 .demo .tool+.tool{border-top:1px solid #e6e3d9}
-.demo .tool .hd{display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--ink)}
+.demo .tool .hd{display:flex;align-items:center;gap:8px;padding:7px 12px;color:var(--ink)}
 .demo .tool .hd b{font-weight:500}.demo .tool .hd .n{color:var(--mute)}
 .demo .tool .hd svg.chev{width:12px;height:12px;margin-left:auto;fill:none;stroke:var(--mute);stroke-width:1.8;stroke-linecap:round}
-.demo .tool em{display:block;padding:0 12px 8px 32px;color:var(--mute);white-space:normal;font-size:12.5px}
+.demo .tool em{display:block;padding:0 12px 7px 32px;color:var(--mute);white-space:normal;font-size:12.5px}
 .demo .tool .ti{width:14px;height:14px;display:inline-block;color:var(--mute);font-size:13px;line-height:14px;text-align:center}
 .demo .tool .ok{display:inline-flex}.demo .tool .ok svg{width:12px;height:12px}
 .demo .tool.run .hd{color:var(--mute)}
 .tool .ti.doc{color:var(--mute)}
 .tool .wait{width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.demo .agent .input{margin:10px 14px 14px;display:block;padding:12px 12px 10px 14px;border:1px solid #e3e0d6;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(28,36,30,.04)}
-.demo .agent .input>span{display:block;color:#9a9890;font-size:15px;margin-bottom:12px}
+.demo .agent .input{margin:10px 14px 14px;display:block;padding:11px 10px 9px 14px;border:1px solid #e3e0d6;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(28,36,30,.04)}
+.demo .agent .input>span{display:block;color:#9a9890;font-size:14.5px;margin-bottom:10px}
 .demo .agent .input .row{display:flex;align-items:center;gap:8px}
-.demo .agent .input .plus{width:28px;height:28px;border:1px solid #e3e0d6;border-radius:8px;display:grid;place-items:center;color:var(--mute);font-size:18px;line-height:1}
-.demo .agent .input .mdl{font-size:13px;color:var(--mute);display:flex;align-items:center;gap:4px}
-.demo .agent .input .mdl i{width:6px;height:6px;border-radius:50%;background:var(--green);margin:0 2px 0 0}
-.demo .agent .input i.send{margin-left:auto;width:32px;height:32px;border-radius:9px;background:#d97757}
+.demo .agent .input .plus{display:none}
+.demo .agent .input .mdl{font-size:12.5px;color:var(--mute);display:flex;align-items:center;gap:5px;border:1px solid #e6e3d9;border-radius:999px;padding:4px 9px}
+.demo .agent .input .mdl i{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.demo .agent .input .mdl svg{width:9px;height:9px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.demo .agent .input i.send{margin-left:auto;width:28px;height:28px;border-radius:50%;background:#d97757}
 .plan{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:14px;margin:12px 0 0}
 .plan b{color:var(--mute);font-weight:500}
 .plan .lager{color:var(--green);font-weight:500}
-.rcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 0}
-.rcard{border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13px;display:flex;flex-direction:column}
-.rcard .img{aspect-ratio:16/9;background:var(--leaf-soft);overflow:hidden}.rcard img{display:block;width:100%;height:100%;object-fit:cover}
-.rcard .meta{padding:8px 10px 0;color:var(--mute);line-height:1.45;flex:1}
+.rcards{display:flex;flex-direction:column;gap:8px;margin:12px 0 0}
+.rcard{border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12.5px;display:grid;grid-template-columns:104px 1fr auto;align-items:center;background:#fff}
+.rcard .img{aspect-ratio:4/3;background:var(--leaf-soft);overflow:hidden;align-self:stretch}.rcard img{display:block;width:100%;height:100%;object-fit:cover}
+.rcard .meta{padding:8px 10px;color:var(--mute);line-height:1.4;min-width:0}
 .rcard .meta b{display:block;color:var(--ink);font-weight:600;font-size:13.5px;line-height:1.2;margin-bottom:3px}
-.rcard button{margin:8px 10px 10px;align-self:flex-start;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font:500 12px/1.2 var(--sans);color:var(--ink);cursor:pointer}
+.rcard button{margin:0 10px 0 0;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font:500 12px/1.2 var(--sans);color:var(--ink);cursor:pointer}
 .rcard button:hover{background:var(--soft)}
 .rtotal{margin:10px 0 0;font-size:14px}.rtotal b{font-weight:600}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 0}
-.store{border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px}
+.store{border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;min-width:0}
 .store.win{border-color:var(--green);background:var(--leaf-soft)}
 .store .tot{font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
 .store .tag{font-size:12px;color:var(--green);font-weight:600}
 .store ul{list-style:none;margin:10px 0 0;padding:0;color:var(--mute);font-size:13px;line-height:1.6}
 .store li{display:flex;justify-content:space-between;gap:8px}
-.store li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.store li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.store li span:last-child{flex:none}
 .store li.free span:last-child{color:var(--green);font-weight:600}
 .cartrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 0}
 .cartrow .pay{font-size:13px;color:var(--mute)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 0}
+.slot{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.35;background:#fff}.slot b{display:block;font-weight:600}.slot span{color:var(--mute);font-size:12px}
+.slot.win{border-color:var(--green);background:var(--leaf-soft)}
 .fade{animation:rise .45s cubic-bezier(.2,.7,.2,1)}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .think{font-size:14px;color:var(--mute);padding:2px 0;background:linear-gradient(90deg,#8a887f 0%,#8a887f 40%,#d2cfc4 50%,#8a887f 60%,#8a887f 100%) 0 0/200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 1.4s linear infinite}
@@ -133,8 +146,9 @@ h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spac
 @keyframes tick{to{stroke-dashoffset:0}}
 
 @keyframes line{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.fade,.chip.next i,.tool .wait,.tool .ok svg,.think,.demo .ai .bubble .w{animation:none}.think{color:var(--mute)}.tool .ok svg{stroke-dashoffset:0}}
-@media (max-width:520px){.rcards{grid-template-columns:1fr}.rcard .img{min-height:0}.cmp{grid-template-columns:1fr}.demo .log{min-height:360px}}
+@media (prefers-reduced-motion:reduce){.fade,.demo .item.next .ic,.demo .item.run .ic,.tool .wait,.tool .ok svg,.think,.demo .ai .bubble .w{animation:none}.think{color:var(--mute)}.tool .ok svg{stroke-dashoffset:0}}
+@media (max-width:640px){.demo .body{grid-template-columns:1fr;min-height:0}.demo .side{border-right:0;border-bottom:1px solid #ebe8df;flex-direction:row;gap:4px;padding:8px;overflow-x:auto;scrollbar-width:none}.demo .side .grp,.demo .item small{display:none}.demo .item{flex:0 0 auto;width:auto;padding:7px 12px 7px 9px;border:1px solid #e6e3d9;border-radius:999px;background:#fff;gap:0 6px}.demo .agent .input .mdl+.mdl{display:none}.demo .item.on{background:var(--ink);color:#fff;border-color:var(--ink)}.demo .agent .log{min-height:380px}.slots{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.rcard{grid-template-columns:88px 1fr auto}.cmp{grid-template-columns:1fr}}
 
 /* sections */
 section{padding-top:136px}
@@ -403,15 +417,21 @@ main{position:relative}
     </div>
 
     <div class="demo" id="demo">
-      <div class="chips" aria-label="Eksempler">
-        <button class="chip" type="button" aria-pressed="false"><i></i>Lav madplan</button>
-        <button class="chip" type="button" aria-pressed="false"><i></i>Vis opskrifter</button>
-        <button class="chip" type="button" aria-pressed="false"><i></i>Find billigste</button>
-      </div>
-      <div class="agent" aria-label="Eksempel på en samtale med en AI-assistent">
+      <div class="agent" aria-label="Eksempel på en AI-assistent med HandleMCP">
         <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="title">Ugens indkøb</span></div>
-        <div class="log"></div>
-        <div class="input"><span>Svar …</span><div class="row"><span class="plus">+</span><span class="mdl"><i></i>HandleMCP tilsluttet</span><i class="send"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5"/></svg></i></div></div>
+        <div class="body">
+          <div class="side" aria-label="Eksempler">
+            <div class="grp">Denne uge</div>
+            <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Lav madplan<small>700 kr · tilbud · lager</small></button>
+            <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Vis opskrifter<small>3 nye retter til 4</small></button>
+            <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Find billigste<small>nemlig eller Bilka</small></button>
+            <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Vælg levering<small>Tid og betaling</small></button>
+          </div>
+          <div class="main">
+            <div class="log"></div>
+            <div class="input"><span>Planlæg, sammenlign, fyld kurven …</span><div class="row"><span class="mdl"><i></i>HandleMCP <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></span><span class="mdl">nemlig.com + BilkaToGo</span><i class="send"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5"/></svg></i></div></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -537,10 +557,10 @@ const init=()=>{measure();draw()};
 addEventListener('scroll',go,{passive:true});addEventListener('resize',init);addEventListener('load',init);b.complete?init():b.addEventListener('load',init)})();
 </script>
 <script>
-// Hero demo: three example conversations. Numbers are an example, not live prices.
+// Hero demo: four example conversations. Numbers are an example, not live prices.
 (()=>{
 const D=document.getElementById('demo');if(!D)return;
-const log=D.querySelector('.log'),chips=[...D.querySelectorAll('.chip')],still=matchMedia('(prefers-reduced-motion: reduce)');
+const log=D.querySelector('.log'),items=[...D.querySelectorAll('.item')],still=matchMedia('(prefers-reduced-motion: reduce)');
 const OK='<span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>';
 const el=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
 const wait=ms=>new Promise(r=>setTimeout(r,still.matches?0:ms));
@@ -551,30 +571,34 @@ const R=[
  [{n:'Harira, marokkansk suppe',i:'https://media.umbraco.io/nemlig3/n1vpwtc1/camillas-opskrifter-september-2022-16-x-9.jpg?mode=crop&anchor=center&width=600&height=338',t:'75 min',p:220,l:'citron og koriander'},{n:'Ovnbagt laks med pasta i citronsauce',i:'https://media.umbraco.io/nemlig3/qyxprmle/maaltider-uge-18-2026-ovnbagt-laks-med-citronpasta.jpg?crop=0.3346465309695777,0.0000000000000002216117694378,0.0,0.0&cropmode=percentage&width=600&height=338',t:'30 min',p:174,l:'citronskal og dild'}]];
 const card=(r,i)=>`<div class="rcard" data-i="${i}"><div class="img"><img src="${r.i}" alt="" loading="lazy" width="600" height="338" onerror="this.remove()"></div><div class="meta"><b>${r.n}</b>${r.p} kr til 4 · ${r.t}<br>Løft: ${r.l}</div><button type="button">Byt ret</button></div>`;
 const cases=[
- {you:'Der er 700 kr til mad i denne uge. Lav en madplan til 4 ud fra det vi har og ugens tilbud.',
+ {t:'Lav madplan',you:'Der er 700 kr til mad i denne uge. Lav en madplan til 4 ud fra det vi har og ugens tilbud.',
   tools:[['doc','Læser jeres lager','røde linser, ris, 300 g laks i fryseren'],['','<b>handle</b> · list_offers','nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare'],['','<b>handle</b> · compare_basket','28 varer · nemlig.com 693 kr · BilkaToGo 741 kr']],
   ai:'Hele ugen, to aftener er rester. Bygget på 1 kg kylling til 100 kr og gratis rosinboller. Linserne og laksen fra fryseren bruges først, det sparer 84 kr. nemlig.com: <b>693 kr, 7 kr under budget.</b>',
   html:'<div class="plan"><b>Tir</b><span>One pot-lasagne med kylling (stor portion)</span><b>Ons</b><span>Lasagne, dag 2</span><b>Tor</b><span>Rugbrødsaften med frikadeller</span><b>Fre</b><span>Sprøde kyllingenuggets</span><b>Lør</b><span>Laks i citronsauce <span class="lager">· fra fryseren</span></span><b>Søn</b><span>Harira på jeres linser <span class="lager">· fra lageret</span></span></div>'},
- {you:'Vis mig de tre retter, børnene ikke har prøvet før.',
+ {t:'Vis opskrifter',you:'Vis mig de tre retter, børnene ikke har prøvet før.',
   tools:[['','<b>handle</b> · list_recipes','nemlig.com · Familievenlig · 48 opskrifter'],['','<b>handle</b> · get_recipe','3 opskrifter · 4 personer · trin, tid og pris']],
   ai:'Her er tre fra nemligs familievenlige. Hver ret har ét løft, så det ikke bliver kedeligt. Byt en ret ud, så regner jeg om.',
   html:'<div class="rcards">'+R.map((r,i)=>card(r[0],i)).join('')+'</div><p class="rtotal">Varer til tre retter, 4 personer: <b>576 kr</b> · 48 kr pr. portion</p>',
   after(a){const st=[0,0,0];bind(a);
    function bind(a){a.querySelectorAll('.rcard button').forEach(b=>b.onclick=e=>{const c=e.target.closest('.rcard'),i=+c.dataset.i;st[i]^=1;c.outerHTML=card(R[i][st[i]],i);const sum=st.reduce((t,v,j)=>t+R[j][v].p,0);dispatchEvent(new Event('resize'));a.querySelector('.rtotal').innerHTML=`Varer til tre retter, 4 personer: <b>${kr(sum)}</b> · ${Math.round(sum/12)} kr pr. portion`;bind(a)})}}},
- {you:'Hvilken butik er billigst for hele ugen? Fyld kurven der.',
+ {t:'Find billigste',you:'Hvilken butik er billigst for hele ugen? Fyld kurven der.',
   tools:[['','<b>handle</b> · compare_basket','28 varer · samme mængder i begge butikker'],['','<b>handle</b> · set_cart_quantities','28 varer i kurven hos nemlig.com']],
   ai:'nemlig.com er <b>48 kr billigere</b> i denne uge. Forskellen er kyllingen, skyren og en gratis vare. Kurven er fyldt. Åbn den, vælg en tid og betal.',
-  html:'<div class="cmp"><div class="store win"><div class="tag">Billigst ✓</div><div class="tot">693 kr</div>nemlig.com<ul><li><span>Kyllingeinderfilet 1 kg</span><span>100,00</span></li><li><span>Skyr 2 kg</span><span>40,00</span></li><li class="free"><span>Rosinboller</span><span>gratis</span></li><li><span>Levering</span><span>29,00</span></li><li><span>+ 25 varer</span><span>524,00</span></li></ul></div><div class="store"><div class="tag">&nbsp;</div><div class="tot">741 kr</div>BilkaToGo<ul><li><span>Kyllingeinderfilet 1 kg</span><span>129,00</span></li><li><span>Skyr 2 kg</span><span>52,00</span></li><li><span>Rosinboller</span><span>18,00</span></li><li><span>Levering</span><span>39,00</span></li><li><span>+ 25 varer</span><span>503,00</span></li></ul></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Se kurv hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a><span class="pay">Du betaler selv. HandleMCP bestiller aldrig.</span></div>'}];
+  html:'<div class="cmp"><div class="store win"><div class="tag">Billigst ✓</div><div class="tot">693 kr</div>nemlig.com<ul><li><span>Kyllingeinderfilet 1 kg</span><span>100,00</span></li><li><span>Skyr 2 kg</span><span>40,00</span></li><li class="free"><span>Rosinboller</span><span>gratis</span></li><li><span>Levering</span><span>29,00</span></li><li><span>+ 25 varer</span><span>524,00</span></li></ul></div><div class="store"><div class="tag">&nbsp;</div><div class="tot">741 kr</div>BilkaToGo<ul><li><span>Kyllingeinderfilet 1 kg</span><span>129,00</span></li><li><span>Skyr 2 kg</span><span>52,00</span></li><li><span>Rosinboller</span><span>18,00</span></li><li><span>Levering</span><span>39,00</span></li><li><span>+ 25 varer</span><span>503,00</span></li></ul></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Se kurv hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a><span class="pay">Du betaler selv. HandleMCP bestiller aldrig.</span></div>'},
+ {t:'Vælg levering',you:'Hvornår kan de levere på søndag?',
+  tools:[['','<b>handle</b> · list_delivery_slots','nemlig.com · søndag · 6 ledige tider']],
+  ai:'Søndag har seks ledige tider. Den billigste er <b>kl. 8–12 for 29 kr.</b> Jeg kan ikke vælge tiden eller betale. Det gør du selv i kurven, og først da bliver der bestilt.',
+  html:'<div class="slots"><div class="slot win"><b>8–12</b><span>29 kr</span></div><div class="slot"><b>12–16</b><span>39 kr</span></div><div class="slot"><b>16–18</b><span>49 kr</span></div><div class="slot"><b>18–20</b><span>49 kr</span></div><div class="slot"><b>20–22</b><span>39 kr</span></div><div class="slot"><b>22–24</b><span>29 kr</span></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Vælg tid hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a></div>'}];
 let run=0;
-async function play(i){const id=++run;chips.forEach((c,j)=>{c.classList.toggle('on',j===i);c.setAttribute('aria-pressed',j===i);c.classList.remove('next')});log.innerHTML='';log.setAttribute('aria-busy','true');const c=cases[i];
+async function play(i){const id=++run;items.forEach((c,j)=>{c.classList.toggle('on',j===i);c.classList.toggle('run',j===i);c.setAttribute('aria-pressed',j===i);c.classList.remove('next')});log.innerHTML='';log.setAttribute('aria-busy','true');const c=cases[i];log.appendChild(el(`<div class="ttl">${c.t}</div>`));
  const you=el('<div class="you"><div class="bubble"></div></div>');log.appendChild(you);const b=you.firstChild;
  if(still.matches)b.textContent=c.you;else{for(const ch of c.you){if(id!==run)return;b.textContent+=ch;await wait(11)}}
- const th=el('<div class="think" style="margin-left:32px">Tænker …</div>');log.appendChild(th);await wait(450);if(id!==run)return;th.remove();const tools=el('<div class="tools"></div>');log.appendChild(tools);
+ const th=el('<div class="think" style="margin-left:30px">Tænker …</div>');log.appendChild(th);await wait(450);if(id!==run)return;th.remove();const tools=el('<div class="tools"></div>');log.appendChild(tools);
  for(const t of c.tools){const name=t[1].replace(/<[^>]+>/g,'');const row=el(`<div class="tool run"><div class="hd"><span class="ti">${t[0]?'≡':'⚙'}</span><span class="st"><span class="wait"></span></span><span>${t[0]?'Læser':'Kører'} <b>${name}</b></span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></div></div>`);tools.appendChild(row);await wait(430);if(id!==run)return;row.classList.remove('run');row.querySelector('.st').innerHTML=OK;row.querySelector('.hd span:nth-child(3)').innerHTML=`<b>${name}</b>`;row.insertAdjacentHTML('beforeend',`<em>${t[2]}</em>`)}
  await wait(300);if(id!==run)return;const ai=el('<div class="ai"><div class="bubble"><span class="txt"></span></div></div>');log.appendChild(ai);const tx=ai.querySelector('.txt');
- if(still.matches)tx.innerHTML=c.ai;else{const parts=c.ai.split(/(<[^>]+>|\s+)/).filter(Boolean);let acc='';for(const w of parts){if(id!==run)return;acc+=(w.startsWith('<')||/^\s+$/.test(w))?w:`<span class="w">${w}</span>`;tx.innerHTML=acc;if(!/^\s+$/.test(w)&&!w.startsWith('<'))await wait(24)}}if(c.html){await wait(150);if(id!==run)return;tx.insertAdjacentHTML('afterend',`<div class="fade">${c.html}</div>`)}if(c.after)c.after(ai);log.removeAttribute('aria-busy');
- const n=chips[i+1];if(n)n.classList.add('next');dispatchEvent(new Event('resize'))}
-chips.forEach((c,i)=>c.addEventListener('click',()=>play(i)));
+ if(still.matches)tx.innerHTML=c.ai;else{const parts=c.ai.split(/(<[^>]+>|\s+)/).filter(Boolean);let acc='';for(const w of parts){if(id!==run)return;acc+=(w.startsWith('<')||/^\s+$/.test(w))?w:`<span class="w">${w}</span>`;tx.innerHTML=acc;if(!/^\s+$/.test(w)&&!w.startsWith('<'))await wait(24)}}if(c.html){await wait(150);if(id!==run)return;tx.insertAdjacentHTML('afterend',`<div class="fade">${c.html}</div>`)}if(c.after)c.after(ai);log.removeAttribute('aria-busy');items[i].classList.remove('run');items[i].classList.add('done');
+ const n=items[i+1];if(n&&!n.classList.contains('done'))n.classList.add('next');dispatchEvent(new Event('resize'))}
+items.forEach((c,i)=>c.addEventListener('click',()=>play(i)));
 setTimeout(()=>play(0),document.documentElement.classList.contains('pl')?1900:300);
 })();
 </script>
