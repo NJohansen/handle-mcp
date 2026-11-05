@@ -28,9 +28,14 @@ Danish grocery stores with home delivery, as an MCP server: [nemlig.com](https:/
 
 Taste, budget and meal rules live in your own prompt or skill. The server finds and counts. [Build your own skill](docs/skills.md).
 
-## Try it
+## Requirements
 
-Works on macOS, Linux and Windows (x64), with Python 3.12+ and [uv](https://docs.astral.sh/uv/). Windows on ARM is not supported yet: a dependency (`cryptography`) has no ready-made build for it.
+- macOS, Linux or Windows (x64). Windows on ARM is not supported yet: a dependency (`cryptography`) has no ready-made build for it.
+- [uv](https://docs.astral.sh/uv/). It fetches Python 3.12+ if you do not have it.
+- An MCP client, such as Claude Code or Claude Desktop.
+- An account at nemlig.com or BilkaToGo with home delivery to your address.
+
+## Try it
 
 ```sh
 uvx --from git+https://github.com/NJohansen/handle-mcp@v1.2.1 handle-mcp login nemlig
