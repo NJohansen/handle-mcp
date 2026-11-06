@@ -5,7 +5,7 @@
   <!-- produce -->
   <path d="M232 128 C 222 80, 236 34, 262 22 C 282 14, 292 34, 284 58 C 276 84, 262 108, 258 130 Z" fill="#f5e211"/>
   <path d="M262 40 l14 6 M258 62 l14 6 M253 84 l13 6" stroke="#2C2E2A" stroke-width="2.4" stroke-linecap="round"/>
-  <path d="M150 128 C 128 104, 132 66, 160 54 C 176 48, 186 62, 182 78 C 196 62, 214 70, 210 90 C 206 108, 190 124, 176 130 Z" fill="#8ed462"/>
+  <path d="M150 128 C 128 104, 132 66, 160 54 C 176 48, 186 62, 182 78 C 196 62, 214 70, 210 90 C 206 108, 190 124, 176 130 Z" fill="#a98be0"/>
   <path d="M168 126 C 168 104, 172 86, 178 74" stroke="#2C2E2A" stroke-width="2.4" stroke-linecap="round"/>
   <circle cx="218" cy="112" r="34" fill="#ff705d"/>
   <path d="M210 80 c 4 -8 12 -10 18 -6" stroke="#2C2E2A" stroke-width="2.4" stroke-linecap="round"/>
