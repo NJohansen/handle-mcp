@@ -118,14 +118,22 @@ h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spac
 .plan{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:14px;margin:12px 0 0}
 .plan b{color:var(--mute);font-weight:500}
 .plan .lager{color:var(--green);font-weight:500}
-.rcards{display:flex;flex-direction:column;gap:8px;margin:12px 0 0}
-.rcard{border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12.5px;display:grid;grid-template-columns:104px 1fr auto;align-items:center;background:#fff}
-.rcard .img{aspect-ratio:4/3;background:var(--leaf-soft);overflow:hidden;align-self:stretch}.rcard img{display:block;width:100%;height:100%;object-fit:cover}
-.rcard .meta{padding:8px 10px;color:var(--mute);line-height:1.4;min-width:0}
-.rcard .meta b{display:block;color:var(--ink);font-weight:600;font-size:13.5px;line-height:1.2;margin-bottom:3px}
-.rcard button{margin:0 10px 0 0;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font:500 12px/1.2 var(--sans);color:var(--ink);cursor:pointer}
-.rcard button:hover{background:var(--soft)}
-.rtotal{margin:10px 0 0;font-size:14px}.rtotal b{font-weight:600}
+.recipe{border:1px solid #e6e3d9;border-radius:16px;background:#fff;overflow:hidden;margin:12px 0 0}
+.recipe .strip{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;height:118px;background:#f0eee6}
+.recipe .ph{background:var(--leaf-soft);overflow:hidden;cursor:pointer;position:relative}.recipe .ph img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.recipe .ph:hover img{transform:scale(1.04)}.recipe .ph.on::after{content:"";position:absolute;inset:0;box-shadow:inset 0 -3px 0 var(--green)}
+.recipe .rbody{padding:16px 18px 18px}
+.recipe h3{margin:0 0 4px;font-size:19px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.recipe .sub{margin:0 0 12px;color:var(--mute);font-size:14px}
+.recipe .serv{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mute);margin:0 0 16px}
+.recipe .serv button{width:26px;height:26px;border:0;border-radius:7px;background:#f0eee6;color:var(--ink);font:500 17px/1 var(--sans);cursor:pointer}.recipe .serv button:hover{background:#e6e3d9}
+.recipe .serv b{color:var(--ink);font-weight:500;min-width:14px;text-align:center}
+.recipe .serv .ic{margin-left:auto;display:flex;gap:14px}.recipe .serv .ic svg{width:16px;height:16px;fill:none;stroke:var(--mute);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.recipe h4{margin:0 0 6px;font-size:15px;font-weight:600}
+.recipe ul{list-style:none;margin:0 0 16px;padding:0;font-size:14px;line-height:1.75}
+.recipe ol{margin:0;padding:0;list-style:none;counter-reset:st;font-size:14px;line-height:1.5}
+.recipe ol li{display:grid;grid-template-columns:22px 1fr;gap:10px;margin:0 0 8px}
+.recipe ol li::before{counter-increment:st;content:counter(st);width:22px;height:22px;border-radius:50%;background:#f0eee6;font-size:12px;font-weight:600;display:grid;place-items:center;color:var(--ink)}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 0}
 .store{border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;min-width:0}
 .store.win{border-color:var(--green);background:var(--leaf-soft)}
@@ -152,7 +160,7 @@ h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spac
 @keyframes line{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade,.demo .item.next .ic,.demo .item.run .ic,.demo .tool.run .hd b,.tool .wait,.tool .ok svg,.think,.demo .ai .bubble .w{animation:none}.think{color:var(--mute)}.tool .ok svg{stroke-dashoffset:0}}
 @media (max-width:640px){.demo .body{grid-template-columns:1fr;min-height:0}.demo .side{border-right:0;border-bottom:1px solid #ebe8df;flex-direction:row;gap:4px;padding:8px;overflow-x:auto;scrollbar-width:none}.demo .side .grp,.demo .item small{display:none}.demo .item{flex:0 0 auto;width:auto;padding:7px 12px 7px 9px;border:1px solid #e6e3d9;border-radius:999px;background:#fff;gap:0 6px}.demo .item.on{background:var(--ink);color:#fff;border-color:var(--ink)}.demo .agent .log{min-height:380px}.slots{grid-template-columns:1fr 1fr}}
-@media (max-width:520px){.rcard{grid-template-columns:88px 1fr auto}.cmp{grid-template-columns:1fr}}
+@media (max-width:520px){.cmp{grid-template-columns:1fr}.recipe .strip{height:84px}}
 
 /* sections */
 section{padding-top:136px}
@@ -572,22 +580,29 @@ const kr=n=>n.toLocaleString('da-DK')+' kr';
 const dn=()=>{log.scrollTop=log.scrollHeight};
 // The window can be dragged by its title bar.
 {const win=D.querySelector('.agent'),bar=win.querySelector('.bar');let dx=0,dy=0;bar.addEventListener('pointerdown',e=>{if(e.button)return;const sx=e.clientX-dx,sy=e.clientY-dy;bar.setPointerCapture(e.pointerId);win.classList.add('drag');const mv=e=>{dx=e.clientX-sx;dy=e.clientY-sy;win.style.transform=`translate(${dx}px,${dy}px)`};const up=()=>{bar.removeEventListener('pointermove',mv);bar.removeEventListener('pointerup',up);bar.removeEventListener('pointercancel',up);win.classList.remove('drag')};bar.addEventListener('pointermove',mv);bar.addEventListener('pointerup',up);bar.addEventListener('pointercancel',up)})}
-const R=[
- [{n:'One pot lasagne med kylling og mascarpone',i:'https://media.umbraco.io/nemlig3/52weelyh/maaltider-uge-48-2025-one-pot-lasagne-med-kylling-og-mascarpone-ubeskaaret.jpg?crop=0.373133205897067,0.21692917722216115,0.1030630137559129,0.15524837537173686&cropmode=percentage&width=600&height=338',t:'40 min',p:184,l:'frisk basilikum'},{n:'Kylling i karry med kokosmælk',i:'https://media.umbraco.io/nemlig3/jlebokhi/kylling-i-karry-ubeskaaret.jpg?mode=crop&anchor=center&width=600&height=338',t:'35 min',p:220,l:'æble og frisk chili'}],
- [{n:'Sprøde kyllingenuggets',i:'https://media.umbraco.io/nemlig3/4sddjlj5/nuggets-web-1.jpeg?crop=0.0,0.078,0.0,0.07825000000000004&cropmode=percentage&width=600&height=338',t:'30 min',p:172,l:'paprika-dijon-marinade'},{n:'Salsiccia pizza med ricotta',i:'https://media.umbraco.io/nemlig3/ysmfg4mw/7a8a7320.jpg?mode=crop&anchor=center&width=600&height=338',t:'30 min',p:206,l:'salvie og valnødder'}],
- [{n:'Harira, marokkansk suppe',i:'https://media.umbraco.io/nemlig3/n1vpwtc1/camillas-opskrifter-september-2022-16-x-9.jpg?mode=crop&anchor=center&width=600&height=338',t:'75 min',p:220,l:'citron og koriander'},{n:'Ovnbagt laks med pasta i citronsauce',i:'https://media.umbraco.io/nemlig3/qyxprmle/maaltider-uge-18-2026-ovnbagt-laks-med-citronpasta.jpg?crop=0.3346465309695777,0.0000000000000002216117694378,0.0,0.0&cropmode=percentage&width=600&height=338',t:'30 min',p:174,l:'citronskal og dild'}]];
-const card=(r,i)=>`<div class="rcard" data-i="${i}"><div class="img"><img src="${r.i}" alt="" loading="lazy" width="600" height="338" onerror="this.remove()"></div><div class="meta"><b>${r.n}</b>${r.p} kr til 4 · ${r.t}<br>Løft: ${r.l}</div><button type="button">Byt ret</button></div>`;
+const RC=[
+ {n:'One pot lasagne med kylling og mascarpone',s:'Cremet lasagne i én pande.',t:'40 min',i:'https://media.umbraco.io/nemlig3/52weelyh/maaltider-uge-48-2025-one-pot-lasagne-med-kylling-og-mascarpone-ubeskaaret.jpg?crop=0.373133205897067,0.21692917722216115,0.1030630137559129,0.15524837537173686&cropmode=percentage&width=600&height=338',
+  ing:[[1,'stk.','løg'],[2,'fed','hvidløg'],[300,'g','gulerødder'],[400,'g','lasagneplader'],[1,'spsk.','neutral olie'],[400,'g','hakket kylling'],[4,'spsk.','tomatpuré'],[390,'g','hakkede tomater'],[3,'tsk.','italiensk krydderimix'],[1,'stk.','hønsebouillonterning'],[8,'dl','vand'],[150,'g','mascarpone'],[0,'','salt og peber'],[0.25,'bdt.','basilikum']],
+  st:['Pil og hak løg og hvidløg. Riv gulerødderne groft, og knæk lasagnepladerne i små stykker.','Steg løg og hvidløg i olie på en stor pande. Tilsæt kyllingen, og brun den i ca. 5 min.','Kom gulerod, tomatpuré og krydderimix på panden, og lad det stege et par minutter.','Tilsæt lasagneplader, hakkede tomater, bouillon og vand. Læg låg på, og lad det simre 15–20 min. Rør undervejs.','Vend mascarpone i, smag til med salt og peber, og top med frisk basilikum.']},
+ {n:'Sprøde kyllingenuggets',s:'Hjemmelavede nuggets i sprød rasp.',t:'30 min',i:'https://media.umbraco.io/nemlig3/4sddjlj5/nuggets-web-1.jpeg?crop=0.0,0.078,0.0,0.07825000000000004&cropmode=percentage&width=600&height=338',
+  ing:[[2,'tsk.','paprika'],[1,'tsk.','dijonsennep'],[2,'tsk.','salt'],[0.5,'tsk.','peber'],[1,'fed','hvidløg'],[4,'spsk.','neutral yoghurt'],[500,'g','kyllingebryst'],[100,'g','rasp'],[0,'','neutral olie til stegning']],
+  st:['Bland paprika, sennep, salt, peber, presset hvidløg og yoghurt til en marinade.','Skær kyllingen i mundrette stykker, og vend dem i marinaden. Lad dem gerne stå 30 min.','Vend stykkerne i rasp.','Steg dem gyldne i 1–2 cm olie. Læg dem på køkkenrulle, og drys med lidt salt.']},
+ {n:'Harira, marokkansk suppe',s:'Fyldig suppe med linser og kikærter.',t:'75 min',i:'https://media.umbraco.io/nemlig3/n1vpwtc1/camillas-opskrifter-september-2022-16-x-9.jpg?mode=crop&anchor=center&width=600&height=338',
+  ing:[[300,'g','oksebov'],[1,'stk.','løg'],[3,'tsk.','frisk ingefær, revet'],[3,'stk.','bladselleri'],[25,'g','smør'],[3,'spsk.','tomatpuré'],[1,'tsk.','stødt kanel'],[1,'tsk.','stødt koriander'],[0.5,'tsk.','gurkemeje'],[1,'ds.','flåede tomater'],[0.5,'dl','røde linser'],[2,'stk.','oksebouillonterninger'],[1,'l','vand'],[0.5,'dl','jasminris'],[2,'ds.','kikærter'],[1,'spsk.','majsstivelse'],[1,'stk.','citron, saften'],[0.25,'bdt.','koriander'],[0.25,'bdt.','bredbladet persille'],[1,'stk.','rød chili'],[0,'','salt og peber']],
+  st:['Skær kødet i mundrette stykker, og brun det i en stor gryde.','Hak løg, riv ingefær, og snit bladselleri. Steg løg i smør, og rist tomatpuréen med.','Tilsæt ingefær, kanel, bladselleri, koriander, gurkemeje, linser, flåede tomater, bouillon og vand. Lad det simre under låg i 1 time.','Kom ris i efter 40 min. og kikærter 10 min. før servering. Jævn med majsstivelse rørt ud i lidt vand.','Smag til med salt, peber og citronsaft. Top med krydderurter og chili.']}];
+const fmt=x=>String(Math.round(x*10)/10).replace('.',',');
+const ICONS='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.5 2.5l2 2L6 12H4v-2z"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2M4.5 5.5 8 2l3.5 3.5M3 9v4h10V9"/></svg><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6V2h8v4M4 11H2V6h12v5h-2M4 9h8v5H4z"/></svg>';
+const recipe=(k,n)=>{const r=RC[k],f=n/4;return `<div class="recipe"><div class="strip">${RC.map((q,j)=>`<div class="ph${j===k?' on':''}" data-k="${j}" role="button" tabindex="0" aria-label="${q.n}"><img src="${q.i}" alt="" loading="lazy" width="600" height="338" onerror="this.remove()"></div>`).join('')}</div><div class="rbody"><h3>${r.n}</h3><p class="sub">${r.s} ${r.t}. Fra nemlig.com.</p><div class="serv"><button type="button" data-d="-1" aria-label="Færre personer">−</button><b>${n}</b><button type="button" data-d="1" aria-label="Flere personer">+</button><span>personer</span><span class="ic">${ICONS}</span></div><h4>Ingredienser</h4><ul>${r.ing.map(a=>`<li>${a[0]?fmt(a[0]*f)+' '+a[1]+' ':''}${a[2]}</li>`).join('')}</ul><h4>Fremgangsmåde</h4><ol>${r.st.map(t=>`<li>${t}</li>`).join('')}</ol></div></div>`};
 const cases=[
  {t:'Lav madplan',you:'Der er 700 kr til mad i denne uge. Lav en madplan til 4 ud fra det vi har og ugens tilbud.',
   tools:[['doc','Tjekker hvad I har derhjemme','røde linser, ris, 300 g laks i fryseren'],['','Finder ugens tilbud hos nemlig.com og BilkaToGo','214 tilbud · 1 gratis vare'],['','Regner hele ugens indkøb ud i begge butikker','28 varer · nemlig.com 693 kr · BilkaToGo 741 kr']],
   ai:'Hele ugen, to aftener er rester. Bygget på 1 kg kylling til 100 kr og gratis rosinboller. Linserne og laksen fra fryseren bruges først, det sparer 84 kr. nemlig.com: <b>693 kr, 7 kr under budget.</b>',
   html:'<div class="plan"><b>Tir</b><span>One pot-lasagne med kylling (stor portion)</span><b>Ons</b><span>Lasagne, dag 2</span><b>Tor</b><span>Rugbrødsaften med frikadeller</span><b>Fre</b><span>Sprøde kyllingenuggets</span><b>Lør</b><span>Laks i citronsauce <span class="lager">· fra fryseren</span></span><b>Søn</b><span>Harira på jeres linser <span class="lager">· fra lageret</span></span></div>'},
  {t:'Vis opskrifter',you:'Vis mig de tre retter, børnene ikke har prøvet før.',
-  tools:[['','Finder familievenlige opskrifter på nemlig.com','48 opskrifter'],['','Henter tre opskrifter med trin, tid og pris','3 opskrifter til 4 personer']],
-  ai:'Her er tre fra nemligs familievenlige. Hver ret har ét løft, så det ikke bliver kedeligt. Byt en ret ud, så regner jeg om.',
-  html:'<div class="rcards">'+R.map((r,i)=>card(r[0],i)).join('')+'</div><p class="rtotal">Varer til tre retter, 4 personer: <b>576 kr</b> · 48 kr pr. portion</p>',
-  after(a){const st=[0,0,0];bind(a);
-   function bind(a){a.querySelectorAll('.rcard button').forEach(b=>b.onclick=e=>{const c=e.target.closest('.rcard'),i=+c.dataset.i;st[i]^=1;c.outerHTML=card(R[i][st[i]],i);const sum=st.reduce((t,v,j)=>t+R[j][v].p,0);dispatchEvent(new Event('resize'));a.querySelector('.rtotal').innerHTML=`Varer til tre retter, 4 personer: <b>${kr(sum)}</b> · ${Math.round(sum/12)} kr pr. portion`;bind(a)})}}},
+  tools:[['','Finder familievenlige opskrifter på nemlig.com','48 opskrifter'],['','Henter tre opskrifter med ingredienser og trin','3 opskrifter til 4 personer']],
+  ai:'Her er tre fra nemligs familievenlige. Jeg viser lasagnen først. Tryk på et billede for at se de andre, og skru op for personer, så regner jeg mængderne om.',
+  html:recipe(0,4),
+  after(a){let k=0,n=4;const w=a.querySelector('.fade');const bind=()=>{w.querySelectorAll('.ph').forEach(p=>{p.onclick=()=>{k=+p.dataset.k;n=4;w.innerHTML=recipe(k,n);bind();dispatchEvent(new Event('resize'))};p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();p.onclick()}}});w.querySelectorAll('.serv button').forEach(b=>b.onclick=()=>{n=Math.min(12,Math.max(2,n+ +b.dataset.d));w.innerHTML=recipe(k,n);bind()})};bind()}},
  {t:'Find billigste',you:'Hvilken butik er billigst for hele ugen? Fyld kurven der.',
   tools:[['','Sammenligner nemlig.com og BilkaToGo','28 varer · samme mængder i begge butikker'],['','Lægger varerne i kurven hos nemlig.com','28 varer i kurven · intet bestilt']],
   ai:'nemlig.com er <b>48 kr billigere</b> i denne uge. Forskellen er kyllingen, skyren og en gratis vare. Kurven er fyldt. Åbn den, vælg en tid og betal.',
