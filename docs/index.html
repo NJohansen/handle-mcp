@@ -106,15 +106,16 @@ h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spac
 .tool .ti.doc{color:var(--mute)}
 .tool .wait{width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.demo .agent .input{margin:8px 14px 0;display:block;padding:12px 10px 10px 14px;border:1px solid #e3e0d6;border-radius:16px;background:#fff;box-shadow:0 1px 2px rgba(28,36,30,.04)}
-.demo .foot{font-size:11.5px;color:#9a9890;text-align:center;padding:8px 14px 10px}
-.demo .agent .input>span{display:block;color:#9a9890;font-size:15px;margin-bottom:12px}
-.demo .agent .input .row{display:flex;align-items:center;gap:8px}
-.demo .agent .input .plus,.demo .agent .input .tl{width:30px;height:30px;border:1px solid #e3e0d6;border-radius:8px;display:grid;place-items:center;color:var(--mute);font-size:19px;line-height:1}.demo .agent .input .tl svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
-.demo .agent .input .mdl{margin-left:auto;font-size:13px;color:var(--mute);display:flex;align-items:center;gap:5px}
-.demo .agent .input .mdl i{width:6px;height:6px;border-radius:50%;background:var(--green)}
-.demo .agent .input .mdl svg{width:9px;height:9px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
-.demo .agent .input i.send{margin-left:6px;width:30px;height:30px;border-radius:9px;background:#c96442}
+.demo .agent .input{margin:8px 14px 0;display:block;padding:0;border:0;background:none;box-shadow:none}
+.demo .agent .input .field{display:flex;align-items:center;gap:10px;padding:13px 16px 13px 18px;border:1px solid #e3e0d6;border-radius:22px;background:#fff;box-shadow:0 1px 2px rgba(28,36,30,.04);color:#9a9890;font-size:15px}
+.demo .agent .input .field span{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.demo .agent .input .field svg{width:16px;height:16px;fill:none;stroke:#b4b2a8;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.demo .agent .input .row{display:flex;align-items:center;gap:14px;padding:10px 10px 0 12px;color:var(--mute)}
+.demo .agent .input .row svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.demo .agent .input .mic{display:flex;align-items:center;gap:4px}.demo .agent .input .mic svg+svg{width:10px;height:10px}
+.demo .agent .input .mdl{margin-left:auto;font-size:13.5px;color:var(--ink);display:flex;align-items:center;gap:10px}
+.demo .agent .input .mdl i{margin:0;width:14px;height:14px;border-radius:50%;background:none;border:2px solid #e3e0d6;border-top-color:var(--green)}
+.demo .foot{font-size:11.5px;color:#9a9890;text-align:center;padding:10px 14px 10px}
 .plan{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:14px;margin:12px 0 0}
 .plan b{color:var(--mute);font-weight:500}
 .plan .lager{color:var(--green);font-weight:500}
@@ -151,8 +152,8 @@ h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spac
 
 @keyframes line{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade,.demo .item.next .ic,.demo .item.run .ic,.demo .tool.run .hd b,.tool .wait,.tool .ok svg,.think,.demo .ai .bubble .w{animation:none}.think{color:var(--mute)}.tool .ok svg{stroke-dashoffset:0}}
-@media (max-width:640px){.demo .body{grid-template-columns:1fr;min-height:0}.demo .side{border-right:0;border-bottom:1px solid #ebe8df;flex-direction:row;gap:4px;padding:8px;overflow-x:auto;scrollbar-width:none}.demo .side .grp,.demo .item small{display:none}.demo .item{flex:0 0 auto;width:auto;padding:7px 12px 7px 9px;border:1px solid #e6e3d9;border-radius:999px;background:#fff;gap:0 6px}.demo .agent .input .tl{display:none}.demo .item.on{background:var(--ink);color:#fff;border-color:var(--ink)}.demo .agent .log{min-height:380px}.slots{grid-template-columns:1fr 1fr}}
-@media (max-width:520px){.demo .agent .input .plus{display:none}.rcard{grid-template-columns:88px 1fr auto}.cmp{grid-template-columns:1fr}}
+@media (max-width:640px){.demo .body{grid-template-columns:1fr;min-height:0}.demo .side{border-right:0;border-bottom:1px solid #ebe8df;flex-direction:row;gap:4px;padding:8px;overflow-x:auto;scrollbar-width:none}.demo .side .grp,.demo .item small{display:none}.demo .item{flex:0 0 auto;width:auto;padding:7px 12px 7px 9px;border:1px solid #e6e3d9;border-radius:999px;background:#fff;gap:0 6px}.demo .item.on{background:var(--ink);color:#fff;border-color:var(--ink)}.demo .agent .log{min-height:380px}.slots{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.rcard{grid-template-columns:88px 1fr auto}.cmp{grid-template-columns:1fr}}
 
 /* sections */
 section{padding-top:136px}
@@ -433,7 +434,7 @@ main{position:relative}
           </div>
           <div class="main">
             <div class="log"></div>
-            <div class="input"><span>Skriv et svar …</span><div class="row"><span class="plus">+</span><span class="tl"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/><circle cx="5" cy="4" r="1.6" fill="#fff"/><circle cx="11" cy="8" r="1.6" fill="#fff"/><circle cx="6" cy="12" r="1.6" fill="#fff"/></svg></span><span class="mdl"><i></i>HandleMCP <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></span><i class="send"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5"/></svg></i></div></div>
+            <div class="input"><div class="field"><span>Stil et spørgsmål eller start en opgave …</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 3v5H4M6.5 5.5 4 8l2.5 2.5"/></svg></div><div class="row"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg><span class="mic"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="1.5" width="5" height="8" rx="2.5"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5"/></svg><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></span><span class="mdl">HandleMCP <i></i></span></div></div>
             <div class="foot">Du betaler selv. HandleMCP bestiller aldrig.</div>
           </div>
         </div>
