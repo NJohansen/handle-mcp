@@ -656,7 +656,7 @@ let asked=false;
 let run=0,pending=null;
 // The composer is real: after a case that ends at a store, "ja tak" opens the store in a new tab. Nothing is ordered.
 {const form=D.querySelector('.field'),inp=form.querySelector('input');const say=(cls,h)=>{log.appendChild(el(`<div class="${cls}"><div class="bubble">${h}</div></div>`));dn()};
- form.addEventListener('submit',e=>{e.preventDefault();const t=inp.value.trim();if(!t)return;inp.value='';say('you',t.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])));
+ form.addEventListener('submit',e=>{e.preventDefault();const t=inp.value.trim();if(!t||log.hasAttribute('aria-busy'))return;inp.value='';say('you',t.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])));
   if(pending&&/^(ja|jo|yes|ok|okay|gerne)\b/i.test(t)){window.open(pending,'_blank','noopener');say('ai','Åbner nemlig.com i en ny fane. Sker der ikke noget, så <a href="'+pending+'" target="_blank" rel="noopener">åbn den her</a>. Du vælger tid og betaler selv.')}
   else if(pending)say('ai','Skriv <b>ja tak</b>, så åbner jeg nemlig.com. Jeg bestiller ikke noget.');
   else say('ai','Det her er en demo. Prøv <b>Find billigste</b> i menuen, og skriv <b>ja tak</b>, når kurven er fyldt.')})}
