@@ -5,8 +5,13 @@
   <!-- produce -->
   <path d="M232 128 C 222 80, 236 34, 262 22 C 282 14, 292 34, 284 58 C 276 84, 262 108, 258 130 Z" fill="#f5e211"/>
   <path d="M262 40 l14 6 M258 62 l14 6 M253 84 l13 6" stroke="#2C2E2A" stroke-width="2.4" stroke-linecap="round"/>
-  <path d="M150 128 C 128 104, 132 66, 160 54 C 176 48, 186 62, 182 78 C 196 62, 214 70, 210 90 C 206 108, 190 124, 176 130 Z" fill="#a98be0"/>
-  <path d="M168 126 C 168 104, 172 86, 178 74" stroke="#2C2E2A" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- bunch of carrots -->
+  <path d="M138 66 c 8 -18, 24 -16, 30 2 L 176 130 L 146 130 Z" fill="#ff9f3a"/>
+  <path d="M166 54 c 10 -18, 28 -14, 30 6 L 200 130 L 176 130 Z" fill="#ff9f3a"/>
+  <path d="M194 70 c 8 -16, 24 -12, 26 4 L 212 130 L 200 130 Z" fill="#ff9f3a"/>
+  <path d="M146 84 l 14 2 M150 100 l 14 2 M176 74 l 16 2 M180 92 l 16 2" stroke="#2C2E2A" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M150 58 c -4 -14, -16 -22, -30 -20 c 6 12, 16 18, 30 20 Z M152 56 c -8 -14, -6 -28, 6 -36 c 6 12, 2 26, -6 36 Z M180 46 c -4 -16, -12 -28, -26 -30 c 2 14, 12 24, 26 30 Z M182 44 c -6 -16, 0 -30, 14 -36 c 2 14, -4 28, -14 36 Z M184 46 c 8 -12, 22 -14, 34 -6 c -10 8, -24 10, -34 6 Z M206 62 c 0 -14, 8 -24, 22 -28 c -2 14, -10 22, -22 28 Z" fill="#8ed462"/>
+  <path d="M150 58 l -16 -12 M152 56 l 2 -22 M180 46 l -14 -18 M182 44 l 8 -22 M184 46 l 20 -6 M206 62 l 14 -16" stroke="#2C2E2A" stroke-width="2" stroke-linecap="round"/>
   <circle cx="218" cy="112" r="34" fill="#ff705d"/>
   <path d="M210 80 c 4 -8 12 -10 18 -6" stroke="#2C2E2A" stroke-width="2.4" stroke-linecap="round"/>
   <ellipse cx="204" cy="98" rx="8" ry="4.5" transform="rotate(-40 204 98)" fill="#fff"/>
