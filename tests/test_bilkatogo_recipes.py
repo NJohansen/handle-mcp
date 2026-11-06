@@ -7,6 +7,7 @@ import httpx
 import pytest
 
 from handle_mcp.stores import StoreError
+from handle_mcp.stores import bilkatogo_recipes as bilka_recipes
 from handle_mcp.stores.bilkatogo import BilkaStore
 from handle_mcp.stores.bilkatogo_recipes import category_path, js_object, recipe_path
 from tests import test_bilkatogo
@@ -101,9 +102,37 @@ async def test_recipe_has_text_and_products(store, fake):
     assert r.tip.startswith("Du kan prøve at lave vegetariske karbonader")
     assert [i.product.id for i in r.items] == ["81498", "125887", "137133"]  # the page's order
     assert all(i.product.quantity == 1 and not i.have_at_home for i in r.items)
+    assert len(r.missing) == 12 and "17010" in r.missing  # 15 item numbers, 3 sold here
     assert r.total == sum((i.product.price for i in r.items), Decimal(0)) > 0
     sent = test_bilkatogo.json.loads(fake.requests[-1].content)["requests"][0]["params"]
     assert "objectID%3A81498+OR+objectID%3A125887" in sent and "17010" in sent
+
+
+async def test_no_products_found_is_a_clear_error(store, fake):
+    fake.scripted["/1/indexes/*/queries"] = [{"results": [{"hits": []}]}]
+    with pytest.raises(StoreError, match="ingen af opskriftens varer"):
+        await store.recipe(KARBONADER)
+
+
+async def test_only_item_numbers_go_in_the_filter(store, monkeypatch):
+    asked = []
+
+    async def algolia(query, limit, offers=False, ids=None):
+        asked.extend(ids or [])
+        return []
+
+    monkeypatch.setattr(store, "_algolia", algolia)
+    page = await store._page("aftensmad/danske-retter/karbonader")
+    slider = next(n for n in bilka_recipes._nodes(page, "CuratedSlider"))
+    slider["sourceProperties"]["curatedSkuList"] += ["1 OR isInOffer:1", None, 7]
+
+    async def cached(_path):
+        return page
+
+    monkeypatch.setattr(store, "_page", cached)
+    with pytest.raises(StoreError):
+        await store.recipe(KARBONADER)
+    assert len(asked) == 15 and all(a.isdigit() for a in asked)
 
 
 async def test_method_and_tips_in_one_paragraph(store, fake):

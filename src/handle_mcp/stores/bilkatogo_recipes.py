@@ -35,7 +35,13 @@ IDENT = re.compile(r"[A-Za-z_$][\w$]*")
 NUMBER = re.compile(r"\d+")
 FEATURED = "madplaner"  # "Ugens madplan": 7 dinners, Monday to Sunday
 METHOD = ("Fremgangsm", "Sådan gør du")  # the heading above the steps
-MAX_DEPTH = 2  # aftensmad → sandwiches-pita-og-wraps → sandwiches → recipes
+MAX_DEPTH = 2
+PARALLEL = 5  # pages read at once: be polite to the website
+SKU = re.compile(r"^\d+$")
+
+
+class NoPage(StoreError):
+    """bilkatogo.dk has no page at that path."""  # aftensmad → sandwiches-pita-og-wraps → sandwiches → recipes
 
 
 def recipe_path(recipe: str) -> str:
@@ -205,9 +211,16 @@ class BilkaRecipesMixin:
     _send: Any
     _algolia: Any
     _build: str | None = None
+    _pages_at_once: asyncio.Semaphore | None = None
 
     async def _page(self, path: str) -> dict:
         """The page's data. A stale build id answers with the website's HTML: read it again."""
+        if not getattr(self, "_pages_at_once", None):
+            self._pages_at_once = asyncio.Semaphore(PARALLEL)
+        async with self._pages_at_once:
+            return await self._payload(path)
+
+    async def _payload(self, path: str) -> dict:
         for fresh in (False, True):
             if fresh or not self._build:
                 await self._read_build()
@@ -218,7 +231,7 @@ class BilkaRecipesMixin:
                 if not isinstance(page, dict):
                     raise StoreError("BilkaToGo-siden har ændret format.")
                 return page
-        raise StoreError(f"BilkaToGo har ingen side {ROOT}{path}/.")
+        raise NoPage(f"BilkaToGo har ingen side {ROOT}{path}/.")
 
     async def _read_build(self) -> None:
         resp = await self._send("GET", f"{SITE}{ROOT}")
@@ -253,9 +266,7 @@ class BilkaRecipesMixin:
         path = category_path(category or "aftensmad")
         try:
             groups = await self._collect(path, MAX_DEPTH, {})
-        except StoreError as exc:
-            if "ingen side" not in str(exc):
-                raise
+        except NoPage:
             top = [c[0] for c in _cards(await self._page(""))]
             raise StoreError(
                 f"BilkaToGo kender ikke kategorien {category!r}. Brug fx: {', '.join(top)}."
@@ -292,12 +303,14 @@ class BilkaRecipesMixin:
             str(s)
             for slider in _nodes(page, "CuratedSlider")
             for s in (slider.get("sourceProperties") or {}).get("curatedSkuList") or []
-            if s
+            if isinstance(s, str) and SKU.match(s)  # item numbers only: they go in a filter
         ]
         if not ingredients and not skus:
             raise StoreError(f"{ROOT}{path}/ er ikke en opskrift hos BilkaToGo.")
         skus = list(dict.fromkeys(skus))
         products = {p.id: p for p in await self._algolia("", len(skus), ids=skus)} if skus else {}
+        if skus and not products:  # the lookup by item number itself failed, or nothing is sold
+            raise StoreError("BilkaToGo fandt ingen af opskriftens varer i din butik.")
         items = [
             RecipeItem(
                 ingredient=p.name,
@@ -333,4 +346,5 @@ class BilkaRecipesMixin:
             tip=" ".join(tips) or None,
             items=items,
             total=sum((i.product.price for i in items), Decimal(0)),
+            missing=[s for s in skus if s not in products],
         )

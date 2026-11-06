@@ -86,6 +86,7 @@ class RecipeDetails:
     tip: str | None = None
     items: list[RecipeItem] = field(default_factory=list)
     total: Decimal = Decimal(0)  # the items to buy, without have_at_home items
+    missing: list[str] = field(default_factory=list)  # product ids the store does not sell here
 
 
 @dataclass
