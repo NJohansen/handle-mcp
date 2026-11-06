@@ -657,7 +657,7 @@ let run=0,pending=null;
 // The composer is real: after a case that ends at a store, "ja tak" opens the store in a new tab. Nothing is ordered.
 {const form=D.querySelector('.field'),inp=form.querySelector('input');const say=(cls,h)=>{log.appendChild(el(`<div class="${cls}"><div class="bubble">${h}</div></div>`));dn()};
  form.addEventListener('submit',e=>{e.preventDefault();const t=inp.value.trim();if(!t)return;inp.value='';say('you',t.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])));
-  if(pending&&/^(ja|jo|yes|ok|okay|gerne)\b/i.test(t)){const url=pending;say('ai','Åbner nemlig.com i en ny fane. Du vælger tid og betaler selv.');setTimeout(()=>window.open(url,'_blank','noopener'),400)}
+  if(pending&&/^(ja|jo|yes|ok|okay|gerne)\b/i.test(t)){const w=window.open(pending,'_blank','noopener');say('ai',(w?'Åbner nemlig.com i en ny fane.':'Din browser blokerede fanen.')+' <a href="'+pending+'" target="_blank" rel="noopener">Åbn nemlig.com</a>. Du vælger tid og betaler selv.')}
   else if(pending)say('ai','Skriv <b>ja tak</b>, så åbner jeg nemlig.com. Jeg bestiller ikke noget.');
   else say('ai','Det her er en demo. Prøv <b>Find billigste</b> i menuen, og skriv <b>ja tak</b>, når kurven er fyldt.')})}
 async function play(i){const id=++run;pending=null;D.querySelector('.field input').placeholder='Stil et spørgsmål eller start en opgave …';items.forEach((c,j)=>{c.classList.toggle('on',j===i);c.classList.toggle('run',j===i);c.setAttribute('aria-pressed',j===i);c.classList.remove('next')});log.innerHTML='';log.setAttribute('aria-busy','true');const c=cases[i];
