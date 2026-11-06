@@ -394,13 +394,13 @@ main{position:relative}
 #hvorfor.band{z-index:1}
 #hvorfor.band::before{border-radius:44px 44px 0 0}
 /* solution: full-colour band, text left, photo right */
-.band.sol::before{background:var(--leaf-soft)}
+.band.sol::before{background:#f4f0e6}
 .sol .split{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
 .sol h2{margin:0 0 28px}
 .wavy{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 0 20 6 T40 6' fill='none' stroke='%2346b35f' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left bottom/40px 12px;padding-bottom:16px;display:inline-block}
-.sol p{font-size:20px;line-height:1.55;color:#3d3f39;margin:0 0 18px;max-width:560px}
-.sol .sign{font-size:16px;color:var(--mute);margin-top:24px}
-.sol .blob{width:100%;height:auto;max-width:520px;aspect-ratio:4/5;justify-self:end;object-fit:cover;border-radius:62% 38% 55% 45%/42% 58% 42% 58%;display:block}
+.sol p{font-size:20px;line-height:1.55;color:#2c2e2a;opacity:.82;margin:0 0 18px;max-width:560px}
+.sol .sign{font-size:16px;margin-top:24px;opacity:.6}
+.sol .blob{width:100%;height:auto;max-width:600px;aspect-ratio:6/7;justify-self:end;object-fit:cover;border-radius:62% 38% 55% 45%/42% 58% 42% 58%;display:block}
 @media (max-width:900px){.sol .split{grid-template-columns:1fr;gap:40px}.sol .blob{justify-self:center;max-width:420px}.sol p{font-size:18px}}
 
 .hero-basket{position:absolute;left:0;top:0;width:600px;height:auto;z-index:4;pointer-events:none;will-change:transform;visibility:hidden}
@@ -551,7 +551,7 @@ main{position:relative}
         <p>Vi sparer ca. 2.500 kr. om måneden. Og vi har fået aftnerne tilbage.</p>
         <p class="sign">Niclas, far til 2</p>
       </div>
-      <img class="blob" src="niclas-nemlig.jpg" alt="Niclas ved hoveddøren med ugens kasser fra nemlig.com" width="680" height="850" loading="lazy">
+      <img class="blob" src="niclas-nemlig.jpg" alt="Niclas ved hoveddøren med ugens kasser fra nemlig.com" width="864" height="1008" loading="lazy">
     </div>
   </section>
   <section id="saadan"><div class="doodles" aria-hidden="true"><img class="doodle" src="doodles/banana.svg" alt="" width="112" style="top:84px;right:9%;--r:-10deg;--d:8s"><img class="doodle" src="doodles/spark.svg" alt="" width="30" style="top:70px;right:26%;--r:0deg;--d:5s"><img class="doodle" src="doodles/tomato.svg" alt="" width="40" style="top:150px;left:56%;--r:-20deg;--d:7s"></div>
