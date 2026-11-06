@@ -395,29 +395,20 @@ main{position:relative}
 #hvorfor.band::before{border-radius:44px 44px 0 0}
 /* solution: full-colour band, text left, photo right */
 .band.sol::before{background:#f4f0e6}
-.sol .split{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+.sol .split{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:start}
 .sol h2{margin:0 0 28px}.sol .kicker{border:0;padding:0;background:none;border-radius:0;display:block;font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin:0 0 18px;opacity:.6}
 .wavy{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 0 20 6 T40 6' fill='none' stroke='%2346b35f' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left bottom/40px 12px;padding-bottom:16px;display:inline-block}
-.sol p{font-size:20px;line-height:1.55;color:#2c2e2a;opacity:.82;margin:0 0 18px;max-width:560px}
-.sol .asks{margin:0 0 18px;padding:0;list-style:none;counter-reset:a;font-size:20px;line-height:1.5;font-weight:600}.sol .asks li{counter-increment:a;display:flex;gap:12px;margin:0 0 8px}.sol .asks li::before{content:counter(a);flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--sun);font-size:15px;font-weight:700}
+.sol p{font-size:clamp(20px,1.9vw,25px);line-height:1.55;color:#2c2e2a;opacity:.85;margin:0 0 26px;max-width:620px}
+.sol .asks{margin:0 0 18px;padding:0;list-style:none;counter-reset:a;font-size:clamp(20px,1.9vw,25px);line-height:1.55;font-weight:600;max-width:620px}.sol .asks li{counter-increment:a;display:flex;gap:12px;margin:0 0 8px}.sol .asks li::before{content:counter(a);flex:none;display:grid;place-items:center;width:34px;height:34px;margin-top:2px;border-radius:50%;background:var(--sun);font-size:16px;font-weight:700}
 .sol .blob{width:100%;height:auto;max-width:600px;aspect-ratio:6/7;justify-self:end;object-fit:cover;border-radius:62% 38% 55% 45%/42% 58% 42% 58%;display:block}
-.sol .lead{font-size:24px;line-height:1.45;opacity:1;font-weight:500;letter-spacing:-.01em}
-.sol .said{font:italic 400 clamp(28px,3vw,36px)/1.2 Newsreader,Georgia,serif;opacity:1;margin:30px 0 14px;padding-left:20px;border-left:4px solid #46b35f}
-.sol p{line-height:1.65}
+.sol .lead{font-size:clamp(22px,2.1vw,28px);line-height:1.45;opacity:1;font-weight:500;letter-spacing:-.01em}
+.sol .said{font:italic 400 clamp(28px,2.8vw,36px)/1.2 Newsreader,Georgia,serif;opacity:1;margin:34px 0 18px}
 .sol .end{margin-top:26px;opacity:1}
-.sol .me{position:relative;margin:0;justify-self:end;width:100%;max-width:600px}
+.sol .me{position:sticky;top:110px;margin:0;justify-self:end;width:100%;max-width:600px}
 .sol .me .blob{max-width:none}
 .sol .me figcaption{position:absolute;left:-18px;bottom:9%;display:flex;flex-direction:column;gap:2px;background:#fff;border-radius:18px;padding:14px 20px;box-shadow:0 10px 30px rgba(44,46,42,.14);transform:rotate(-3deg)}
 .sol .me figcaption b{font-size:20px;font-weight:700;letter-spacing:-.02em}
 .sol .me figcaption span{font-size:14px;color:var(--mute)}
-/* solution v7: big calm reading text, sticky photo */
-.sol .split{align-items:start}
-.sol p,.sol .asks{font-size:clamp(20px,1.9vw,25px);line-height:1.55;max-width:620px}
-.sol p{opacity:.85;margin:0 0 26px}
-.sol .lead{font-size:clamp(22px,2.1vw,28px);opacity:1}
-.sol .said{font-size:clamp(28px,2.8vw,36px);border-left:0;padding-left:0;margin:34px 0 18px}
-.sol .asks li::before{width:34px;height:34px;font-size:16px;margin-top:2px}
-.sol .me{position:sticky;top:110px}
 @media (max-width:900px){.sol .split{grid-template-columns:1fr;gap:40px}.sol .me{position:static;justify-self:center;max-width:420px}.sol .me figcaption{left:0}.sol .blob{justify-self:center;max-width:420px}.sol p,.sol .asks{font-size:18px}.sol .lead{font-size:21px}}
 
 .hero-basket{position:absolute;left:0;top:0;width:600px;height:auto;z-index:4;pointer-events:none;will-change:transform;visibility:hidden}
