@@ -399,7 +399,7 @@ main{position:relative}
 /* rounded top on every section, the previous colour shows in the corners */
 main>section{position:relative;z-index:1}
 main>section::before{content:"";position:absolute;top:0;bottom:-44px;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:#fff;border-radius:44px 44px 0 0}
-main>section.band::before{bottom:-44px}main>section.band.leaf::before{background:var(--leaf)}main>section.band.coral::before{background:var(--coral-soft)}main>section.band:not(.leaf):not(.coral):not(.sol)::before{background:var(--sky-soft)}
+main>section.band::before{bottom:-44px}main>section.band.sand::before,main>section.band.sol::before{background:#f4f0e6}main>section.band:not(.sand):not(.sol)::before{background:var(--sky-soft)}
 footer{z-index:1;border-radius:44px 44px 0 0}
 @media (max-width:640px){main>section::before,footer{border-radius:28px 28px 0 0}}
 /* solution: full-colour band, text left, photo right */
