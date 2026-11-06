@@ -584,8 +584,8 @@ claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp@
 (()=>{const b=document.getElementById('basket'),hero=document.querySelector('.hero'),sec=document.getElementById('hvorfor'),main=b&&b.parentElement;if(!b||!hero||!sec)return;
 const still=matchMedia('(prefers-reduced-motion: reduce)');let a,z,raf=0;
 const box=e=>{const r=e.getBoundingClientRect(),m=main.getBoundingClientRect();return{x:r.left-m.left,y:r.top-m.top,w:r.width,h:r.height}};
-function measure(){hero.style.position='relative';hero.style.top='';const m0=main.getBoundingClientRect().top+scrollY,h=box(hero),s=box(sec),f=box(sec.querySelector('.facts')),c=box(hero.querySelector('.ctas')),w=b.offsetWidth,bh=b.offsetHeight;
-const sm=innerWidth<900;a=sm?{x:h.x+h.w/2-w/2,y:h.y+h.h-bh*0.62}:{x:c.x+c.w/2-w/2,y:Math.max(c.y+c.h+28,Math.min(h.y+h.h-bh*0.62,innerHeight-m0-bh*0.62,box(sec.querySelector('h2')).y-bh-20))};
+function measure(){hero.style.position='relative';hero.style.top='';const m0=main.getBoundingClientRect().top+scrollY,h=box(hero),s=box(sec),f=box(sec.querySelector('.facts')),c=box(hero.querySelector('.ctas')),pr=box(hero.querySelector('.proof')||hero.querySelector('.ctas')),w=b.offsetWidth,bh=b.offsetHeight;
+const sm=innerWidth<900;a=sm?{x:h.x+h.w/2-w/2,y:h.y+h.h-bh*0.62}:{x:c.x+c.w/2-w/2,y:Math.max(pr.y+pr.h+28,Math.min(h.y+h.h-bh*0.62,innerHeight-m0-bh*0.62,box(sec.querySelector('h2')).y-bh-20))};
 const k=sm?1:.62;z=sm?a:{x:s.x+s.w-w*k/2-8-w/2,y:f.y+24-bh*k/2-bh/2};z.k=k;z.top=s.y;
 hero.style.position='';hero.style.top=Math.min(0,innerHeight-h.h)+'px';z.dim=m0+h.y+Math.max(0,h.h-innerHeight)}
 function draw(){raf=0;let p=still.matches?0:Math.min(1,Math.max(0,scrollY/Math.max(1,z.top-innerHeight*0.35)));p=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
