@@ -455,10 +455,9 @@ main{position:relative}
 <pre>uvx --from git+https://github.com/NJohansen/handle-mcp@v1.2.1 handle-mcp login nemlig
 claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp@v1.2.1 handle-mcp</pre>
         <p class="small">BilkaToGo og Claude Desktop: se <a href="https://github.com/NJohansen/handle-mcp/blob/main/docs/setup.md">vejledningen</a> (på engelsk).</p>
-        <!-- Hidden until the Tally URL exists: set href, then remove "hidden". -->
-        <div class="extra" hidden>
-          <p class="small" style="margin-bottom:14px">Uden terminal? Vi arbejder på en nemmere vej. Skriv dig op, så får du besked.</p>
-          <a class="btn coral" href="#" data-placeholder="tally">Skriv mig op <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5"/></svg></i></a>
+        <div class="extra" id="venteliste">
+          <p class="small" style="margin-bottom:14px">Snart med ét klik, uden terminal. Skriv dig op, så får du besked først.</p>
+          <a class="btn coral" href="https://tally.so/r/TALLY_ID" data-tally="TALLY_ID">Skriv mig op <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5"/></svg></i></a>
         </div>
         <div class="extra">
           <p class="small" style="margin-bottom:14px">Gratis, og det bliver det ved med. Sparer den jer tid eller penge? En kop kaffe holder projektet i gang.</p>
@@ -501,6 +500,24 @@ const x=a.x+(z.x-a.x)*p,y=a.y+(z.y-a.y)*p,k=1+(z.k-1)*p,r=-6+10*p;b.style.transf
 const go=()=>{if(!raf)raf=requestAnimationFrame(draw)};
 const init=()=>{measure();draw()};
 addEventListener('scroll',go,{passive:true});addEventListener('resize',init);addEventListener('load',init);b.complete?init():b.addEventListener('load',init)})();
+</script>
+<script>
+// Waitlist popup. Tally's script loads only when someone clicks, so no third party runs before that.
+// Without JS, or if the script fails, the link opens the form on tally.so.
+(function(){
+  var btn=document.querySelector('[data-tally]');if(!btn)return;
+  var id=btn.getAttribute('data-tally'),loading=false;
+  function open(){window.Tally.openPopup(id,{layout:'modal',width:560,autoClose:4000})}
+  btn.addEventListener('click',function(e){
+    if(window.Tally){e.preventDefault();open();return}
+    if(loading){e.preventDefault();return}
+    e.preventDefault();loading=true;
+    var s=document.createElement('script');s.src='https://tally.so/widgets/embed.js';s.async=true;
+    s.onload=function(){loading=false;window.Tally?open():location.href=btn.href};
+    s.onerror=function(){loading=false;location.href=btn.href};
+    document.head.appendChild(s);
+  });
+})();
 </script>
 </body>
 </html>
