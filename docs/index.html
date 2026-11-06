@@ -184,7 +184,7 @@ html{overflow-x:clip}.demo.max .side{padding-top:18px}.demo.max .log{align-items
 
 @keyframes line{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade,.q .qin,.demo .item.next .ic,.demo .item.run .ic,.demo .tool.run .hd b,.tool .wait,.tool .ok svg,.think,.demo .ai .bubble .w{animation:none}.think{color:var(--mute)}.tool .ok svg{stroke-dashoffset:0}}
-@media (max-width:640px){.demo .body{grid-template-columns:1fr;min-height:0}.demo .side{border-right:0;border-bottom:1px solid #ebe8df;flex-direction:row;gap:4px;padding:8px;overflow-x:auto;scrollbar-width:none}.demo .side .grp,.demo .item small{display:none}.demo .item{flex:0 0 auto;width:auto;padding:7px 12px 7px 9px;border:1px solid #e6e3d9;border-radius:999px;background:#fff;gap:0 6px}.demo .item.on{background:var(--ink);color:#fff;border-color:var(--ink)}.demo .agent .log{min-height:380px}.slots{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.demo .body{grid-template-columns:1fr;min-height:0}.demo .body{height:min(640px,78svh)}.demo .side{border-right:0;border-bottom:1px solid #ebe8df;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px}.demo .side .grp,.demo .item small{display:none}.demo .item{width:100%;min-width:0;padding:7px 10px 7px 9px;white-space:nowrap;border:1px solid #e6e3d9;border-radius:999px;background:#fff;gap:0 6px}.demo .item.on{background:var(--ink);color:#fff;border-color:var(--ink)}.demo .agent .log{min-height:0;padding:16px 14px 8px}.demo .agent .input{margin:6px 10px 0}.demo .agent .input .row{display:none}.demo .foot{padding:8px 12px 10px}.slots{grid-template-columns:1fr 1fr}}
 @media (max-width:520px){.cmp{grid-template-columns:1fr}.recipe .strip{height:84px}}
 
 /* sections */
@@ -344,7 +344,7 @@ body{overflow-x:clip}
 @media(max-width:700px){.agent .log{padding:20px 16px 4px}.tool{grid-template-columns:18px 1fr 16px}.tool em{grid-column:2}.agent .conn{display:none}}
 
 /* v6: sand hero, boxed nav, white CTA with round dot */
-:root{--sand:#9ccbf3;--navy:#0a1c35}.hero h1,.hero .proof,.hero .textlink,.hero .lead strong{color:var(--navy)}.hero .lead,.hero .eyebrow.kicker{color:#1c3a60}.hero .textlink{text-decoration-color:#5f7a94}.hero h1 .soft{font-family:Newsreader,Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em}
+:root{--sand:#9ccbf3;--navy:#0a1c35}.hero h1{color:#2c2e2a}.hero .proof,.hero .textlink,.hero .lead strong{color:var(--navy)}.hero .lead,.hero .eyebrow.kicker{color:#1c3a60}.hero .textlink{text-decoration-color:#5f7a94}.hero h1 .soft{font-family:Newsreader,Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em}
 .hero{position:relative;padding-bottom:88px}
 .hero::before{content:"";position:absolute;top:-140px;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:var(--sand)}
 .navwrap{position:relative;top:0}
@@ -663,7 +663,7 @@ let run=0,pending=null;
   if(pending&&/^(ja|jo|yes|ok|okay|gerne)\b/i.test(t)){window.open(pending,'_blank','noopener');say('ai','Åbner nemlig.com i en ny fane. Sker der ikke noget, så <a href="'+pending+'" target="_blank" rel="noopener">åbn den her</a>. Du vælger tid og betaler selv.')}
   else if(pending)say('ai','Skriv <b>ja tak</b>, så åbner jeg nemlig.com. Jeg bestiller ikke noget.');
   else say('ai','Det her er en demo. Prøv <b>Find billigste</b> i menuen, og skriv <b>ja tak</b>, når kurven er fyldt.')})}
-async function play(i){const id=++run;pending=null;D.querySelector('.field input').placeholder='Stil et spørgsmål eller start en opgave …';items.forEach((c,j)=>{c.classList.toggle('on',j===i);c.classList.toggle('run',j===i);c.setAttribute('aria-pressed',j===i);c.classList.remove('next')});log.innerHTML='';log.setAttribute('aria-busy','true');const c=cases[i];
+const PH=matchMedia('(max-width:640px)').matches?'Spørg om noget …':'Stil et spørgsmål eller start en opgave …';async function play(i){const id=++run;pending=null;D.querySelector('.field input').placeholder=PH;items.forEach((c,j)=>{c.classList.toggle('on',j===i);c.classList.toggle('run',j===i);c.setAttribute('aria-pressed',j===i);c.classList.remove('next')});log.innerHTML='';log.setAttribute('aria-busy','true');const c=cases[i];
  const you=el('<div class="you"><div class="bubble"></div></div>');log.appendChild(you);const b=you.firstChild;
  if(still.matches)b.textContent=c.you;else{for(const ch of c.you){if(id!==run)return;b.textContent+=ch;await wait(11)}}
  const th=el('<div class="think">Tænker …</div>');log.appendChild(th);dn();await wait(1000);if(id!==run)return;th.outerHTML='<div class="thought">Tænkte i 1 sek. <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></div>';if(c.ask&&!asked){const pre=el(`<div class="ai"><div class="bubble">${c.intro}</div></div>`);log.appendChild(pre);dn();await wait(500);items[i].classList.remove('run');log.removeAttribute('aria-busy');await ask(c.ask,id);if(id!==run)return;asked=true;items[i].classList.add('run');log.setAttribute('aria-busy','true');log.appendChild(el('<div class="think">Tænker …</div>'));dn();await wait(1000);if(id!==run)return;log.lastChild.outerHTML='<div class="thought">Tænkte i 1 sek. <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></div>'}const tools=el('<div class="tools"></div>');log.appendChild(tools);
