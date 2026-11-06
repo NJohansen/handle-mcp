@@ -20,7 +20,7 @@ Works with any client that supports the Model Context Protocol, for example Clau
 
 ## FAQ
 
-The landing page has a short FAQ in Danish, also as FAQPage JSON-LD: [handlemcp.dk/spoergsmaal/](https://handlemcp.dk/spoergsmaal/).
+A short FAQ in Danish: [handlemcp.dk/spoergsmaal/](https://handlemcp.dk/spoergsmaal/). The front page carries it as FAQPage JSON-LD.
 
 - What is an MCP? A plug. The AI cannot see nemlig.com on its own. With HandleMCP it can search, read offers and fill the cart.
 - How does it work? You write: "Meal plan for 4. Budget 900 kr. Use the offers." You get a plan, a list and the cheapest store. No spreadsheet, no app to learn.
