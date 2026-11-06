@@ -138,9 +138,8 @@ async def get_recipe(store: str, recipe: str, persons: int | None = None) -> dic
     Also `image`, `description`, `method`, `tip`. Scale `ingredients` from `ingredients_persons`.
     `recipe` is the recipe's link or id from search_recipes or list_recipes. Put the products
     in the cart with add_recipe_to_cart after the human says yes.
-    BilkaToGo: one pack of each product on its "Det skal du bruge", no alternatives, no
-    have_at_home; `persons` is not used (fixed persons, null when written for pieces);
-    needs a login for prices."""
+    BilkaToGo: one pack per product, no alternatives; `persons` is fixed (null for pieces).
+    `missing`: product ids not sold at the address: say so to the human."""
     return _out(await _call(store, "recipe", recipe, _persons(persons)))
 
 
@@ -157,10 +156,8 @@ async def list_recipes(
     Under 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,
     Kylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.
     `category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...).
-    BilkaToGo: no tags. No category gives this week's "Madplan" (7 dinners, Monday first).
-    `category` is a path on bilkatogo.dk/inspiration/opskrifter: aftensmad,
-    aftensmad/pastaretter, frokost, boern-i-koekkenet, ...; an unknown one answers with the list.
-    Use get_recipe for the products."""
+    BilkaToGo: no tags; no category is this week's "Madplan" (7 dinners); `category` is a path
+    like aftensmad or aftensmad/pastaretter, an unknown one answers with the list. Use get_recipe."""
     limit = max(1, min(limit, MAX_RESULTS))
     if not tags and not category:
         return _out(await _each(_names(stores), lambda s: s.featured_recipes(limit)))
@@ -239,8 +236,7 @@ async def add_recipe_to_cart(
     ingredients; `swap` maps an ingredient (or product id) to one of its alternatives' product
     ids. Names: ingredient or product id. Returns before/added/after per product, the skipped
     items and the new cart. Check `ok` per product: a store can refuse some lines; tell the
-    human which ones failed.
-    BilkaToGo: one pack of each product, as get_recipe shows; `persons` is not used."""
+    human which ones failed. BilkaToGo: one pack per product; `persons` is not used."""
     details = await _call(store, "recipe", recipe, _persons(persons))
     try:
         lines, skipped = recipe_cart.plan(details, skip, swap, include)
