@@ -30,7 +30,7 @@
 <link rel="icon" href="/logo.svg" type="image/svg+xml">
 <style>
 @font-face{font-family:Inter;src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:swap}
-@font-face{font-family:Newsreader;src:url(fonts/newsreader-italic.woff2) format("woff2");font-weight:200 800;font-style:italic;font-display:swap}
+@font-face{font-family:Newsreader;src:url(fonts/newsreader-italic.woff2) format("woff2");font-weight:200 800;font-style:italic;font-display:swap;ascent-override:97%;descent-override:24%;line-gap-override:0%}
 :root{
   --bg:#fff;--soft:#f4f4f1;--line:#e6e6e1;--ink:#1d1e1b;--mute:#6d6e69;
   --green:#2f8f46;--leaf:#8ed462;--leaf-soft:#eef8e6;--sky:#2ba0ff;--sky-soft:#e6f3ff;--coral:#ff705d;--coral-soft:#ffece8;--sun:#f5e211;--sun-soft:#fdf8c9;
@@ -344,7 +344,7 @@ body{overflow-x:clip}
 @media(max-width:700px){.agent .log{padding:20px 16px 4px}.tool{grid-template-columns:18px 1fr 16px}.tool em{grid-column:2}.agent .conn{display:none}}
 
 /* v6: sand hero, boxed nav, white CTA with round dot */
-:root{--sand:#9ccbf3;--navy:#0a1c35}.hero h1{color:#2c2e2a}.hero .proof,.hero .textlink,.hero .lead strong{color:var(--navy)}.hero .lead,.hero .eyebrow.kicker{color:#1c3a60}.hero .textlink{text-decoration-color:#5f7a94}.hero h1 .soft{font-family:Newsreader,Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em}
+:root{--sand:#9ccbf3;--navy:#0a1c35}.hero h1{color:#2c2e2a}@media (min-width:901px){.hero>div:first-child{align-self:start;padding-top:24px}}.hero .proof,.hero .textlink,.hero .lead strong{color:var(--navy)}.hero .lead,.hero .eyebrow.kicker{color:#1c3a60}.hero .textlink{text-decoration-color:#5f7a94}.hero h1 .soft{font-family:Newsreader,Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em}
 .hero{position:relative;padding-bottom:88px}
 .hero::before{content:"";position:absolute;top:-140px;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:var(--sand)}
 .navwrap{position:relative;top:0}
@@ -446,7 +446,6 @@ main{position:relative}
   <div class="stage">
   <div class="hero">
     <div>
-      <p class="eyebrow kicker">Alt til ugen · i den billigste kurv</p>
       <h1>Spar penge på ugens indkøb. <span class="soft">Få ro resten af ugen.</span></h1>
       <p class="lead">HandleMCP laver madplanen, finder ugens tilbud og fylder den billigste kurv hos nemlig.com eller BilkaToGo. <strong>Du godkender og betaler selv.</strong></p>
       <div class="ctas">
