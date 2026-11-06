@@ -396,7 +396,7 @@ main{position:relative}
 /* solution: full-colour band, text left, photo right */
 .band.sol::before{background:#f4f0e6}
 .sol .split{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
-.sol h2{margin:0 0 28px}
+.sol h2{margin:0 0 28px}.sol .kicker{border:0;padding:0;background:none;border-radius:0;display:block;font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin:0 0 18px;opacity:.6}
 .wavy{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 0 20 6 T40 6' fill='none' stroke='%2346b35f' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left bottom/40px 12px;padding-bottom:16px;display:inline-block}
 .sol p{font-size:20px;line-height:1.55;color:#2c2e2a;opacity:.82;margin:0 0 18px;max-width:560px}
 .sol .sign{font-size:16px;margin-top:24px;opacity:.6}
@@ -545,6 +545,7 @@ main{position:relative}
   <section id="losning" class="band sol">
     <div class="split">
       <div>
+        <p class="kicker">Historien bag HandleMCP</p>
         <h2>Én handel om ugen.<br><span class="wavy">Pengene holder.</span></h2>
         <p>Jeg byggede HandleMCP til vores egen familie. Vi handlede 5-6 gange om ugen, og madkontoen var tom den 20.</p>
         <p>Nu skriver vi budgettet én gang. HandleMCP læser ugens tilbud, laver madplanen og fylder kurven i den billigste butik. Vi tjekker, betaler, og kasserne står ved døren.</p>
