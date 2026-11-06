@@ -399,7 +399,7 @@ main{position:relative}
 .sol h2{margin:0 0 28px}.sol .kicker{border:0;padding:0;background:none;border-radius:0;display:block;font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin:0 0 18px;opacity:.6}
 .wavy{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 0 20 6 T40 6' fill='none' stroke='%2346b35f' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left bottom/40px 12px;padding-bottom:16px;display:inline-block}
 .sol p{font-size:20px;line-height:1.55;color:#2c2e2a;opacity:.82;margin:0 0 18px;max-width:560px}
-.sol .sign{font-size:16px;margin-top:24px;opacity:.6}
+.sol .asks{margin:0 0 18px;padding:0;list-style:none;counter-reset:a;font-size:20px;line-height:1.5;font-weight:600}.sol .asks li{counter-increment:a;display:flex;gap:12px;margin:0 0 8px}.sol .asks li::before{content:counter(a);flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--sun);font-size:15px;font-weight:700}.sol .sign{font-size:16px;margin-top:24px;opacity:.6}
 .sol .blob{width:100%;height:auto;max-width:600px;aspect-ratio:6/7;justify-self:end;object-fit:cover;border-radius:62% 38% 55% 45%/42% 58% 42% 58%;display:block}
 @media (max-width:900px){.sol .split{grid-template-columns:1fr;gap:40px}.sol .blob{justify-self:center;max-width:420px}.sol p{font-size:18px}}
 
@@ -547,9 +547,12 @@ main{position:relative}
       <div>
         <p class="kicker">Historien bag HandleMCP</p>
         <h2>Én handel om ugen.<br><span class="wavy">Pengene holder.</span></h2>
-        <p>Jeg byggede HandleMCP til vores egen familie. Vi handlede 5-6 gange om ugen, og madkontoen var tom den 20.</p>
-        <p>Nu skriver vi budgettet én gang. HandleMCP læser ugens tilbud, laver madplanen og fylder kurven i den billigste butik. Vi tjekker, betaler, og kasserne står ved døren.</p>
-        <p>Vi sparer ca. 2.500 kr. om måneden. Og vi har fået aftnerne tilbage.</p>
+        <p>Jeg gad ikke i Rema 6 gange om ugen mere. Og madkontoen skulle altid have 2.000 kr. ekstra den 20.</p>
+        <p>"Vi handler bare ind om søndagen." Det virkede ikke. Måske er jeg bare ikke god til at planlægge. Men jeg er nok ikke den eneste.</p>
+        <p>Så nu beder jeg min AI om tre ting:</p>
+        <ol class="asks"><li>Handl ind én gang om ugen.</li><li>Hold budgettet på 4.000 kr.</li><li>Ingen selleri til børnene.</li></ol>
+        <p>Hver lørdag ligger madplanen klar, og kurven er fyldt i den billigste butik. Jeg skimmer kurven og betaler selv. Færdig.</p>
+        <p>Vi regner med at spare ca. 24.000 kr. om året. Og børnene beder ikke om en tur i Rema efter skole.</p>
         <p class="sign">Niclas, far til 2</p>
       </div>
       <img class="blob" src="niclas-nemlig.jpg" alt="Niclas ved hoveddøren med ugens kasser fra nemlig.com" width="864" height="1008" loading="lazy">
