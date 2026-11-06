@@ -95,8 +95,7 @@ h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spac
 .demo .tool{display:block;padding:0;font:13px/1.4 var(--sans);background:#f5f4ed;border:1px solid #e8e6dc;border-radius:12px;overflow:hidden}
 .demo .tool+.tool{border-top:1px solid #e6e3d9}
 .demo .tool .hd{display:flex;align-items:center;gap:8px;padding:9px 12px;color:var(--ink)}
-.demo .tool .hd .srv{color:var(--mute)}.demo .tool .hd .srv::after{content:" · "}
-.demo .tool .hd b{font-weight:500}.demo .tool .hd .n{color:var(--mute)}
+.demo .tool .hd b{font-weight:500;line-height:1.35}.demo .tool .hd .n{color:var(--mute)}
 .demo .tool .hd svg.chev{width:12px;height:12px;margin-left:auto;fill:none;stroke:var(--mute);stroke-width:1.8;stroke-linecap:round}
 .demo .tool em{display:block;padding:7px 12px;border-top:1px solid #e8e6dc;color:var(--mute);white-space:normal;font-size:12.5px;font-style:normal}
 .demo .tool .ti{width:14px;height:14px;display:inline-block;color:var(--mute);font-size:13px;line-height:14px;text-align:center}
@@ -469,11 +468,11 @@ main{position:relative}
       <div class="log">
         <div class="you"><div class="bubble">Der er 700 kr til mad i denne uge. Lav en madplan til 4 ud fra tilbuddene, og fyld den billigste kurv.</div></div>
         <div class="tools">
-          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · list_offers</span><em>nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
-          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · list_recipes</span><em>nemlig.com · Familievenlig</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
-          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · get_recipe</span><em>3 opskrifter · 4 personer</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
-          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · compare_basket</span><em>28 varer · nemlig.com 693 kr · BilkaToGo 741 kr</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
-          <div class="tool"><span class="ti">⚙</span><span><b>handle</b> · set_cart_quantities</span><em>28 varer i kurven hos nemlig.com</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>Finder ugens tilbud</b></span><em>nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>Finder opskrifter</b></span><em>nemlig.com · Familievenlig</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>Henter opskrifter</b></span><em>3 opskrifter · 4 personer</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>Sammenligner butikker</b></span><em>28 varer · nemlig.com 693 kr · BilkaToGo 741 kr</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
+          <div class="tool"><span class="ti">⚙</span><span><b>Fylder kurven</b></span><em>28 varer i kurven hos nemlig.com</em><span class="ok"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span></div>
         </div>
         <div class="ai"><div class="bubble">Hele ugen: one pot-lasagne i stor portion, rugbrødsaften med frikadeller, sprøde kyllingenuggets, laks i citronsauce og harira. Bygget på ugens tilbud i begge butikker, og gratis rosinboller kommer med. nemlig.com er 48 kr billigere end BilkaToGo, og I har 7 kr tilbage. Kurven er klar: åbn den, vælg en tid og betal.</div></div>
       </div>
@@ -580,21 +579,21 @@ const R=[
 const card=(r,i)=>`<div class="rcard" data-i="${i}"><div class="img"><img src="${r.i}" alt="" loading="lazy" width="600" height="338" onerror="this.remove()"></div><div class="meta"><b>${r.n}</b>${r.p} kr til 4 · ${r.t}<br>Løft: ${r.l}</div><button type="button">Byt ret</button></div>`;
 const cases=[
  {t:'Lav madplan',you:'Der er 700 kr til mad i denne uge. Lav en madplan til 4 ud fra det vi har og ugens tilbud.',
-  tools:[['doc','Læser jeres lager','røde linser, ris, 300 g laks i fryseren'],['','<b>handle</b> · list_offers','nemlig.com + BilkaToGo · 214 tilbud · 1 gratis vare'],['','<b>handle</b> · compare_basket','28 varer · nemlig.com 693 kr · BilkaToGo 741 kr']],
+  tools:[['doc','Tjekker hvad I har derhjemme','røde linser, ris, 300 g laks i fryseren'],['','Finder ugens tilbud hos nemlig.com og BilkaToGo','214 tilbud · 1 gratis vare'],['','Regner hele ugens indkøb ud i begge butikker','28 varer · nemlig.com 693 kr · BilkaToGo 741 kr']],
   ai:'Hele ugen, to aftener er rester. Bygget på 1 kg kylling til 100 kr og gratis rosinboller. Linserne og laksen fra fryseren bruges først, det sparer 84 kr. nemlig.com: <b>693 kr, 7 kr under budget.</b>',
   html:'<div class="plan"><b>Tir</b><span>One pot-lasagne med kylling (stor portion)</span><b>Ons</b><span>Lasagne, dag 2</span><b>Tor</b><span>Rugbrødsaften med frikadeller</span><b>Fre</b><span>Sprøde kyllingenuggets</span><b>Lør</b><span>Laks i citronsauce <span class="lager">· fra fryseren</span></span><b>Søn</b><span>Harira på jeres linser <span class="lager">· fra lageret</span></span></div>'},
  {t:'Vis opskrifter',you:'Vis mig de tre retter, børnene ikke har prøvet før.',
-  tools:[['','<b>handle</b> · list_recipes','nemlig.com · Familievenlig · 48 opskrifter'],['','<b>handle</b> · get_recipe','3 opskrifter · 4 personer · trin, tid og pris']],
+  tools:[['','Finder familievenlige opskrifter på nemlig.com','48 opskrifter'],['','Henter tre opskrifter med trin, tid og pris','3 opskrifter til 4 personer']],
   ai:'Her er tre fra nemligs familievenlige. Hver ret har ét løft, så det ikke bliver kedeligt. Byt en ret ud, så regner jeg om.',
   html:'<div class="rcards">'+R.map((r,i)=>card(r[0],i)).join('')+'</div><p class="rtotal">Varer til tre retter, 4 personer: <b>576 kr</b> · 48 kr pr. portion</p>',
   after(a){const st=[0,0,0];bind(a);
    function bind(a){a.querySelectorAll('.rcard button').forEach(b=>b.onclick=e=>{const c=e.target.closest('.rcard'),i=+c.dataset.i;st[i]^=1;c.outerHTML=card(R[i][st[i]],i);const sum=st.reduce((t,v,j)=>t+R[j][v].p,0);dispatchEvent(new Event('resize'));a.querySelector('.rtotal').innerHTML=`Varer til tre retter, 4 personer: <b>${kr(sum)}</b> · ${Math.round(sum/12)} kr pr. portion`;bind(a)})}}},
  {t:'Find billigste',you:'Hvilken butik er billigst for hele ugen? Fyld kurven der.',
-  tools:[['','<b>handle</b> · compare_basket','28 varer · samme mængder i begge butikker'],['','<b>handle</b> · set_cart_quantities','28 varer i kurven hos nemlig.com']],
+  tools:[['','Sammenligner nemlig.com og BilkaToGo','28 varer · samme mængder i begge butikker'],['','Lægger varerne i kurven hos nemlig.com','28 varer i kurven · intet bestilt']],
   ai:'nemlig.com er <b>48 kr billigere</b> i denne uge. Forskellen er kyllingen, skyren og en gratis vare. Kurven er fyldt. Åbn den, vælg en tid og betal.',
   html:'<div class="cmp"><div class="store win"><div class="tag">Billigst ✓</div><div class="tot">693 kr</div>nemlig.com<ul><li><span>Kyllingeinderfilet 1 kg</span><span>100,00</span></li><li><span>Skyr 2 kg</span><span>40,00</span></li><li class="free"><span>Rosinboller</span><span>gratis</span></li><li><span>Levering</span><span>29,00</span></li><li><span>+ 25 varer</span><span>524,00</span></li></ul></div><div class="store"><div class="tag">&nbsp;</div><div class="tot">741 kr</div>BilkaToGo<ul><li><span>Kyllingeinderfilet 1 kg</span><span>129,00</span></li><li><span>Skyr 2 kg</span><span>52,00</span></li><li><span>Rosinboller</span><span>18,00</span></li><li><span>Levering</span><span>39,00</span></li><li><span>+ 25 varer</span><span>503,00</span></li></ul></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Se kurv hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a></div>'},
  {t:'Vælg levering',you:'Hvornår kan de levere på søndag?',
-  tools:[['','<b>handle</b> · list_delivery_slots','nemlig.com · søndag · 6 ledige tider']],
+  tools:[['','Finder ledige leveringstider hos nemlig.com','søndag · 6 ledige tider']],
   ai:'Søndag har seks ledige tider. Den billigste er <b>kl. 8–12 for 29 kr.</b> Jeg kan ikke vælge tiden eller betale. Det gør du selv i kurven, og først da bliver der bestilt.',
   html:'<div class="slots"><div class="slot win"><b>8–12</b><span>29 kr</span></div><div class="slot"><b>12–16</b><span>39 kr</span></div><div class="slot"><b>16–18</b><span>49 kr</span></div><div class="slot"><b>18–20</b><span>49 kr</span></div><div class="slot"><b>20–22</b><span>39 kr</span></div><div class="slot"><b>22–24</b><span>39 kr</span></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Vælg tid hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a></div>'}];
 let run=0;
@@ -602,7 +601,7 @@ async function play(i){const id=++run;items.forEach((c,j)=>{c.classList.toggle('
  const you=el('<div class="you"><div class="bubble"></div></div>');log.appendChild(you);const b=you.firstChild;
  if(still.matches)b.textContent=c.you;else{for(const ch of c.you){if(id!==run)return;b.textContent+=ch;await wait(11)}}
  const th=el('<div class="think">Tænker …</div>');log.appendChild(th);dn();await wait(1000);if(id!==run)return;th.outerHTML='<div class="thought">Tænkte i 1 sek. <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></div>';const tools=el('<div class="tools"></div>');log.appendChild(tools);
- for(const t of c.tools){const name=t[1].replace(/<[^>]+>/g,'');const m=name.match(/^(\S+) · (.+)$/);const row=el(`<div class="tool run"><div class="hd"><span class="ti">${t[0]?'≡':'⚙'}</span><span>${m?`<span class="srv">${m[1]}</span>`:''}<b>${m?m[2]:name}</b></span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></div></div>`);tools.appendChild(row);dn();await wait(520);if(id!==run)return;row.classList.remove('run');row.insertAdjacentHTML('beforeend',`<em>${t[2]}</em>`);dn()}
+ for(const t of c.tools){const row=el(`<div class="tool run"><div class="hd"><span class="ti">${t[0]?'≡':'⚙'}</span><span><b>${t[1]}</b></span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3"/></svg></div></div>`);tools.appendChild(row);dn();await wait(520);if(id!==run)return;row.classList.remove('run');row.insertAdjacentHTML('beforeend',`<em>${t[2]}</em>`);dn()}
  await wait(300);if(id!==run)return;const ai=el('<div class="ai"><div class="bubble"><span class="txt"></span></div></div>');log.appendChild(ai);const tx=ai.querySelector('.txt');
  if(still.matches)tx.innerHTML=c.ai;else{const parts=c.ai.split(/(<[^>]+>|\s+)/).filter(Boolean);let acc='';for(const w of parts){if(id!==run)return;acc+=(w.startsWith('<')||/^\s+$/.test(w))?w:`<span class="w">${w}</span>`;tx.innerHTML=acc;dn();if(!/^\s+$/.test(w)&&!w.startsWith('<'))await wait(24)}}if(c.html){await wait(150);if(id!==run)return;tx.insertAdjacentHTML('afterend',`<div class="fade">${c.html}</div>`);dn()}if(c.after)c.after(ai);log.removeAttribute('aria-busy');items[i].classList.remove('run');items[i].classList.add('done');
  const n=items[i+1];if(n&&!n.classList.contains('done'))n.classList.add('next');dispatchEvent(new Event('resize'))}
