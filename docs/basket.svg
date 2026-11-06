@@ -11,13 +11,10 @@
   <path class="tw" d="M362 22 C 368.6 45.4, 368.6 45.4, 392 52 C 368.6 58.6, 368.6 58.6, 362 82 C 355.4 58.6, 355.4 58.6, 332 52 C 355.4 45.4, 355.4 45.4, 362 22 Z" fill="#b48cf2"/>
   <path class="tw tw2" d="M400 10 C 402.64 19.36, 402.64 19.36, 412 22 C 402.64 24.64, 402.64 24.64, 400 34 C 397.36 24.64, 397.36 24.64, 388 22 C 397.36 19.36, 397.36 19.36, 400 10 Z" fill="#f5e211"/>
   <!-- coin -->
-  <g transform="rotate(-12 40 78)">
-    <circle cx="40" cy="78" r="23" fill="#f5e211" stroke="#2C2E2A" stroke-width="2.4"/>
-    <circle cx="40" cy="78" r="15.5" stroke="#2C2E2A" stroke-width="1.6" opacity=".55"/>
-    <path d="M35 69.5 v17 M44.5 69.5 l-9.5 9 l10 8" stroke="#2C2E2A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M24.5 72 a 17 17 0 0 1 9 -10" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
-  </g>
-  <path class="gl" d="M58 58 C 59.6 64.4, 59.6 64.4, 66 66 C 59.6 67.6, 59.6 67.6, 58 74 C 56.4 67.6, 56.4 67.6, 50 66 C 56.4 64.4, 56.4 64.4, 58 58 Z" fill="#fff" stroke="#2C2E2A" stroke-width="1.2" stroke-linejoin="round"/>
+  <circle cx="40" cy="78" r="23" fill="#f5e211"/>
+  <circle cx="40" cy="78" r="15" stroke="#e0b800" stroke-width="3"/>
+  <path d="M25 72 a 16 16 0 0 1 9 -10" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+  <path class="gl" d="M50 61 C 51.5 66.5, 51.5 66.5, 57 68 C 51.5 69.5, 51.5 69.5, 50 75 C 48.5 69.5, 48.5 69.5, 43 68 C 48.5 66.5, 48.5 66.5, 50 61 Z" fill="#fff"/>
   <path d="M384 196 c 6 -16, 22 -24, 34 -22 c -4 14, -18 24, -34 22 Z" fill="#8ed462"/>
   <path d="M386 194 c 10 -8, 20 -14, 30 -18" stroke="#2C2E2A" stroke-width="2" stroke-linecap="round"/>
   <path d="M12 246 l 14 -8" stroke="#f5e211" stroke-width="8" stroke-linecap="round"/>
