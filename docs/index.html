@@ -56,8 +56,8 @@ nav ul a.btn{padding:10px 18px;color:#fff}
 /* hero */
 .hero{display:grid;grid-template-columns:1fr 1.15fr;gap:40px;align-items:center;padding:72px 0 40px}
 .eyebrow{font-size:14px;font-weight:500;color:var(--mute);margin:0 0 22px}
-.eyebrow b{color:var(--green);font-weight:600}
-h1{font-weight:600;font-size:clamp(56px,8.2vw,112px);line-height:.94;letter-spacing:-.055em;margin:0 0 28px}
+.eyebrow b{color:var(--green);font-weight:600}.eyebrow.kicker{text-transform:uppercase;letter-spacing:.08em;font-size:12.5px;font-weight:600;color:#3d4a55}.proof{font-size:13.5px;color:#3d4a55;margin:14px 0 0}
+h1{font-weight:600;font-size:clamp(38px,4.6vw,64px);line-height:1.04;letter-spacing:-.04em;margin:0 0 22px}
 .lead{font-size:20px;line-height:1.5;max-width:520px;margin:0 0 36px;color:var(--mute)}
 .lead strong{color:var(--ink);font-weight:500}
 .ctas{display:flex;gap:10px;flex-wrap:wrap}
@@ -443,13 +443,14 @@ main{position:relative}
   <div class="stage">
   <div class="hero">
     <div>
-      <p class="eyebrow"><b>Gratis og open source</b> · nemlig.com og BilkaToGo</p>
-      <h1>Tom madkonto<br>den 20.?</h1>
-      <p class="lead"><strong>Og sjette tur i butikken i denne uge?</strong> Din AI laver madplanen ud fra jeres budget og ugens tilbud, og fylder den billigste kurv. Én levering, hele ugen. Du betaler selv.</p>
+      <p class="eyebrow kicker">Alt til ugen · i den billigste kurv</p>
+      <h1>Spar penge på ugens indkøb.<br>Og få ro resten af ugen.</h1>
+      <p class="lead">HandleMCP hjælper med madplanen, finder ugens tilbud og samler alt i den billigste kurv hos nemlig.com eller BilkaToGo. Også toiletpapir og bleer. <strong>Du godkender og betaler selv.</strong></p>
       <div class="ctas">
-        <a class="btn coral" href="#kom-i-gang">Kom i gang <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2v8M2.5 6.5L6 10l3.5-3.5"/></svg></i></a>
-        <a class="textlink" href="https://github.com/NJohansen/handle-mcp">eller se koden på GitHub</a>
+        <a class="btn coral" href="https://tally.so/r/ArKdkW" data-tally="ArKdkW">Skriv mig på ventelisten <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5"/></svg></i></a>
+        <a class="textlink" href="https://github.com/NJohansen/handle-mcp">eller host det selv – se koden på GitHub</a>
       </div>
+      <p class="proof">Vores familie på 4 sparer ca. 2.500 kr. om måneden.</p>
     </div>
 
     <div class="demo" id="demo">
@@ -461,7 +462,7 @@ main{position:relative}
             <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Lav madplan<small>700 kr · tilbud · lager</small></button>
             <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Vis opskrifter<small>3 nye retter til 4</small></button>
             <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Find billigste<small>nemlig eller Bilka</small></button>
-            <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Vælg levering<small>Tid og betaling</small></button>
+            <button class="item" type="button" aria-pressed="false"><span class="ic"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5"/></svg></span>Godkend kurven<small>Du betaler selv</small></button>
           </div>
           <div class="main">
             <div class="log"></div>
@@ -625,8 +626,8 @@ const cases=[
   ask:[{t:'Hvem skal jeg handle til?',o:[['2 voksne og 2 børn','7 og 2 år'],['2 voksne',''],['Flere personer','Skriv hvem under Noget andet']]},
        {t:'Hvad må en uge koste?',o:[['Under 500 kr',''],['Ca. 700 kr','Det, du skrev'],['Over 1.000 kr','']]},
        {t:'Hvad elsker børnene? Vælg alle, der passer.',multi:true,o:[['Spaghetti med kødsovs',''],['Pizza',''],['Kylling i karry',''],['Rugbrødsaften','']]}],
-  tools:[['doc','Tjekker hvad I har derhjemme','røde linser, ris, 300 g laks i fryseren'],['','Finder ugens tilbud hos nemlig.com og BilkaToGo','214 tilbud · 1 gratis vare'],['','Regner hele ugens indkøb ud i begge butikker','28 varer · nemlig.com 693 kr · BilkaToGo 741 kr']],
-  ai:'Hele ugen, to aftener er rester. Bygget på 1 kg kylling til 100 kr og gratis rosinboller. Linserne og laksen fra fryseren bruges først, det sparer 84 kr. nemlig.com: <b>693 kr, 7 kr under budget.</b>',
+  tools:[['doc','Tjekker hvad I har og mangler','røde linser, ris, laks i fryseren · mangler toiletpapir og opvasketabs'],['','Finder ugens tilbud hos nemlig.com og BilkaToGo','214 tilbud · 1 gratis vare'],['','Regner hele ugens indkøb ud i begge butikker','30 varer · nemlig.com 693 kr · BilkaToGo 741 kr']],
+  ai:'Hele ugen, to aftener er rester. Toiletpapir og opvasketabs er med. nemlig.com: <b>693 kr, 7 kr under budget.</b>',
   html:'<div class="plan"><b>Tir</b><span>One pot-lasagne med kylling (stor portion)</span><b>Ons</b><span>Lasagne, dag 2</span><b>Tor</b><span>Rugbrødsaften med frikadeller</span><b>Fre</b><span>Sprøde kyllingenuggets</span><b>Lør</b><span>Laks i citronsauce <span class="lager">· fra fryseren</span></span><b>Søn</b><span>Harira på jeres linser <span class="lager">· fra lageret</span></span></div>'},
  {t:'Vis opskrifter',you:'Vis mig de tre retter, børnene ikke har prøvet før.',
   tools:[['','Finder familievenlige opskrifter på nemlig.com','48 opskrifter'],['','Henter tre opskrifter med ingredienser og trin','3 opskrifter til 4 personer']],
@@ -637,10 +638,10 @@ const cases=[
   tools:[['','Sammenligner nemlig.com og BilkaToGo','28 varer · samme mængder i begge butikker'],['','Lægger varerne i kurven hos nemlig.com','28 varer i kurven · intet bestilt']],
   ai:'nemlig.com er <b>48 kr billigere</b> i denne uge. Forskellen er kyllingen, skyren og en gratis vare. Kurven er fyldt. Skriv <b>ja tak</b>, så åbner jeg den hos nemlig.com, hvor du vælger tid og betaler.',go:'https://www.nemlig.com/',
   html:'<div class="cmp"><div class="store win"><div class="tag">Billigst ✓</div><div class="tot">693 kr</div>nemlig.com<ul><li><span>Kyllingeinderfilet 1 kg</span><span>100,00</span></li><li><span>Skyr 2 kg</span><span>40,00</span></li><li class="free"><span>Rosinboller</span><span>gratis</span></li><li><span>Levering</span><span>29,00</span></li><li><span>+ 25 varer</span><span>524,00</span></li></ul></div><div class="store"><div class="tag">&nbsp;</div><div class="tot">741 kr</div>BilkaToGo<ul><li><span>Kyllingeinderfilet 1 kg</span><span>129,00</span></li><li><span>Skyr 2 kg</span><span>52,00</span></li><li><span>Rosinboller</span><span>18,00</span></li><li><span>Levering</span><span>39,00</span></li><li><span>+ 25 varer</span><span>503,00</span></li></ul></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Se kurv hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a></div>'},
- {t:'Vælg levering',you:'Hvornår kan de levere på søndag?',
-  tools:[['','Finder ledige leveringstider hos nemlig.com','søndag · 6 ledige tider']],
-  ai:'Søndag har seks ledige tider. Den billigste er <b>kl. 8–12 for 29 kr.</b> Jeg kan ikke vælge tiden eller betale. Skriv <b>ja tak</b>, så åbner jeg nemlig.com, hvor du vælger tid og betaler selv.',go:'https://www.nemlig.com/',
-  html:'<div class="slots"><div class="slot win"><b>8–12</b><span>29 kr</span></div><div class="slot"><b>12–16</b><span>39 kr</span></div><div class="slot"><b>16–18</b><span>49 kr</span></div><div class="slot"><b>18–20</b><span>49 kr</span></div><div class="slot"><b>20–22</b><span>39 kr</span></div><div class="slot"><b>22–24</b><span>39 kr</span></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Vælg tid hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a></div>'}];
+ {t:'Godkend kurven',you:'Er kurven klar? Så vil jeg godkende og betale.',
+  tools:[['','Tjekker kurven hos nemlig.com','30 varer · 693 kr · intet bestilt'],['','Finder ledige leveringstider hos nemlig.com','søndag · 6 ledige tider']],
+  ai:'Kurven er klar. Billigste levering søndag er <b>kl. 8–12 for 29 kr.</b> Jeg bestiller aldrig. Skriv <b>ja tak</b>, så åbner jeg nemlig.com, hvor du godkender kurven, vælger tid og betaler.',go:'https://www.nemlig.com/',
+  html:'<div class="slots"><div class="slot win"><b>8–12</b><span>29 kr</span></div><div class="slot"><b>12–16</b><span>39 kr</span></div><div class="slot"><b>16–18</b><span>49 kr</span></div><div class="slot"><b>18–20</b><span>49 kr</span></div><div class="slot"><b>20–22</b><span>39 kr</span></div><div class="slot"><b>22–24</b><span>39 kr</span></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Godkend kurven hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a></div>'}];
 const ARR='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
 // First-time questions: a question card like Claude's. The visitor answers; the plan waits for the last answer.
 async function ask(qs,id){const card=el('<div class="q fade"></div>');log.appendChild(card);const ans=[];
