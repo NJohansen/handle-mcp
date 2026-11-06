@@ -74,7 +74,7 @@ class RecipeDetails:
     id: str
     name: str
     url: str
-    persons: int
+    persons: int | None  # None when the store writes the recipe for pieces, not persons
     min_persons: int | None = None
     max_persons: int | None = None
     time: str | None = None
