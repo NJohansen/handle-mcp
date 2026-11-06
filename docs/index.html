@@ -156,7 +156,7 @@ html{overflow-x:clip}.demo.max .side{padding-top:18px}.demo.max .log{align-items
 .q .qh{display:flex;align-items:center;gap:10px;padding:12px 14px;font-weight:500;line-height:1.3}
 .q .pg{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--mute);font-size:12.5px;font-weight:400;white-space:nowrap}
 .q .qh svg{width:12px;height:12px;flex:none;fill:none;stroke:var(--mute);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.q .opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:9px 14px;border:0;border-top:1px solid #eeece4;background:none;font:inherit;color:var(--ink);transition:background .2s}
+.q .opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:9px 14px;border:0;border-top:1px solid #eeece4;background:none;font:inherit;color:var(--ink);cursor:pointer;transition:background .2s}.q .opt:hover{background:#f7f6f1}.q .opt:focus-visible,.q .qf button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
 .q .opt i{width:26px;height:26px;flex:none;border-radius:7px;background:#f0eee6;color:var(--mute);font:500 12.5px/26px var(--sans);text-align:center;transition:background .2s,color .2s}
 .q .opt b{display:block;font-weight:400}.q .opt small{display:block;color:var(--mute);font-size:12.5px}
 .q .opt.pick{background:#f7f6f1}.q .opt.pick i{background:var(--ink);color:#fff}
@@ -165,7 +165,7 @@ html{overflow-x:clip}.demo.max .side{padding-top:18px}.demo.max .log{align-items
 .q.multi .opt.pick i{background:var(--green);border-color:var(--green);color:#fff}
 .q .qf{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid #eeece4}
 .q .qf .cnt{color:var(--mute);font-size:12.5px;margin-right:auto}
-.q .qf .skip,.q .qf .go{border:0;background:#f0eee6;border-radius:8px;font:inherit;font-size:13px;color:var(--ink);padding:6px 12px}
+.q .qf .skip,.q .qf .go{border:0;background:#f0eee6;border-radius:8px;font:inherit;font-size:13px;color:var(--ink);padding:6px 12px;cursor:pointer}.q .qf .skip:hover,.q .qf .go:hover{background:#e6e3d9}
 .q .qf .skip{margin-left:auto}.q .qf .cnt+.skip{margin-left:0}
 .q .qf .go{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;transition:background .2s,color .2s}.q .qf .go svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.q .qf .go.hot{background:var(--ink);color:#fff}
 .q .qin{animation:qslide .35s cubic-bezier(.2,.7,.2,1)}
@@ -621,10 +621,10 @@ const ICONS='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.5 2.5l2 2L
 const recipe=(k,n)=>{const r=RC[k],f=n/4;return `<div class="recipe"><div class="strip">${RC.map((q,j)=>`<div class="ph${j===k?' on':''}" data-k="${j}" role="button" tabindex="0" aria-label="${q.n}"><img src="${q.i}" alt="" loading="lazy" width="600" height="338" onerror="this.remove()"></div>`).join('')}</div><div class="rbody"><h3>${r.n}</h3><p class="sub">${r.s} ${r.t}. Fra nemlig.com.</p><div class="serv"><button type="button" data-d="-1" aria-label="Færre personer">−</button><b>${n}</b><button type="button" data-d="1" aria-label="Flere personer">+</button><span>personer</span><span class="ic">${ICONS}</span></div><h4>Ingredienser</h4><ul>${r.ing.map(a=>`<li>${a[0]?fmt(a[0]*f,a[1])+' '+a[1]+' ':''}${a[2]}</li>`).join('')}</ul><h4>Fremgangsmåde</h4><ol>${r.st.map(t=>`<li>${t}</li>`).join('')}</ol></div></div>`};
 const cases=[
  {t:'Lav madplan',you:'Der er 700 kr til mad i denne uge. Lav en madplan til 4 ud fra det vi har og ugens tilbud.',
-  intro:'Første gang. Tre hurtige spørgsmål, så husker jeg det til næste uge.',
-  ask:[{t:'Hvem skal jeg handle til?',o:[['2 voksne og 2 børn','7 og 2 år'],['2 voksne',''],['Flere personer','Skriv hvem under Noget andet']],pick:[0]},
-       {t:'Hvad må en uge koste?',o:[['Under 500 kr',''],['Ca. 700 kr','Det, du skrev'],['Over 1.000 kr','']],pick:[1]},
-       {t:'Hvad elsker børnene? Vælg alle, der passer.',multi:true,o:[['Spaghetti med kødsovs',''],['Pizza',''],['Kylling i karry',''],['Rugbrødsaften','']],pick:[0,2,3]}],
+  intro:'Første gang. Tre hurtige spørgsmål, så husker jeg det til næste uge. Vælg selv.',
+  ask:[{t:'Hvem skal jeg handle til?',o:[['2 voksne og 2 børn','7 og 2 år'],['2 voksne',''],['Flere personer','Skriv hvem under Noget andet']]},
+       {t:'Hvad må en uge koste?',o:[['Under 500 kr',''],['Ca. 700 kr','Det, du skrev'],['Over 1.000 kr','']]},
+       {t:'Hvad elsker børnene? Vælg alle, der passer.',multi:true,o:[['Spaghetti med kødsovs',''],['Pizza',''],['Kylling i karry',''],['Rugbrødsaften','']]}],
   tools:[['doc','Tjekker hvad I har derhjemme','røde linser, ris, 300 g laks i fryseren'],['','Finder ugens tilbud hos nemlig.com og BilkaToGo','214 tilbud · 1 gratis vare'],['','Regner hele ugens indkøb ud i begge butikker','28 varer · nemlig.com 693 kr · BilkaToGo 741 kr']],
   ai:'Hele ugen, to aftener er rester. Bygget på 1 kg kylling til 100 kr og gratis rosinboller. Linserne og laksen fra fryseren bruges først, det sparer 84 kr. nemlig.com: <b>693 kr, 7 kr under budget.</b>',
   html:'<div class="plan"><b>Tir</b><span>One pot-lasagne med kylling (stor portion)</span><b>Ons</b><span>Lasagne, dag 2</span><b>Tor</b><span>Rugbrødsaften med frikadeller</span><b>Fre</b><span>Sprøde kyllingenuggets</span><b>Lør</b><span>Laks i citronsauce <span class="lager">· fra fryseren</span></span><b>Søn</b><span>Harira på jeres linser <span class="lager">· fra lageret</span></span></div>'},
@@ -642,13 +642,15 @@ const cases=[
   ai:'Søndag har seks ledige tider. Den billigste er <b>kl. 8–12 for 29 kr.</b> Jeg kan ikke vælge tiden eller betale. Det gør du selv i kurven, og først da bliver der bestilt.',
   html:'<div class="slots"><div class="slot win"><b>8–12</b><span>29 kr</span></div><div class="slot"><b>12–16</b><span>39 kr</span></div><div class="slot"><b>16–18</b><span>49 kr</span></div><div class="slot"><b>18–20</b><span>49 kr</span></div><div class="slot"><b>20–22</b><span>39 kr</span></div><div class="slot"><b>22–24</b><span>39 kr</span></div></div><div class="cartrow"><a class="btn" href="https://www.nemlig.com/" target="_blank" rel="noopener">Vælg tid hos nemlig.com <i><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5"/></svg></i></a></div>'}];
 const ARR='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
-// First-time questions: the card looks like a Claude question card, the demo answers it by itself.
+// First-time questions: a question card like Claude's. The visitor answers; the plan waits for the last answer.
 async function ask(qs,id){const card=el('<div class="q fade"></div>');log.appendChild(card);const ans=[];
  for(let n=0;n<qs.length;n++){const q=qs[n];if(id!==run)return;card.classList.toggle('multi',!!q.multi);
-  card.innerHTML=`<div class="qin"><div class="qh"><span>${q.t}</span><span class="pg"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 3 4.5 6l3 3"/></svg><span>${n+1} af ${qs.length}</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3 7.5 6l-3 3"/></svg></span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6"/></svg></div>${q.o.map((o,j)=>`<div class="opt"><i>${q.multi?'✓':j+1}</i><span><b>${o[0]}</b>${o[1]?`<small>${o[1]}</small>`:''}</span></div>`).join('')}<div class="opt other"><i>✎</i><span><b>Noget andet</b></span></div><div class="qf">${q.multi?'<span class="cnt">0 valgt</span>':''}<span class="skip">Spring over</span>${q.multi?`<span class="go">${ARR}</span>`:''}</div></div>`;dn();
-  const opts=card.querySelectorAll('.opt'),cnt=card.querySelector('.cnt'),go=card.querySelector('.go');await wait(900);
-  for(const j of q.pick){if(id!==run)return;opts[j].classList.add('pick');if(cnt){const k=card.querySelectorAll('.pick').length;cnt.textContent=k+' valgt';go.classList.add('hot')}await wait(q.multi?420:650)}
-  ans.push([q.t,q.pick.map(j=>q.o[j][0]).join(', ')]);await wait(q.multi?500:200)}
+  card.innerHTML=`<div class="qin"><div class="qh"><span>${q.t}</span><span class="pg"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 3 4.5 6l3 3"/></svg><span>${n+1} af ${qs.length}</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3 7.5 6l-3 3"/></svg></span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6"/></svg></div>${q.o.map((o,j)=>`<button type="button" class="opt"${q.multi?' role="checkbox" aria-checked="false"':''}><i>${q.multi?'✓':j+1}</i><span><b>${o[0]}</b>${o[1]?`<small>${o[1]}</small>`:''}</span></button>`).join('')}<button type="button" class="opt other"${q.multi?' role="checkbox" aria-checked="false"':''}><i>✎</i><span><b>Noget andet</b></span></button><div class="qf">${q.multi?'<span class="cnt">0 valgt</span>':''}<button type="button" class="skip">Spring over</button>${q.multi?`<button type="button" class="go" aria-label="Videre">${ARR}</button>`:''}</div></div>`;dn();
+  const opts=[...card.querySelectorAll('.opt')],cnt=card.querySelector('.cnt'),go=card.querySelector('.go'),skip=card.querySelector('.skip');
+  const picked=await new Promise(res=>{const sel=new Set();
+   opts.forEach((o,j)=>o.onclick=()=>{if(q.multi){const on=o.classList.toggle('pick');o.setAttribute('aria-checked',on);on?sel.add(j):sel.delete(j);cnt.textContent=sel.size+' valgt';go.classList.toggle('hot',sel.size>0)}else{opts.forEach(x=>x.classList.remove('pick'));o.classList.add('pick');setTimeout(()=>res([j]),still.matches?0:350)}});
+   skip.onclick=()=>res([]);if(go)go.onclick=()=>res([...sel].sort((x,y)=>x-y))});
+  if(id!==run)return;const lab=opts.map(o=>o.querySelector('b').textContent);ans.push([q.t,picked.length?picked.map(j=>lab[j]).join(', '):'Sprunget over']);if(q.multi)await wait(250)}
  if(id!==run)return;card.outerHTML=`<div class="sum fade">${ans.map(a=>`<div><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div>`;dn();await wait(500)}
 let asked=false;
 let run=0;
