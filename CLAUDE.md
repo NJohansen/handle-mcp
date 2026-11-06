@@ -91,8 +91,9 @@ One PR per change. Run the tests before you push, show the result, wait for OK.
 ## Release
 
 1. Bump `version` in `pyproject.toml` (`uv lock` follows) and every pin: `grep -rn "@v" README.md docs/` (README, `docs/setup.md`, `docs/index.html`, `docs/kom-i-gang/index.html`, `docs/security.md`).
-2. Merge, then tag the merge commit on `main`: `git fetch origin main && git tag vX.Y.Z origin/main && git push origin vX.Y.Z`.
-3. Semver: a tool's args or answer shape changes in a way old skills notice → major. New tool or field → minor. Fix → patch.
+2. Re-check the dated star claim ("flest stjerner ... (november 2026)") in `docs/index.html` and `docs/spoergsmaal/index.html`: update the month or drop it.
+3. Merge, then tag the merge commit on `main`: `git fetch origin main && git tag vX.Y.Z origin/main && git push origin vX.Y.Z`.
+4. Semver: a tool's args or answer shape changes in a way old skills notice → major. New tool or field → minor. Fix → patch.
 
 ## Branches, commits and PRs (gitmoji)
 
