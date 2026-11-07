@@ -1,7 +1,7 @@
 """nemlig.com adapter against a fake backend (httpx.MockTransport). No network."""
 
 import json
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
 
@@ -10,7 +10,7 @@ import pytest
 
 from handle_mcp import compare, server
 from handle_mcp import stores as registry
-from handle_mcp.stores import StoreError, _http, nemlig_offers
+from handle_mcp.stores import StoreError, _http, nemlig, nemlig_offers
 from handle_mcp.stores.nemlig import NemligStore
 from handle_mcp.stores.nemlig_offers import offer_product
 
@@ -342,7 +342,8 @@ async def test_set_quantities_one_failure_does_not_stop_the_rest(store, fake):
     assert [r.ok for r in results] == [False, True]
 
 
-async def test_terms_and_delivery_info(store):
+async def test_terms_and_delivery_info(store, monkeypatch):
+    monkeypatch.setattr(nemlig, "_now", lambda: datetime(2026, 11, 1, 12, tzinfo=nemlig.DK))
     terms = await store.terms()
     assert (terms.home_delivery, terms.delivery_fee, terms.minimum_order) == (
         True,
@@ -353,6 +354,14 @@ async def test_terms_and_delivery_info(store):
     assert info.chosen_start.isoformat() == "2026-11-03T16:00:00+00:00"
     assert info.edit_deadline.isoformat() == "2026-11-02T23:00:00+00:00"
     assert "17-20" in info.note
+
+
+async def test_an_ended_slot_is_not_the_chosen_one(store, monkeypatch):
+    """nemlig keeps the last order's slot in the basket. Offers must not be priced for it."""
+    monkeypatch.setattr(nemlig, "_now", lambda: datetime(2026, 11, 3, 20, 1, tzinfo=nemlig.DK))
+    info = await store.delivery_info()
+    assert (info.chosen_start, info.chosen_end, info.edit_deadline) == (None, None, None)
+    assert info.note.startswith("Ingen tid valgt.")
 
 
 async def test_orders_and_order(store):

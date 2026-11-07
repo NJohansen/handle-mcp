@@ -8,12 +8,14 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from collections.abc import Awaitable, Callable
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
+from pydantic import BeforeValidator
 
 from handle_mcp import cli, compare, links, recipe_cart, telemetry
 from handle_mcp import stores as registry
@@ -26,6 +28,18 @@ MAX_QUANTITY = 50  # per product
 MAX_RESULTS = 25
 MAX_DAYS = 14
 MIN_PERSONS, MAX_PERSONS = 2, 12  # nemlig: 2-12
+
+
+def _whole(value: Any) -> Any:
+    """A count is a number or plain digits. int() reads "2_0" as 20 and True as 1."""
+    if isinstance(value, bool) or (
+        isinstance(value, str) and not re.fullmatch(r"\s*[0-9]+\s*", value)
+    ):
+        raise ValueError("Antal skal være et helt tal, fx 2.")
+    return value
+
+
+Count = Annotated[int, BeforeValidator(_whole)]
 
 READ = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=True)
 WRITE = ToolAnnotations(
@@ -218,7 +232,7 @@ async def get_cart(store: str | None = None) -> dict:
 
 
 @_tool(WRITE)
-async def set_cart_quantities(store: str, items: dict[str, int]) -> dict:
+async def set_cart_quantities(store: str, items: dict[str, Count]) -> dict:
     """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart with its `url`: give the human that link to check and pay."""
     if not items:
         raise ToolError("Ingen varer angivet.")

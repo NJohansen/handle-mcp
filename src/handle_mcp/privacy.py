@@ -95,11 +95,12 @@ PERSONAL_KEYS = frozenset(
 
 
 # store free text: the value may hold personal data even though the key does not
-FREE_TEXT_KEYS = frozenset({"warnings", "message", "messages", "note", "error"})
+FREE_TEXT_KEYS = frozenset({"warnings", "message", "messages", "note", "notes", "error"})
 
-_STREET_END = (
-    "vej|gade|allé|alle|vænge|vænget|stræde|plads|torv|boulevard|parken|park|"
-    "haven|have|bakken|toften|engen|marken|stien|sti|høj|lund|ager"
+_STREET_END = (  # definite forms too: "Strandvejen 3", "Søndergaden 5"
+    "vej|vejen|gade|gaden|allé|alléen|alle|alleen|vænge|vænget|stræde|strædet|plads|pladsen|"
+    "torv|torvet|boulevard|boulevarden|parken|park|haven|have|bakken|toften|engen|marken|stien|"
+    "sti|høj|højen|lund|lunden|ager|ageren"
 )
 _STREET_WORD = "Vej|Gade|Allé|Alle|Boulevard|Plads|Torv|Stræde|Vænge"
 _TEXT_PATTERNS = (

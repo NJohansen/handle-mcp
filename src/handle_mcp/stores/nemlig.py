@@ -78,6 +78,10 @@ def _time(value: str | None) -> datetime | None:
         return None
 
 
+def _now() -> datetime:
+    return datetime.now(DK)
+
+
 def _unit(label: str | None) -> str | None:
     """'kr./Kg.' → 'kg', 'kr/l' → 'l', 'kr/stk' → 'stk'."""
     if not label:
@@ -460,6 +464,9 @@ class NemligStore(RecipesMixin, OffersMixin):
         basket = await self._basket()
         spot = await self._api("GET", f"{BASE}/webapi/Order/DeliverySpot") or {}
         slot = spot.get("TimeSlot") or {}
+        end = _time(slot.get("End"))
+        if end and end.replace(tzinfo=end.tzinfo or DK) < _now():  # the last order's slot
+            basket, spot, slot = {}, {}, {}
         chosen = basket.get("FormattedDeliveryTime")
         return DeliveryInfo(
             store=self.name,
