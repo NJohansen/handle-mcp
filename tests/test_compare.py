@@ -15,6 +15,7 @@ from handle_mcp.candidates import brief
 from handle_mcp.compare import best_match
 from handle_mcp.match import is_oeko, pack_size, parse_item, parse_size, score
 from handle_mcp.models import DeliveryInfo, Product, StoreTerms
+from handle_mcp.privacy import jsonable
 from handle_mcp.stores.bilkatogo import BilkaStore
 from handle_mcp.stores.nemlig import NemligStore
 
@@ -137,6 +138,8 @@ def test_parse_size_and_item():
         ("1½ dl fløde", ("ml", Decimal(150))),
         ("1 ½ dl fløde", ("ml", Decimal(150))),
         ("1 1/2 l mælk", ("ml", Decimal(1500))),
+        ("3 3/4 dl fløde", ("ml", Decimal(375))),
+        ("2/3 dl mel", ("ml", Decimal(200) / 3)),
         ("¼ kg smør", ("g", Decimal(250))),
         ("2 x 1/2 l", ("ml", Decimal(1000))),
         ("1/0 dl", None),
@@ -144,6 +147,10 @@ def test_parse_size_and_item():
 )
 def test_parse_size_reads_fractions(text, size):
     assert parse_size(text) == size
+
+
+def test_a_third_is_shown_with_two_decimals():
+    assert jsonable(parse_size("2/3 dl mel")[1]) == "66.67"  # every tool answer goes via jsonable
 
 
 def test_a_fraction_is_not_left_in_the_words():
