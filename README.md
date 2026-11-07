@@ -82,9 +82,9 @@ What is sent, and nothing else. Every event also has `version` and `date` (day o
 | `server_started` | the server starts, at most once per machine per day | `os` (`darwin`, `linux` or `windows`) |
 | `first_tool_call` | the first tool call of the day (a client that only lists the tools sends nothing) | `tool` (e.g. `compare_basket`) |
 | `login_ok` | a store answers with your cart, at most once per store per day | `store` (`nemlig` or `bilka`) |
-| `cart_filled` | once per cart, after 5 minutes without changes, only when every line went in | `store`, `basket_total_dkk` (rounded to the nearest 50 kr), `item_count` |
+| `cart_filled` | once per order: after 30 minutes without changes, only when every line went in. Later edits send nothing until the cart is empty again (after checkout) | `store`, `basket_total_dkk` (rounded to the nearest 50 kr), `item_count` |
 
-Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP address to send the answer back and to guess the country; it does not save the address. Sends run with a 2 second timeout, in the background. A failed send never breaks a tool. The first tool answer on a machine has a `telemetry_notice`, so your AI tells you about it once. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, and the day each daily event was last sent.
+Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP address to send the answer back and to guess the country; it does not save the address. Sends run with a 2 second timeout, in the background. A failed send never breaks a tool. The first tool answer on a machine has a `telemetry_notice`, so your AI tells you about it once. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, the day each daily event was last sent, and which stores have a counted cart that is not empty yet.
 
 Cart links (`url` in the cart) carry `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`, so the store sees the visit in its own analytics.
 

@@ -7,6 +7,7 @@ Every answer goes through privacy.scrub() in `_out()`.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import re
 from collections.abc import Awaitable, Callable
@@ -114,7 +115,7 @@ def _error_reason(store: str, exc: BaseException) -> str:
 async def _call(store: str, method: str, *args: Any) -> Any:
     try:
         if method == "cart":  # the cart with its tagged link (links.py)
-            return await links.cart(_store(store))
+            return await links.cart(_store(store), *args)
         return await getattr(_store(store), method)(*args)
     except ToolError:
         raise
@@ -241,8 +242,11 @@ async def set_cart_quantities(store: str, items: dict[str, Count]) -> dict:
     bad = [pid for pid, qty in items.items() if not 0 <= qty <= MAX_QUANTITY]
     if bad:
         raise ToolError(f"Antal skal være 0-{MAX_QUANTITY}. Forkert for: {', '.join(bad)}.")
+    if telemetry.locked(store):  # was the counted cart ordered? (telemetry.cart_seen)
+        with contextlib.suppress(ToolError):  # counting never blocks a cart change
+            await _call(store, "cart")
     results = await _call(store, "set_quantities", dict(items))
-    cart = await _call(store, "cart")
+    cart = await _call(store, "cart", False)
     telemetry.cart_filled(store, cart, results)
     return _out({"results": results, "cart": cart})
 
@@ -273,13 +277,13 @@ async def add_recipe_to_cart(
         raise ToolError("Ingen varer at lægge i kurven.")
     if len(lines) > MAX_ITEMS:
         raise ToolError(f"Højst {MAX_ITEMS} varer pr. kald.")
-    before = recipe_cart.in_cart(await _call(store, "get_cart"))
+    before = recipe_cart.in_cart(await _call(store, "cart"))
     targets = {pid: before.get(pid, 0) + ln["quantity"] for pid, ln in lines.items()}
     if bad := [pid for pid, qty in targets.items() if qty > MAX_QUANTITY]:
         raise ToolError(f"Højst {MAX_QUANTITY} stk. pr. vare. For mange af: {', '.join(bad)}.")
     results = await _call(store, "set_quantities", targets)
     added = recipe_cart.report(lines, before, results)
-    cart = await _call(store, "cart")
+    cart = await _call(store, "cart", False)
     telemetry.cart_filled(store, cart, results)
     return _out({"added": added, "skipped": skipped, "cart": cart})
 

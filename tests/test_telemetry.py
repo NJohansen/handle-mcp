@@ -70,6 +70,91 @@ async def test_many_changes_count_as_one_cart(sent):
     assert sent[-1]["payload"]["data"]["item_count"] == 5
 
 
+def test_a_cart_counts_after_30_quiet_minutes():
+    assert telemetry.QUIET == 1800
+
+
+async def test_edits_after_the_count_send_nothing(sent):
+    await fill()
+    await fill(items={"2": 5})  # the human changes the cart the next day
+    telemetry._pending.clear()  # and after a restart: the lock is in the file
+    await fill(items={"1": 4})
+    assert names(sent).count("cart_filled") == 1
+
+
+async def test_an_empty_cart_unlocks_so_the_next_order_counts(sent):
+    await fill()
+    await server.set_cart_quantities("fake", {"1": 0, "2": 0})  # checkout empties the cart
+    await server.get_cart("fake")
+    await fill(items={"2": 2})
+    assert names(sent).count("cart_filled") == 2
+
+
+async def test_reading_an_empty_cart_unlocks(sent):
+    await fill()
+    server._store("fake").cart.clear()  # the order went through on the store's site
+    await server.get_cart("fake")
+    await fill()
+    assert names(sent).count("cart_filled") == 2
+
+
+async def test_an_order_after_checkout_counts_without_a_read_first(sent):
+    await fill()
+    server._store("fake").cart.clear()  # paid on the store's site; no tool read the cart
+    await fill()  # the model fills next week's cart straight away
+    assert names(sent).count("cart_filled") == 2
+
+
+async def test_a_cart_paid_before_30_minutes_still_counts(sent):
+    await server.set_cart_quantities("fake", {"2": 3})
+    server._store("fake").cart.clear()  # paid at once
+    await server.get_cart("fake")
+    assert names(sent).count("cart_filled") == 1
+    await fill()
+    assert names(sent).count("cart_filled") == 2
+
+
+async def test_the_daily_file_write_and_the_lock_do_not_lose_each_other(sent):
+    await fill()
+    telemetry.start()
+    state = json.loads((registry.CONFIG_DIR / "telemetry.json").read_text())
+    assert state["counted"] == ["fake"] and "server_started" in state["days"]
+
+
+async def test_off_means_an_empty_cart_read_touches_no_file(sent, monkeypatch):
+    monkeypatch.setenv("HANDLE_TELEMETRY", "0")
+    server._store("fake").cart.clear()
+    await server.get_cart("fake")
+    assert not (registry.CONFIG_DIR / "telemetry.json").exists()
+
+
+async def test_a_failing_pre_read_never_blocks_the_write(sent, monkeypatch):
+    await fill()
+    store = server._store("fake")
+
+    async def down():
+        raise registry.StoreError("nemlig.com har kø lige nu.")
+
+    monkeypatch.setattr(store, "get_cart", down)
+    with pytest.raises(ToolError):  # the read after the write fails too, as it should
+        await server.set_cart_quantities("fake", {"2": 9})
+    assert store.cart["2"] == 9  # but the write went through
+
+
+async def test_reading_a_full_cart_keeps_the_lock(sent):
+    await fill()
+    await server.get_cart("fake")
+    await fill(items={"2": 7})
+    assert names(sent).count("cart_filled") == 1
+
+
+def test_the_lock_keeps_store_names_only(sent):
+    telemetry.cart_filled("bilkatogo", {"total": "100", "lines": [{"quantity": 1}]}, [])
+    telemetry._flush_all()
+    state = json.loads((registry.CONFIG_DIR / "telemetry.json").read_text())
+    assert state == {"counted": ["bilkatogo"]}
+
+
 async def test_an_emptied_cart_is_not_counted(sent):
     await server.set_cart_quantities("fake", {"2": 2})
     await server.set_cart_quantities("fake", {"1": 0, "2": 0})

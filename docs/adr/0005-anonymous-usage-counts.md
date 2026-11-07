@@ -13,7 +13,7 @@ No install id. A random id saved on the user's machine is pseudonymous personal 
 - Opt-out only works if people know. A notice in a log file nobody reads would be hidden tracking, so the notice goes where the human reads: the chat. The README says it in the first lines.
 - Umami sees the sender's IP address (to answer and to guess the country). It does not save it. The privacy page says so.
 
-- A cart counts once after 5 minutes without changes (a model fills a cart in many calls). A cart changed again an hour later counts again. An emptied cart and a cart with a refused line do not count.
+- A cart counts once per order: after 30 minutes without changes (a model fills a cart in many calls), then the store is locked, so edits to the same cart send nothing. The lock is a store name in `telemetry.json`. A read that finds the cart empty (after checkout) sends a waiting cart at once and unlocks the store. A write to a locked store reads the cart first, so the next order counts even when the model goes straight to the write. A cart emptied through handle-mcp and a cart with a refused line do not count. A normal close sends a waiting cart; a killed process loses it (too few, never too many).
 - Weekly active machines and retention are estimates, not exact. Daily events count machine-days.
 - `login_ok` means a store sent back the user's cart; a login that is never used is not counted. `first_tool_call` counts a call when it starts, also one that fails (e.g. no login): the user tried. Its file read and write run once a day on the event loop; a tiny local file, accepted.
 - Sends run in a daemon thread with a 2 s timeout. Every error is logged at debug level and never reaches a tool. Waiting carts are sent when the server stops.
