@@ -129,6 +129,28 @@ def test_parse_size_and_item():
     assert parse_item("hakket oksekød med fedt") == (1, ["hakket", "oksekød", "fedt"], None)
 
 
+@pytest.mark.parametrize(
+    ("text", "size"),
+    [
+        ("1/2 dl olie", ("ml", Decimal(50))),  # was 2 dl: the number after the slash won
+        ("½ dl kogevand", ("ml", Decimal(50))),  # was no size
+        ("1½ dl fløde", ("ml", Decimal(150))),
+        ("1 ½ dl fløde", ("ml", Decimal(150))),
+        ("1 1/2 l mælk", ("ml", Decimal(1500))),
+        ("¼ kg smør", ("g", Decimal(250))),
+        ("2 x 1/2 l", ("ml", Decimal(1000))),
+        ("1/0 dl", None),
+    ],
+)
+def test_parse_size_reads_fractions(text, size):
+    assert parse_size(text) == size
+
+
+def test_a_fraction_is_not_left_in_the_words():
+    assert parse_item("1/2 dl olie til stegning") == (1, ["olie", "stegning"], ("ml", Decimal(50)))
+    assert parse_item("2/3 dl mel")[1] == ["mel"]
+
+
 def test_whole_word_beats_word_inside_word():
     line = best_match("mælk 1 l", [NEMLIG[1], p("x", "m", "Mælk", "12.00", "1 l")])
     assert line.product.id == "m" and line.sure  # not the cheaper Kakaomælk
