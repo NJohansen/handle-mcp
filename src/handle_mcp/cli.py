@@ -15,12 +15,35 @@ from __future__ import annotations
 
 import asyncio
 import getpass
+import logging
 import os
 import sys
+from typing import Any
 
 from keyring.errors import KeyringError
 
 from handle_mcp import stores as registry
+from handle_mcp import telemetry
+
+
+def configure_logging() -> None:
+    """Log to stderr. httpx logs every request URL at INFO, and URLs can hold ids and
+    tokens. MCP clients keep stderr in log files, so httpx only speaks on warnings."""
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+
+
+def main(mcp: Any) -> None:
+    """`handle-mcp`: the MCP server over stdio, or with arguments this command line."""
+    configure_logging()
+    args = sys.argv[1:]
+    if "--no-telemetry" in args:
+        telemetry.disable()
+        args.remove("--no-telemetry")
+    if args:  # `handle-mcp login <store>` from a terminal, not from an MCP client
+        sys.exit(run(args))
+    telemetry.start()
+    mcp.run("stdio")
 
 
 def _say(text: str) -> None:

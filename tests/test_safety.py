@@ -59,9 +59,9 @@ def test_httpx_does_not_log_urls():
     """httpx logs every URL at INFO; nemlig's offer URL holds the personal UserId."""
     import logging
 
-    from handle_mcp import server
+    from handle_mcp import cli
 
-    server.configure_logging()
+    cli.configure_logging()
     assert not logging.getLogger("httpx").isEnabledFor(logging.INFO)
 
 

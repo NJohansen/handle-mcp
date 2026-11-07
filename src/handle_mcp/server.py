@@ -7,9 +7,7 @@ Every answer goes through privacy.scrub() in `_out()`.
 from __future__ import annotations
 
 import asyncio
-import functools
 import logging
-import sys
 from collections.abc import Awaitable, Callable
 from typing import Any, Literal
 
@@ -17,7 +15,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
-from handle_mcp import compare, links, recipe_cart, telemetry
+from handle_mcp import cli, compare, links, recipe_cart, telemetry
 from handle_mcp import stores as registry
 from handle_mcp.privacy import jsonable, scrub, scrub_text
 
@@ -73,17 +71,8 @@ def _persons(persons: int | None) -> int | None:
 
 
 def _tool(annotations: ToolAnnotations) -> Callable[[Callable], Callable]:
-    """`mcp.tool`, and count the day's first tool call. Listing the tools is not a call."""
-
-    def register(fn: Callable[..., Awaitable[dict]]) -> Callable[..., Awaitable[dict]]:
-        @functools.wraps(fn)
-        async def counted(*args: Any, **kwargs: Any) -> dict:
-            telemetry.tool_called(fn.__name__)
-            return await fn(*args, **kwargs)
-
-        return mcp.tool(annotations=annotations)(counted)
-
-    return register
+    """`mcp.tool`, and count the day's first tool call (telemetry.counted)."""
+    return lambda fn: mcp.tool(annotations=annotations)(telemetry.counted(fn))
 
 
 def _out(value: Any) -> dict[str, Any]:
@@ -319,25 +308,8 @@ async def get_order(store: str, order_id: str) -> dict:
     return _out(await _call(store, "order", order_id))
 
 
-def configure_logging() -> None:
-    """Log to stderr. httpx logs every request URL at INFO, and URLs can hold ids and
-    tokens. MCP clients keep stderr in log files, so httpx only speaks on warnings."""
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-
-
 def main() -> None:
-    configure_logging()
-    args = sys.argv[1:]
-    if "--no-telemetry" in args:
-        telemetry.disable()
-        args.remove("--no-telemetry")
-    if args:  # `handle-mcp login <store>` from a terminal, not from an MCP client
-        from handle_mcp.cli import run
-
-        sys.exit(run(args))
-    telemetry.start()
-    mcp.run("stdio")
+    cli.main(mcp)
 
 
 if __name__ == "__main__":

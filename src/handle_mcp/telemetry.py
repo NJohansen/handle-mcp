@@ -2,7 +2,8 @@
 
 No id, no names, no addresses, no logins, no products, no order ids (docs/adr/0005). The only
 file is `telemetry.json` in the config folder: the notice was shown, and the last day each
-daily event went out. The funnel: server_started, first_tool_call, login_ok, cart_filled. Off with HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or `--no-telemetry`.
+daily event went out. The funnel: server_started, first_tool_call, login_ok, cart_filled.
+Off with HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or `--no-telemetry`.
 Every send runs in a background thread with a short timeout. A failure is logged, never raised.
 """
 
@@ -127,6 +128,17 @@ def notice() -> str | None:
         log.debug("telemetry notice failed", exc_info=True)
         return None
     return " ".join(NOTICE.split())
+
+
+def counted(fn: Callable[..., Any]) -> Callable[..., Any]:
+    """Wrap an async tool: count the day's first call. Listing the tools is not a call."""
+
+    @functools.wraps(fn)
+    async def wrapper(*args: Any, **kwargs: Any) -> Any:
+        tool_called(fn.__name__)
+        return await fn(*args, **kwargs)
+
+    return wrapper
 
 
 @_safe
