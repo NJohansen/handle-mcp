@@ -6,7 +6,7 @@ handle-mcp sends four events to Umami, a funnel from install to a filled cart: `
 
 To show the stores how many carts and kroner handle-mcp sends them, for a partner deal, and to see where people stop between install and a filled cart. `first_tool_call` separates real users from catalogs and scanners that only list the tools. The UTM tags let the store measure it in its own analytics; the events are our own count next to it.
 
-No install id. A random id saved on the user's machine is pseudonymous personal data, and saving it for statistics needs consent under the ePrivacy rules. Without an id, nothing points to a person: the events are counts. Unique machines per week come from Umami's own daily-rotating visitor hash, as on handlemcp.dk. The local file holds only a flag and the last day per daily event.
+No install id. A random id saved on the user's machine is pseudonymous personal data, and saving it for statistics needs consent under the ePrivacy rules. Without an id, the event fields point to no person: they are counts. The request itself still carries the sender's IP address, which is personal data under GDPR. Umami Cloud uses it to answer and to guess the country, and does not save it; Umami is our data processor. On by default with opt-out is therefore a choice about the IP too: we accept it because the IP is never stored, the purpose is narrow (counting carts per store), the human is told in the chat on first use, and one env var turns it off. If that balance changes, the answer is opt-in. Unique machines per week come from Umami's own daily-rotating visitor hash, as on handlemcp.dk. The local file holds only a flag and the last day per daily event.
 
 ## Consequences
 
