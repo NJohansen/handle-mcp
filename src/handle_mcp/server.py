@@ -7,6 +7,7 @@ Every answer goes through privacy.scrub() in `_out()`.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import re
 from collections.abc import Awaitable, Callable
@@ -242,7 +243,8 @@ async def set_cart_quantities(store: str, items: dict[str, Count]) -> dict:
     if bad:
         raise ToolError(f"Antal skal være 0-{MAX_QUANTITY}. Forkert for: {', '.join(bad)}.")
     if telemetry.locked(store):  # was the counted cart ordered? (telemetry.cart_seen)
-        await _call(store, "cart")
+        with contextlib.suppress(ToolError):  # counting never blocks a cart change
+            await _call(store, "cart")
     results = await _call(store, "set_quantities", dict(items))
     cart = await _call(store, "cart", False)
     telemetry.cart_filled(store, cart, results)

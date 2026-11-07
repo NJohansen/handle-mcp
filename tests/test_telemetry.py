@@ -128,6 +128,19 @@ async def test_off_means_an_empty_cart_read_touches_no_file(sent, monkeypatch):
     assert not (registry.CONFIG_DIR / "telemetry.json").exists()
 
 
+async def test_a_failing_pre_read_never_blocks_the_write(sent, monkeypatch):
+    await fill()
+    store = server._store("fake")
+
+    async def down():
+        raise registry.StoreError("nemlig.com har kø lige nu.")
+
+    monkeypatch.setattr(store, "get_cart", down)
+    with pytest.raises(ToolError):  # the read after the write fails too, as it should
+        await server.set_cart_quantities("fake", {"2": 9})
+    assert store.cart["2"] == 9  # but the write went through
+
+
 async def test_reading_a_full_cart_keeps_the_lock(sent):
     await fill()
     await server.get_cart("fake")
