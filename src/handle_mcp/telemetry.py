@@ -29,7 +29,7 @@ from handle_mcp import stores as registry
 log = logging.getLogger(__name__)
 
 URL = "https://cloud.umami.is/api/send"  # Umami's event API; HANDLE_TELEMETRY_URL overrides
-WEBSITE = ""  # the Umami website that counts the events; HANDLE_TELEMETRY_WEBSITE overrides
+WEBSITE = "a6431afb-4982-436d-8b11-bfb33da3baa9"  # handlemcp.dk in Umami; the hostname splits app from site
 HOSTNAME = "app.handlemcp.dk"  # a label in Umami, not a server
 TIMEOUT = 2.0  # seconds
 QUIET = 300.0  # seconds without a cart change before the cart counts as filled
