@@ -113,7 +113,7 @@ class FakeNemlig:
                 return httpx.Response(200, json={"DayRangeHours": [], "NextRangeStart": None})
             return httpx.Response(200, json=fixture("delivery_days"))
         if path == "/webapi/Order/DeliverySpot":
-            return httpx.Response(200, json=fixture("delivery_spot"))
+            return httpx.Response(200, json=getattr(self, "spot", None) or fixture("delivery_spot"))
         if path == "/webapi/order/GetBasicOrderHistory":
             return httpx.Response(200, json=fixture(self.history))
         if path.startswith("/webapi/v2/order/GetOrderHistory/"):
@@ -362,6 +362,13 @@ async def test_an_ended_slot_is_not_the_chosen_one(store, monkeypatch):
     info = await store.delivery_info()
     assert (info.chosen_start, info.chosen_end, info.edit_deadline) == (None, None, None)
     assert info.note.startswith("Ingen tid valgt.")
+
+
+@pytest.mark.parametrize(("hour", "ended"), [(19, False), (20, True)])
+async def test_a_slot_without_a_zone_is_danish_time(store, fake, monkeypatch, hour, ended):
+    fake.spot = {"TimeSlot": {"Start": "2026-11-03T17:00:00", "End": "2026-11-03T20:00:00"}}
+    monkeypatch.setattr(nemlig, "_now", lambda: datetime(2026, 11, 3, hour, 1, tzinfo=nemlig.DK))
+    assert ((await store.delivery_info()).chosen_end is None) == ended
 
 
 async def test_orders_and_order(store):

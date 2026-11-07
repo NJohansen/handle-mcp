@@ -464,10 +464,10 @@ class NemligStore(RecipesMixin, OffersMixin):
         basket = await self._basket()
         spot = await self._api("GET", f"{BASE}/webapi/Order/DeliverySpot") or {}
         slot = spot.get("TimeSlot") or {}
+        chosen = basket.get("FormattedDeliveryTime")
         end = _time(slot.get("End"))
         if end and end.replace(tzinfo=end.tzinfo or DK) < _now():  # the last order's slot
-            basket, spot, slot = {}, {}, {}
-        chosen = basket.get("FormattedDeliveryTime")
+            spot, slot, chosen = {}, {}, None
         return DeliveryInfo(
             store=self.name,
             chosen_start=_time(slot.get("Start")),
