@@ -5,6 +5,7 @@ import threading
 from datetime import date
 
 import pytest
+from mcp.server.mcpserver.exceptions import ToolError
 
 from handle_mcp import server, telemetry
 from handle_mcp import stores as registry
@@ -101,14 +102,64 @@ def test_totals_round_to_the_nearest_50(total, rounded):
     assert telemetry.basket({"total": total, "lines": []})[0] == rounded
 
 
-async def test_active_at_most_once_per_day_even_after_a_restart(sent, monkeypatch):
+def test_server_started_once_per_day_with_version_and_os(sent, monkeypatch):
+    monkeypatch.setattr(telemetry.platform, "system", lambda: "Darwin")
+    telemetry.start()
+    monkeypatch.setattr(telemetry, "_sent_today", {})  # a restart, same day
+    telemetry.start()
+    assert names(sent) == ["server_started"]
+    assert sent[0]["payload"]["data"] == {
+        "os": "darwin",
+        "version": telemetry._version(),
+        "date": date.today().isoformat(),
+    }
+
+
+async def test_first_tool_call_once_per_day_with_the_tool_name(sent, monkeypatch):
+    await server.list_offers()
     await server.get_cart("fake")
+    monkeypatch.setattr(telemetry, "_sent_today", {})  # a restart, same day
+    await server.search_products("mælk")
+    calls = [e["payload"]["data"] for e in sent if e["payload"]["name"] == "first_tool_call"]
+    assert [c["tool"] for c in calls] == ["list_offers"]
+
+
+async def test_listing_the_tools_is_not_a_tool_call(sent):
+    await server.mcp.list_tools()
+    assert sent == []
+
+
+async def test_login_ok_once_per_store_per_day(sent, monkeypatch):
     await server.get_cart("fake")
-    monkeypatch.setattr(telemetry, "_active_day", None)  # a new process, same day
-    await server.get_cart("fake")
-    assert names(sent) == ["active"]
+    await server.set_cart_quantities("fake", {"2": 1})
+    monkeypatch.setattr(telemetry, "_sent_today", {})  # a restart, same day
+    await server.get_cart()
+    logins = [e["payload"] for e in sent if e["payload"]["name"] == "login_ok"]
+    assert [e["data"]["store"] for e in logins] == ["fake", "broken"]
+    assert logins[0]["url"] == "/login_ok/fake"
+
+
+async def test_no_login_no_login_ok(sent, monkeypatch):
+    from handle_mcp import stores as registry
+
+    async def no_login(self):
+        raise registry.StoreError("Ikke logget ind.")
+
+    monkeypatch.setattr(registry.STORES["fake"], "get_cart", no_login)
+    with pytest.raises(ToolError):
+        await server.get_cart("fake")
+    assert "login_ok" not in names(sent)
+
+
+def test_the_file_keeps_days_never_an_id(sent):
+    telemetry.start()
+    telemetry.login_ok("bilkatogo")
     state = json.loads((registry.CONFIG_DIR / "telemetry.json").read_text())
-    assert state == {"last_active": date.today().isoformat()}  # a date, never an id
+    today = date.today().isoformat()
+    assert state == {
+        "notice_shown": True,
+        "days": {"server_started": today, "login_ok:bilka": today},
+    }
 
 
 @pytest.mark.parametrize(
@@ -178,5 +229,5 @@ def test_post_has_a_short_timeout_and_a_configurable_url(monkeypatch):
 def test_no_website_id_sends_nothing(sent, monkeypatch):
     monkeypatch.delenv("HANDLE_TELEMETRY_WEBSITE")
     monkeypatch.setattr(telemetry, "WEBSITE", "")
-    telemetry._send("active", {})
+    telemetry._send("server_started", {})
     assert sent == []

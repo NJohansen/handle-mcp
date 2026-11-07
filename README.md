@@ -71,16 +71,18 @@ Full arguments and fields: [docs/tools.md](docs/tools.md).
 
 ## Brugsstatistik
 
-handle-mcp counts filled carts, anonymously, so we can show nemlig.com and BilkaToGo how many carts and kroner it sends them each week. It is on by default and easy to turn off.
+handle-mcp counts, anonymously, how far people get from install to a filled cart, so we can show nemlig.com and BilkaToGo how many carts and kroner it sends them each week. It is on by default and easy to turn off.
 
-What is sent, and nothing else:
+What is sent, and nothing else. Every event also has `version` and `date` (day only):
 
-| Event | Fields |
-|---|---|
-| `cart_filled` (once per cart, after 5 minutes without changes, only when every line went in) | `store` (`nemlig` or `bilka`), `basket_total_dkk` (rounded to the nearest 50 kr), `item_count`, `version`, `date` (day only) |
-| `active` (at most once per machine per day) | `version`, `date` |
+| Event | When | Fields |
+|---|---|---|
+| `server_started` | the server starts, at most once per machine per day | `os` (`darwin`, `linux` or `windows`) |
+| `first_tool_call` | the first tool call of the day (a client that only lists the tools sends nothing) | `tool` (e.g. `compare_basket`) |
+| `login_ok` | a store answers with your cart, at most once per store per day | `store` (`nemlig` or `bilka`) |
+| `cart_filled` | once per cart, after 5 minutes without changes, only when every line went in | `store`, `basket_total_dkk` (rounded to the nearest 50 kr), `item_count` |
 
-Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS, with a 2 second timeout, in the background. A failed send never breaks a tool. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, and the date of the last `active` event.
+Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS, with a 2 second timeout, in the background. A failed send never breaks a tool. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, and the day each daily event was last sent.
 
 Cart links (`url` in the cart) carry `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`, so the store sees the visit in its own analytics.
 

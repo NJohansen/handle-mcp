@@ -1,8 +1,8 @@
 """Anonymous usage counts: how many carts and kroner handle-mcp fills in each store per week.
 
 No id, no names, no addresses, no logins, no products, no order ids (docs/adr/0005). The only
-file is `telemetry.json` in the config folder: the notice was shown, and the last day an
-"active" event went out. Off with HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or `--no-telemetry`.
+file is `telemetry.json` in the config folder: the notice was shown, and the last day each
+daily event went out. The funnel: server_started, first_tool_call, login_ok, cart_filled. Off with HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or `--no-telemetry`.
 Every send runs in a background thread with a short timeout. A failure is logged, never raised.
 """
 
@@ -13,6 +13,7 @@ import functools
 import json
 import logging
 import os
+import platform
 import sys
 import threading
 from collections.abc import Callable
@@ -37,14 +38,15 @@ STORE_NAMES = {"bilkatogo": "bilka"}
 OFF = {"0", "false", "no", "off"}
 
 NOTICE = """\
-handle-mcp tæller anonymt, hvor mange kurve den fylder: butik, beløb (afrundet til 50 kr.),
-antal varer, version og dato. Ingen navne, adresser, logins, varer eller ordre-id.
+handle-mcp tæller anonymt: start, første værktøj og login pr. dag, og fyldte kurve (butik,
+beløb afrundet til 50 kr., antal varer). Med version, styresystem og dato.
+Ingen navne, adresser, logins, varer, ordre-id eller id for dig eller din computer.
 Slå det fra med HANDLE_TELEMETRY=0 eller: handle-mcp --no-telemetry
 Læs mere: https://github.com/NJohansen/handle-mcp#brugsstatistik
 """
 
 _off = False
-_active_day: str | None = None
+_sent_today: dict[str, str] = {}  # event key -> day, so the file is read once per day
 _lock = threading.Lock()
 _pending: dict[str, tuple[threading.Timer, dict[str, Any]]] = {}
 
@@ -100,29 +102,42 @@ def _save(state: dict[str, Any]) -> None:
 
 @_safe
 def start() -> None:
-    """At server start: the notice once per machine, then today's "active" event."""
+    """At server start: the notice once per machine, then today's "server_started"."""
     if not enabled():
         return
     state = _state()
     if not state.get("notice_shown"):
         sys.stderr.write(NOTICE)
         _save({**state, "notice_shown": True})
-    active()
+    _daily("server_started", {"os": platform.system().lower() or "unknown"})
 
 
 @_safe
-def active() -> None:
-    """At most one "active" event per machine per day. Cheap: called on every tool answer."""
-    global _active_day
+def tool_called(tool: str) -> None:
+    """The first tool call of the day. A catalog or scanner only lists the tools: never here."""
+    _daily("first_tool_call", {"tool": tool})
+
+
+@_safe
+def login_ok(store: str) -> None:
+    """A store answered with the user's own cart, so the login works. Once per store per day."""
+    name = STORE_NAMES.get(store, store)
+    _daily("login_ok", {"store": name}, key=f"login_ok:{name}")
+
+
+def _daily(event: str, data: dict[str, Any], key: str | None = None) -> None:
+    """Send `event` at most once per machine per day. The file keeps the day, never an id."""
+    key = key or event
     today = date.today().isoformat()
-    if _active_day == today or not enabled():
+    if _sent_today.get(key) == today or not enabled():
         return
-    _active_day = today
+    _sent_today[key] = today
     state = _state()
-    if state.get("last_active") == today:
+    days = state.get("days") if isinstance(state.get("days"), dict) else {}
+    if days.get(key) == today:
         return
-    _save({**state, "last_active": today})
-    _send("active", {})
+    _save({**state, "days": {**days, key: today}})
+    _send(event, data)
 
 
 def _get(obj: Any, key: str) -> Any:
@@ -148,7 +163,8 @@ def cart_filled(store: str, cart: Any, results: list[Any]) -> None:
             old[0].cancel()
         if not items:  # an emptied cart is not a filled one
             return
-        data = {"store": STORE_NAMES.get(store, store), "basket_total_dkk": total}
+        data: dict[str, Any] = {"store": STORE_NAMES.get(store, store)}
+        data["basket_total_dkk"] = total
         data["item_count"] = items
         timer = threading.Timer(QUIET, _flush, args=(store,))
         timer.daemon = True

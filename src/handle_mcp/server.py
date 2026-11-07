@@ -71,7 +71,7 @@ def _persons(persons: int | None) -> int | None:
 
 
 def _out(value: Any) -> dict[str, Any]:
-    telemetry.active()
+    telemetry.tool_called(sys._getframe(1).f_code.co_name)  # the tool that answers
     result = scrub(jsonable(value))
     return result if isinstance(result, dict) else {"result": result}
 
@@ -93,7 +93,7 @@ def _error_reason(store: str, exc: BaseException) -> str:
 async def _call(store: str, method: str, *args: Any) -> Any:
     try:
         if method == "cart":  # the cart with its tagged link (links.py)
-            return await links.cart(_store(store))
+            return await _logged_in_cart(_store(store))
         return await getattr(_store(store), method)(*args)
     except ToolError:
         raise
@@ -207,7 +207,14 @@ async def get_cart(store: str | None = None) -> dict:
     (e.g. no login) as {"error": ...} next to the others."""
     if store is not None:
         return _out(await _call(store, "cart"))
-    return _out(await _each(_names(None), links.cart))
+    return _out(await _each(_names(None), _logged_in_cart))
+
+
+async def _logged_in_cart(store: registry.Store) -> Any:
+    """The cart with its tagged link. Only a logged-in user gets a cart back: count the login."""
+    cart = await links.cart(store)
+    telemetry.login_ok(store.name)
+    return cart
 
 
 @mcp.tool(annotations=WRITE)

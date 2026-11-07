@@ -184,7 +184,7 @@ def no_telemetry(monkeypatch, tmp_path):
     """Tests never send an event. tests/test_telemetry.py turns it on with a fake sender."""
     monkeypatch.setenv("HANDLE_TELEMETRY", "0")
     monkeypatch.setattr(telemetry, "_off", False)
-    monkeypatch.setattr(telemetry, "_active_day", None)
+    monkeypatch.setattr(telemetry, "_sent_today", {})
     monkeypatch.setattr(telemetry, "_pending", {})
     monkeypatch.setattr(registry, "CONFIG_DIR", tmp_path / "config")
 
