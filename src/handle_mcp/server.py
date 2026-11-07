@@ -201,7 +201,8 @@ async def compare_basket(items: list[str], stores: list[str] | None = None) -> d
 
 @mcp.tool(annotations=READ)
 async def get_cart(store: str | None = None) -> dict:
-    """Show the cart: lines, fees, total and whether the minimum order is met. With `store`
+    """Show the cart: lines, fees, total, whether the minimum order is met and `url`, the
+    store's cart page where the human checks the cart and pays: give it to the human. With `store`
     that store's cart; without, every store's cart keyed by store name, a failing store
     (e.g. no login) as {"error": ...} next to the others."""
     if store is not None:
@@ -211,7 +212,7 @@ async def get_cart(store: str | None = None) -> dict:
 
 @mcp.tool(annotations=WRITE)
 async def set_cart_quantities(store: str, items: dict[str, int]) -> dict:
-    """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart."""
+    """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart with its `url`: give the human that link to check and pay."""
     if not items:
         raise ToolError("Ingen varer angivet.")
     if len(items) > MAX_ITEMS:
