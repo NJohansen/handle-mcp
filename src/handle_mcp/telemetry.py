@@ -97,7 +97,7 @@ def _state() -> dict[str, Any]:
 
 def _save(state: dict[str, Any]) -> None:
     path = _state_file()
-    path.parent.mkdir(parents=True, exist_ok=True)
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)  # the login folder: owner only
     path.write_text(json.dumps(state), encoding="utf-8")
 
 
