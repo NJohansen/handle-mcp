@@ -396,6 +396,7 @@ class NemligStore(RecipesMixin, OffersMixin):
         ]
         return Cart(
             store=self.name,
+            delivery_mode="home",
             lines=lines,
             products_total=products,
             fees=fees,
@@ -446,6 +447,7 @@ class NemligStore(RecipesMixin, OffersMixin):
         empty = not any(int(ln.get("Quantity") or 0) > 0 for ln in basket.get("Lines") or [])
         return StoreTerms(
             store=self.name,
+            delivery_mode="home",
             home_delivery=True,
             delivery_fee=_money(basket.get("DeliveryPrice")),
             other_fees={"poser (anslået)": _bag_fee()}
@@ -463,6 +465,7 @@ class NemligStore(RecipesMixin, OffersMixin):
         chosen = basket.get("FormattedDeliveryTime")
         return DeliveryInfo(
             store=self.name,
+            delivery_mode="home",
             chosen_start=_time(slot.get("Start")),
             chosen_end=_time(slot.get("End")),
             edit_deadline=_time(spot.get("EditDeadline")),

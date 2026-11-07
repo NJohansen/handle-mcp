@@ -60,7 +60,10 @@ STATUS = {  # Bilka's codes → the words the website shows
     "Faktureret": "Leveret",
     "Annulleret": "Annulleret",
 }
-NOT_HOME = "Kurven er sat til afhentning, ikke hjemlevering. Vælg hjemlevering på bilkatogo.dk."
+UNKNOWN_MODE = (
+    "BilkaToGo viser ikke, om kurven er sat til hjemlevering eller afhentning. "
+    "Vælg det på bilkatogo.dk."
+)
 
 
 GENERIC_OFFERS = {"Se Her"}  # offerDescription with no real text (docs/research.md)
@@ -85,9 +88,17 @@ def _today() -> date:
 
 
 def _is_home(address: dict) -> bool:
-    """Home addresses have a DAWA id or a recipient; pickup points (Bilka stores) do not.
-    ⚠ Confirm with a live home-delivery cart (docs/research.md)."""
+    """Home addresses have a DAWA id or a recipient; pickup points (Bilka stores) do not."""
     return bool(address.get("dawa_uid") or address.get("recipient_name"))
+
+
+def _mode(address: dict) -> tuple[str | None, str | None]:
+    """("home", None), ("pickup", "Bilka Vejle") or (None, None). Fails closed (docs/adr/0006):
+    on a home cart `name` is the customer's, so it is read only when nothing says home."""
+    if _is_home(address):
+        return "home", None
+    name = str(address.get("name") or "").strip()
+    return ("pickup", name) if address.get("sid") and name.startswith("Bilka") else (None, None)
 
 
 def _slot(day: str | None, start: str | None, end: str | None) -> tuple[datetime | None, ...]:
@@ -264,7 +275,7 @@ class BilkaStore(BilkaRecipesMixin):
         sid = str(address.get("sid") or "")
         if not sid:
             raise StoreError(
-                "Ingen leveringsadresse valgt i BilkaToGo. Vælg hjemlevering på bilkatogo.dk."
+                "Ingen adresse valgt i BilkaToGo. Vælg hjemlevering eller afhentning på bilkatogo.dk."
             )
         filters = f"isInAssortmentIn:{sid} AND nonsearchable:false"
         if offers:  # isInOffer is a list of store ids, not true/false
@@ -355,7 +366,8 @@ class BilkaStore(BilkaRecipesMixin):
         chosen_text = (data.get("deliveryDate") or {}).get("delivery_message") or None
         if _slot_ended(data):
             chosen_text = None  # the slot of a past order is no choice
-        warnings = [] if _is_home(address) else [NOT_HOME]
+        mode, pickup_store = _mode(address)
+        warnings = [] if mode else [UNKNOWN_MODE]
         if stat.get("minimum_left_text"):
             warnings.append(re.sub(r"<[^>]+>", "", stat["minimum_left_text"]))
         warnings += [
@@ -372,6 +384,8 @@ class BilkaStore(BilkaRecipesMixin):
             minimum_met=not stat.get("minimum_left"),
             delivery=chosen_text,
             warnings=warnings,
+            delivery_mode=mode,
+            pickup_store=pickup_store,
         )
 
     async def get_cart(self) -> Cart:
@@ -404,37 +418,50 @@ class BilkaStore(BilkaRecipesMixin):
 
     async def terms(self) -> StoreTerms:
         data = await self._cart_json()
-        cart, address = self._cart(data), data.get("deliveryAddress") or {}
+        cart = self._cart(data)
         return StoreTerms(
             store=self.name,
-            home_delivery=_is_home(address),
-            delivery_fee=cart.fees.get("levering"),
+            home_delivery=cart.delivery_mode == "home",
+            delivery_fee=self._fee(data, cart),
             other_fees={k: v for k, v in cart.fees.items() if k != "levering"},
             minimum_order=cart.minimum_order,
+            delivery_mode=cart.delivery_mode,
+            pickup_store=cart.pickup_store,
         )
+
+    def _fee(self, data: dict, cart: Cart) -> Decimal | None:
+        """Pickup is often free: a delivery_price of 0 is a known fee, not a missing one."""
+        stat = data.get("stat") or {}
+        if cart.delivery_mode == "pickup" and "delivery_price" in stat:
+            return _kr(stat["delivery_price"])
+        return cart.fees.get("levering")
 
     async def delivery_info(self) -> DeliveryInfo:
         data = await self._cart_json()
         address = data.get("deliveryAddress") or {}
         start, end = _chosen_slot(data)
         nxt = address.get("nextAvailableDeliveryDate")
+        mode, pickup_store = _mode(address)
         return DeliveryInfo(
             store=self.name,
             chosen_start=start,
             chosen_end=end,
             next_available=date.fromisoformat(nxt) if nxt else None,
-            note=None if _is_home(address) else NOT_HOME,
+            note=None if mode else UNKNOWN_MODE,
+            delivery_mode=mode,
+            pickup_store=pickup_store,
         )
 
     async def delivery_slots(self, days: int = 7) -> list[DeliverySlot]:
-        """GET shop/v3/AvailableDeliveryDates for the cart's address. Bilka has no price per
-        slot: the fee is the cart's flat delivery price. Never choose a slot here."""
+        """GET shop/v3/AvailableDeliveryDates for the cart's address or pickup store. Bilka has no
+        price per slot: the fee is the cart's flat one. Never choose a slot, store or mode here."""
         data, cart = await asyncio.gather(
             self._shop("GET", "shop/v3/AvailableDeliveryDates"), self._cart_json()
         )
-        if not _is_home(cart.get("deliveryAddress") or {}):
-            raise StoreError(NOT_HOME)
-        fee = self._cart(cart).fees.get("levering")
+        parsed = self._cart(cart)
+        if parsed.delivery_mode is None:
+            raise StoreError(UNKNOWN_MODE)
+        fee, pickup = self._fee(cart, parsed), parsed.delivery_mode == "pickup"
         unknown = (
             "" if fee is not None else "Gebyret er ukendt: kurven viser det ikke (tom kurv?). "
         )
@@ -454,7 +481,7 @@ class BilkaStore(BilkaRecipesMixin):
                         price=fee,
                         available=not iv.get("closed")
                         and bool(1 & (iv.get("availability_bit") or 0)),
-                        kind="Nat" if start.hour < 6 else None,
+                        kind="Afhentning" if pickup else "Nat" if start.hour < 6 else None,
                         note=(unknown + re.sub(r"<[^>]+>", "", info)).strip() or None,
                     )
                 )

@@ -73,6 +73,8 @@ class BasketQuote:
     minimum_order: Decimal | None
     minimum_met: bool | None
     notes: list[str] = field(default_factory=list)
+    delivery_mode: str | None = None  # "home", "pickup" or None (docs/adr/0006)
+    pickup_store: str | None = None
 
 
 def best_match(item: str, products: list[Any], on: date | None = None) -> BasketLine:
@@ -225,7 +227,10 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
     products_total = sum((ln.line_total for ln in found), Decimal(0))
     fees = {k: v for k, v in {"levering": terms.delivery_fee, **terms.other_fees}.items() if v}
     notes = [note] if note else []
-    if not terms.home_delivery and not note:
+    mode, pickup_store = get(terms, "delivery_mode"), get(terms, "pickup_store")
+    if mode == "pickup":
+        notes.append(f"Afhentning i {pickup_store}: du henter selv varerne.")
+    elif not terms.home_delivery and not note:
         notes.append("Kurven er ikke sat til hjemlevering.")
     minimum = terms.minimum_order
     if minimum is not None and 0 < products_total < minimum:  # in words, for the human
@@ -240,6 +245,8 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
         minimum_order=minimum,
         minimum_met=None if minimum is None else products_total >= minimum,
         notes=notes,
+        delivery_mode=mode,
+        pickup_store=pickup_store,
     )
 
 

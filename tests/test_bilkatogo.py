@@ -13,7 +13,7 @@ from handle_mcp import server
 from handle_mcp import stores as registry
 from handle_mcp.stores import StoreError, _http
 from handle_mcp.stores import bilkatogo as bilka_module
-from handle_mcp.stores.bilkatogo import NOT_HOME, BilkaStore
+from handle_mcp.stores.bilkatogo import UNKNOWN_MODE, BilkaStore
 
 FIXTURES = Path(__file__).parent / "fixtures" / "bilkatogo"
 
@@ -237,17 +237,41 @@ async def test_home_delivery_cart(store):
     assert cart.fees == {"levering": Decimal("39.00"), "pakkeservice": Decimal("39.00")}
     assert cart.total == Decimal("166.00")
     assert (cart.minimum_order, cart.minimum_met) == (Decimal("500.00"), False)
-    assert NOT_HOME not in cart.warnings
+    assert UNKNOWN_MODE not in cart.warnings
+    assert (cart.delivery_mode, cart.pickup_store) == ("home", None)
     assert cart.warnings[0].startswith("373,00 kr. fra minimumskøb")  # HTML tags removed
     names = [ln.name for ln in cart.lines]
     assert "Papirpose" not in names and "Pakkeservice" not in names  # fees, not products
 
 
-async def test_pickup_cart_warns(store, fake):
-    fake.cart = fixture("cart_logged_in")
+async def test_pickup_cart(store, fake):
+    fake.cart = fixture("cart_logged_in")  # a pickup cart: no DAWA id, no recipient
     cart = await store.get_cart()
-    assert NOT_HOME in cart.warnings
-    assert not (await store.terms()).home_delivery
+    assert (cart.delivery_mode, cart.pickup_store) == ("pickup", "Bilka Vejle")
+    assert UNKNOWN_MODE not in cart.warnings
+    terms = await store.terms()
+    assert (terms.home_delivery, terms.delivery_fee) == (False, Decimal(0))  # free, not unknown
+    assert (terms.delivery_mode, terms.pickup_store) == ("pickup", "Bilka Vejle")
+    info = await store.delivery_info()
+    assert (info.delivery_mode, info.pickup_store, info.note) == ("pickup", "Bilka Vejle", None)
+
+
+@pytest.mark.parametrize(
+    "address",
+    [
+        {"sid": "1661", "name": "Anders And", "recipient_name": "", "dawa_uid": None},
+        {"name": "Bilka Vejle"},  # no store id
+    ],
+)
+async def test_unknown_mode_fails_closed(store, fake, address):
+    """A name is read as a store only when it is one: on a home cart it is the customer's."""
+    fake.cart = {**fixture("cart_logged_in"), "deliveryAddress": address}
+    cart = await store.get_cart()
+    assert (cart.delivery_mode, cart.pickup_store) == (None, None)
+    assert UNKNOWN_MODE in cart.warnings
+    assert (await store.delivery_info()).note == UNKNOWN_MODE
+    with pytest.raises(StoreError, match="hjemlevering eller afhentning"):
+        await store.delivery_slots()
 
 
 async def test_set_quantities_ok_refused_and_limited(store):
@@ -417,6 +441,12 @@ async def test_delivery_slots_flat_fee_and_night_slots(store, fake):
     assert wed.note.startswith("Levering vil ske natten til onsdag.") and "<" not in wed.note
     call = next(r for r in fake.requests if r.url.path.endswith("AvailableDeliveryDates"))
     assert call.method == "GET"
+
+
+async def test_pickup_slots(store, fake):
+    fake.cart = fixture("cart_logged_in")
+    wed = (await store.delivery_slots(days=7))[1]
+    assert (wed.kind, wed.price) == ("Afhentning", Decimal(0))
 
 
 async def test_delivery_slots_keep_exactly_days(store, monkeypatch):
