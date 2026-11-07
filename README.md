@@ -40,8 +40,8 @@ Taste, budget and meal rules live in your own prompt or skill. The server finds 
 ## Try it
 
 ```sh
-uvx --from git+https://github.com/NJohansen/handle-mcp@v1.3.0 handle-mcp login nemlig
-claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp@v1.3.0 handle-mcp
+uvx --from git+https://github.com/NJohansen/handle-mcp@v1.4.0 handle-mcp login nemlig
+claude mcp add handle -- uvx --from git+https://github.com/NJohansen/handle-mcp@v1.4.0 handle-mcp
 ```
 
 Then ask:
