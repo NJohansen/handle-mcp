@@ -75,7 +75,17 @@ async def test_every_tool_answers_json_without_personal_data(tool, args):
         (
             "set_cart_quantities",
             {"store": "fake", "items": {"1": "mange"}},
-            "Input should be a valid integer",  # the SDK's own argument check
+            "Antal skal være et helt tal",
+        ),
+        (
+            "set_cart_quantities",
+            {"store": "fake", "items": {"1": "2_0"}},  # int() reads 20
+            "Antal skal være et helt tal",
+        ),
+        (
+            "set_cart_quantities",
+            {"store": "fake", "items": {"1": True}},  # int() reads 1
+            "Antal skal være et helt tal",
         ),
         (
             "add_recipe_to_cart",

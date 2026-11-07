@@ -129,12 +129,17 @@ def test_money_that_cannot_be_quantized_is_still_shown():
         "Levering til Kildevej 12B",
         "Levering til H.C. Andersens Boulevard 2",
         "2100 København Ø",
+        "Levering til Strandvejen 3",  # definite forms
+        "Levering til Søndergaden 5",
+        "Levering til Birkealléen 7B",
+        "Levering til Rådhuspladsen 1",
+        "Levering til Åboulevarden 12",
     ],
 )
 def test_scrub_text_removes_contact_and_address(text):
     out = scrub_text(text)
     assert REDACTED in out
-    for word in ("anders@", "98 76", "98765432", "Kildevej", "Boulevard 2", "2100"):
+    for word in ("anders@", "98 76", "98765432", "Kildevej", "Boulevard 2", "2100", "en 3"):
         assert word not in out
 
 
@@ -147,6 +152,7 @@ def test_scrub_text_removes_contact_and_address(text):
         "Varen 5064654 er udsolgt",
         "EAN 5701234567890",
         "Bestil senest 04/11 kl. 23:59",
+        "Levering til Nytorvet i morgen",
     ],
 )
 def test_scrub_text_leaves_store_messages_alone(text):
@@ -165,6 +171,10 @@ def test_free_text_under_harmless_keys_is_scrubbed():
     text = json.dumps(out, ensure_ascii=False)
     for word in ("98765432", "Kildevej 12", "2100", "anders@"):
         assert word not in text
+
+
+def test_notes_are_free_text():
+    assert scrub({"notes": "Stil den ved Søndergaden 5"}) == {"notes": f"Stil den ved {REDACTED}"}
 
 
 def test_free_text_in_dicts_under_a_free_text_key_is_scrubbed():
