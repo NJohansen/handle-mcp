@@ -15,6 +15,6 @@ No install id. A random id saved on the user's machine is pseudonymous personal 
 
 - A cart counts once after 5 minutes without changes (a model fills a cart in many calls). A cart changed again an hour later counts again. An emptied cart and a cart with a refused line do not count.
 - Weekly active machines and retention are estimates, not exact. Daily events count machine-days.
-- `login_ok` means a store sent back the user's cart; a login that is never used is not counted. `first_tool_call` counts only a tool that answered.
+- `login_ok` means a store sent back the user's cart; a login that is never used is not counted. `first_tool_call` counts a call when it starts, also one that fails (e.g. no login): the user tried. Its file read and write run once a day on the event loop; a tiny local file, accepted.
 - Sends run in a daemon thread with a 2 s timeout. Every error is logged at debug level and never reaches a tool. Waiting carts are sent when the server stops.
 - Tests and CI never send: `tests/conftest.py` sets `HANDLE_TELEMETRY=0`.
