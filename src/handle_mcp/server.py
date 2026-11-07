@@ -272,7 +272,8 @@ async def add_recipe_to_cart(
 
 @_tool(READ)
 async def get_delivery_info(store: str) -> dict:
-    """Show the chosen delivery time, edit deadline and next free day, plus fees and minimum order."""
+    """Show the chosen delivery time, edit deadline and next free day, plus fees and minimum order.
+    `delivery_mode` is "home", "pickup" (BilkaToGo, with `pickup_store`) or null when unknown."""
     info, terms = await asyncio.gather(_call(store, "delivery_info"), _call(store, "terms"))
     return _out({"delivery": info, "terms": terms})
 
@@ -281,8 +282,9 @@ async def get_delivery_info(store: str) -> dict:
 async def list_delivery_slots(stores: list[str] | None = None, days: int = 7) -> dict:
     """List free delivery times for the next `days` days with the delivery fee per slot, in time
     order, plus the 3 cheapest per store. nemlig: "Personlig" (you are home) or "Fleksibel"
-    (left at the door). BilkaToGo: one flat fee, night delivery. Only reads: it never chooses
-    a time. The human chooses the time on the store's website."""
+    (left at the door). BilkaToGo: one flat fee, night delivery, or pickup times ("Afhentning")
+    when the cart is set to pickup. Only reads: it never chooses a time, store or mode. The
+    human chooses on the store's website."""
     days = max(1, min(days, MAX_DAYS))
     return _out(await _each(_names(stores), lambda s: _slots(s, days)))
 
