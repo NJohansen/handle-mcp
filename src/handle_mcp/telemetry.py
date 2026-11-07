@@ -2,7 +2,8 @@
 
 No id, no names, no addresses, no logins, no products, no order ids (docs/adr/0005). The only
 file is `telemetry.json` in the config folder: the notice was shown, the last day each
-daily event went out, and which stores have a counted cart that is not empty yet. The funnel: server_started, first_tool_call, login_ok, cart_filled.
+daily event went out, and which stores have a counted cart that is not empty yet.
+The funnel: server_started, first_tool_call, login_ok, cart_filled.
 Off with HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or `--no-telemetry`.
 Every send runs in a background thread with a short timeout. A failure is logged, never raised.
 """
@@ -227,7 +228,7 @@ def cart_filled(store: str, cart: Any, results: list[Any]) -> None:
 def cart_seen(store: str, cart: Any) -> None:
     """Every cart read. An empty cart means the order went through (or the human cleared it on
     the store's site): a cart still waiting counts now, and the store is unlocked."""
-    if basket(cart)[1]:
+    if not enabled() or basket(cart)[1]:
         return
     _flush(store)
     _update(lambda state: _with_counted(state, _counted(state) - {store}))

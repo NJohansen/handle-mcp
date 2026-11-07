@@ -121,6 +121,13 @@ async def test_the_daily_file_write_and_the_lock_do_not_lose_each_other(sent):
     assert state["counted"] == ["fake"] and "server_started" in state["days"]
 
 
+async def test_off_means_an_empty_cart_read_touches_no_file(sent, monkeypatch):
+    monkeypatch.setenv("HANDLE_TELEMETRY", "0")
+    server._store("fake").cart.clear()
+    await server.get_cart("fake")
+    assert not (registry.CONFIG_DIR / "telemetry.json").exists()
+
+
 async def test_reading_a_full_cart_keeps_the_lock(sent):
     await fill()
     await server.get_cart("fake")
