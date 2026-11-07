@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import sys
 from collections.abc import Awaitable, Callable
 from typing import Any, Literal
 
@@ -16,7 +15,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
-from handle_mcp import compare, recipe_cart
+from handle_mcp import cli, compare, links, recipe_cart, telemetry
 from handle_mcp import stores as registry
 from handle_mcp.privacy import jsonable, scrub, scrub_text
 
@@ -41,7 +40,8 @@ mcp = MCPServer(
     instructions=(
         "Tools for Danish grocery stores with home delivery. You can search, compare "
         "baskets, find recipes, list delivery times and change cart quantities. You can never order or pay: the human "
-        "always does that on the store's website."
+        "always does that on the store's website. An answer with `telemetry_notice` says "
+        "what handle-mcp counts anonymously: tell the human in one sentence, once."
     ),
 )
 
@@ -70,9 +70,17 @@ def _persons(persons: int | None) -> int | None:
     return None if persons is None else max(MIN_PERSONS, min(persons, MAX_PERSONS))
 
 
+def _tool(annotations: ToolAnnotations) -> Callable[[Callable], Callable]:
+    """`mcp.tool`, and count the day's first tool call (telemetry.counted)."""
+    return lambda fn: mcp.tool(annotations=annotations)(telemetry.counted(fn))
+
+
 def _out(value: Any) -> dict[str, Any]:
     result = scrub(jsonable(value))
-    return result if isinstance(result, dict) else {"result": result}
+    result = result if isinstance(result, dict) else {"result": result}
+    if notice := telemetry.notice():  # once: the model tells the human what is counted
+        result["telemetry_notice"] = notice
+    return result
 
 
 def _error_text(store: str, exc: BaseException) -> str:
@@ -91,6 +99,8 @@ def _error_reason(store: str, exc: BaseException) -> str:
 
 async def _call(store: str, method: str, *args: Any) -> Any:
     try:
+        if method == "cart":  # the cart with its tagged link (links.py)
+            return await links.cart(_store(store))
         return await getattr(_store(store), method)(*args)
     except ToolError:
         raise
@@ -107,7 +117,7 @@ async def _each(names: list[str], work: Callable[[Any], Awaitable[Any]]) -> dict
     }
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def search_products(
     query: str,
     stores: list[str] | None = None,
@@ -121,7 +131,7 @@ async def search_products(
     return _out(await _each(_names(stores), lambda s: compare.search(s, query, limit, sort)))
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def search_recipes(query: str, stores: list[str] | None = None, limit: int = 5) -> dict:
     """Find the stores' own recipes, e.g. "kylling karry". Returns name and link.
     Use get_recipe for time, persons and the products to buy.
@@ -130,7 +140,7 @@ async def search_recipes(query: str, stores: list[str] | None = None, limit: int
     return _out(await _each(_names(stores), lambda s: s.recipes(query, limit)))
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def get_recipe(store: str, recipe: str, persons: int | None = None) -> dict:
     """The products to buy for one of the store's recipes, as on its "Se varer og læg i kurv":
     per ingredient the store's product, packs for `persons` and alternatives. `have_at_home`
@@ -143,7 +153,7 @@ async def get_recipe(store: str, recipe: str, persons: int | None = None) -> dic
     return _out(await _call(store, "recipe", recipe, _persons(persons)))
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def list_recipes(
     stores: list[str] | None = None,
     tags: list[str] | None = None,
@@ -166,7 +176,7 @@ async def list_recipes(
     )
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def list_offers(stores: list[str] | None = None, limit: int = 25) -> dict:
     """List this week's offers in each store, also items you would not search for: nemlig's
     Skarp pris, Priskup, Dagstilbud, Undgå madspild and gifts; BilkaToGo's offers. `limit` is
@@ -177,7 +187,7 @@ async def list_offers(stores: list[str] | None = None, limit: int = 25) -> dict:
     return _out(await _each(_names(stores), lambda s: s.offers(limit)))
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def compare_basket(items: list[str], stores: list[str] | None = None) -> dict:
     """Price a shopping list in each store, e.g. ["2 x letmælk 1 l", "rugbrød", "æg 10 stk"].
     Write the amount you need ("fior di latte 300 g"), not a pack size. Returns per item a
@@ -196,19 +206,20 @@ async def compare_basket(items: list[str], stores: list[str] | None = None) -> d
     return _out({"stores": quotes, **compare.verdict(quotes)})
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def get_cart(store: str | None = None) -> dict:
-    """Show the cart: lines, fees, total and whether the minimum order is met. With `store`
+    """Show the cart: lines, fees, total, whether the minimum order is met and `url`, the
+    store's cart page where the human checks the cart and pays: give it to the human. With `store`
     that store's cart; without, every store's cart keyed by store name, a failing store
     (e.g. no login) as {"error": ...} next to the others."""
     if store is not None:
-        return _out(await _call(store, "get_cart"))
-    return _out(await _each(_names(None), lambda s: s.get_cart()))
+        return _out(await _call(store, "cart"))
+    return _out(await _each(_names(None), links.cart))
 
 
-@mcp.tool(annotations=WRITE)
+@_tool(WRITE)
 async def set_cart_quantities(store: str, items: dict[str, int]) -> dict:
-    """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart."""
+    """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart with its `url`: give the human that link to check and pay."""
     if not items:
         raise ToolError("Ingen varer angivet.")
     if len(items) > MAX_ITEMS:
@@ -217,10 +228,12 @@ async def set_cart_quantities(store: str, items: dict[str, int]) -> dict:
     if bad:
         raise ToolError(f"Antal skal være 0-{MAX_QUANTITY}. Forkert for: {', '.join(bad)}.")
     results = await _call(store, "set_quantities", dict(items))
-    return _out({"results": results, "cart": await _call(store, "get_cart")})
+    cart = await _call(store, "cart")
+    telemetry.cart_filled(store, cart, results)
+    return _out({"results": results, "cart": cart})
 
 
-@mcp.tool(annotations=ADD)
+@_tool(ADD)
 async def add_recipe_to_cart(
     store: str,
     recipe: str,
@@ -252,17 +265,19 @@ async def add_recipe_to_cart(
         raise ToolError(f"Højst {MAX_QUANTITY} stk. pr. vare. For mange af: {', '.join(bad)}.")
     results = await _call(store, "set_quantities", targets)
     added = recipe_cart.report(lines, before, results)
-    return _out({"added": added, "skipped": skipped, "cart": await _call(store, "get_cart")})
+    cart = await _call(store, "cart")
+    telemetry.cart_filled(store, cart, results)
+    return _out({"added": added, "skipped": skipped, "cart": cart})
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def get_delivery_info(store: str) -> dict:
     """Show the chosen delivery time, edit deadline and next free day, plus fees and minimum order."""
     info, terms = await asyncio.gather(_call(store, "delivery_info"), _call(store, "terms"))
     return _out({"delivery": info, "terms": terms})
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def list_delivery_slots(stores: list[str] | None = None, days: int = 7) -> dict:
     """List free delivery times for the next `days` days with the delivery fee per slot, in time
     order, plus the 3 cheapest per store. nemlig: "Personlig" (you are home) or "Fleksibel"
@@ -280,33 +295,21 @@ async def _slots(store: registry.Store, days: int) -> dict:
     return {"cheapest": cheapest, "slots": slots}
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def get_orders(store: str, limit: int = 10) -> dict:
     """List recent orders in one store (newest first). Use get_order for the lines."""
     limit = max(1, min(limit, MAX_RESULTS))
     return _out({"orders": await _call(store, "orders", limit)})
 
 
-@mcp.tool(annotations=READ)
+@_tool(READ)
 async def get_order(store: str, order_id: str) -> dict:
     """Show one order with what was bought."""
     return _out(await _call(store, "order", order_id))
 
 
-def configure_logging() -> None:
-    """Log to stderr. httpx logs every request URL at INFO, and URLs can hold ids and
-    tokens. MCP clients keep stderr in log files, so httpx only speaks on warnings."""
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-
-
 def main() -> None:
-    configure_logging()
-    if len(sys.argv) > 1:  # `handle-mcp login <store>` from a terminal, not from an MCP client
-        from handle_mcp.cli import run
-
-        sys.exit(run(sys.argv[1:]))
-    mcp.run("stdio")
+    cli.main(mcp)
 
 
 if __name__ == "__main__":

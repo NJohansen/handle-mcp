@@ -41,6 +41,7 @@ class StoreError(Exception):
 
 class Store(Protocol):
     name: str
+    cart_page: str  # the store's cart page, where the human pays: gets UTM tags (links.py)
 
     async def search(self, query: str, limit: int = 10) -> list[Product]: ...
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]: ...

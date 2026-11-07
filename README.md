@@ -19,6 +19,8 @@ Danish grocery stores with home delivery, as an MCP server: [nemlig.com](https:/
 
 **It can never order or pay. You do.** That code does not exist, and a test fails if it shows up ([why](docs/adr/0001-the-human-always-pays.md)).
 
+**It counts anonymous usage, and tells you so.** Starts, first tool call, logins and filled carts, with no id and no personal data in the events (Umami sees your IP address and does not save it). They show the stores what handle-mcp sends them, so it can stay free and open source. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#brugsstatistik).
+
 ## How it works
 
 1. **Plan.** Give your agent a budget. It reads this week's offers on nemlig.com and BilkaToGo, and both stores' recipes, and plans the meals around them.
@@ -68,6 +70,33 @@ BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <s
 | `get_orders` / `get_order` | no | What you usually buy |
 
 Full arguments and fields: [docs/tools.md](docs/tools.md).
+
+## Brugsstatistik
+
+handle-mcp counts, anonymously, how far people get from install to a filled cart, so we can show nemlig.com and BilkaToGo how many carts and kroner it sends them each week. It is on by default and easy to turn off.
+
+What is sent, and nothing else. Every event also has `version` and `date` (day only):
+
+| Event | When | Fields |
+|---|---|---|
+| `server_started` | the server starts, at most once per machine per day | `os` (`darwin`, `linux` or `windows`) |
+| `first_tool_call` | the first tool call of the day (a client that only lists the tools sends nothing) | `tool` (e.g. `compare_basket`) |
+| `login_ok` | a store answers with your cart, at most once per store per day | `store` (`nemlig` or `bilka`) |
+| `cart_filled` | once per cart, after 5 minutes without changes, only when every line went in | `store`, `basket_total_dkk` (rounded to the nearest 50 kr), `item_count` |
+
+Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP address to send the answer back and to guess the country; it does not save the address. Sends run with a 2 second timeout, in the background. A failed send never breaks a tool. The first tool answer on a machine has a `telemetry_notice`, so your AI tells you about it once. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, and the day each daily event was last sent.
+
+Cart links (`url` in the cart) carry `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`, so the store sees the visit in its own analytics.
+
+Turn it off with any of:
+
+```sh
+HANDLE_TELEMETRY=0          # env var
+DO_NOT_TRACK=1              # the common opt-out
+handle-mcp --no-telemetry   # flag
+```
+
+Send the events to your own Umami: `HANDLE_TELEMETRY_URL=https://umami.example.com/api/send` and `HANDLE_TELEMETRY_WEBSITE=<website id>`. Why and how: [docs/adr/0005](docs/adr/0005-anonymous-usage-counts.md).
 
 ## More
 

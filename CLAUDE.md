@@ -16,12 +16,14 @@ A local MCP server (stdio) for Danish grocery stores with home delivery. Goal an
 ```
 src/handle_mcp/
   server.py        all tools, store selection, error handling
-  cli.py           `handle-mcp login <store>`: logins into the OS keychain
+  cli.py           `handle-mcp` entry: stdio server or `login <store>` (logins into the OS keychain)
   compare.py       compare_basket: best product per item, cheapest store
   candidates.py    the products per item the caller picks from, with flags
   match.py         words: does this product match the item?
   pricing.py       kroner: packs for the amount, offers, delivery day
   recipe_cart.py   add_recipe_to_cart: a recipe's products as absolute cart counts
+  links.py         with_utm(): UTM tags on every cart link the human clicks
+  telemetry.py     anonymous counts (cart_filled, active); off with HANDLE_TELEMETRY=0
   models.py        dataclasses; money is Decimal DKK
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES

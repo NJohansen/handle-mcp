@@ -18,7 +18,7 @@ async def test_server_starts_over_stdio_and_lists_tools(tmp_path):
     params = StdioServerParameters(
         command=sys.executable,
         args=["-m", "handle_mcp.server"],
-        env={"HANDLE_CONFIG_DIR": str(tmp_path)},  # no real logins
+        env={"HANDLE_CONFIG_DIR": str(tmp_path), "HANDLE_TELEMETRY": "0"},  # no logins, no events
     )
     async with stdio_client(params) as (read, write), ClientSession(read, write) as session:
         await session.initialize()
