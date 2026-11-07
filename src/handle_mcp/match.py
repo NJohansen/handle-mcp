@@ -1,6 +1,6 @@
 """Matching a shopping-list item to a store product, by words only. No money here.
 
-- "2 x rugbrød" means quantity 2. A size like "1,5 kg" is the amount wanted.
+- "2 x rugbrød" means quantity 2. A size like "1,5 kg" or "1/2 dl" is the amount wanted.
 - A product matches well when every word of the item is a whole word in its name.
 - A word only after "m.", "m", "med", "i", "u." ... is a flavour, not the product: "Yoghurt m. banan"
   is not a banana. Such products never win, unless the item asks for it: "makrel i tomat".
@@ -32,8 +32,11 @@ UNITS = {
 
 PIECES = ("stk", "rl")  # counted things: '2 x køkkenrulle' is 2 packs of rolls, like pieces
 
+VULGAR = {"½": (1, 2), "⅓": (1, 3), "⅔": (2, 3), "¼": (1, 4), "¾": (3, 4), "⅛": (1, 8)}
+# An amount: "1 1/2", "1/2", "1½", "1 ½", "½", "1,5", "1.5" or "2". Recipes write fractions.
+_AMOUNT = rf"\d+ +\d+/\d+|\d+/\d+|(?:\d+ ?)?[{''.join(VULGAR)}]|\d+(?:[.,]\d+)?"
 SIZE_RE = re.compile(
-    r"(?:(\d+)\s*[x×]\s*)?(\d+(?:[.,]\d+)?)\s*(" + "|".join(UNITS) + r")\b", re.IGNORECASE
+    rf"(?:(\d+)\s*[x×]\s*)?({_AMOUNT})\s*(" + "|".join(UNITS) + r")\b", re.IGNORECASE
 )
 
 # "m" without a dot too: nemlig writes "Mini frugtstænger m blåbær".
@@ -82,7 +85,20 @@ def parse_size(text: str | None) -> tuple[str, Decimal] | None:
         return None
     count, amount, unit = match.groups()
     base, factor = UNITS[unit.lower()]
-    return base, Decimal(amount.replace(",", ".")) * factor * int(count or 1)
+    value = _amount(amount)
+    return None if value is None else (base, value * factor * int(count or 1))
+
+
+def _amount(text: str) -> Decimal | None:
+    """'1 1/2' → 1.5, '½' → 0.5, '1,5' → 1.5. None for '1/0'."""
+    whole, _, rest = text.strip().rpartition(" ") if "/" in text else ("", "", text)
+    if rest[-1] in VULGAR:
+        whole, (num, den) = rest[:-1], VULGAR[rest[-1]]
+    elif "/" in rest:
+        num, den = (int(n) for n in rest.split("/"))
+    else:
+        return Decimal(rest.replace(",", "."))
+    return None if den == 0 else Decimal(whole.strip() or 0) + Decimal(num) / Decimal(den)
 
 
 def parse_item(item: str) -> tuple[int, list[str], tuple[str, Decimal] | None]:
