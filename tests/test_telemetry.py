@@ -98,6 +98,29 @@ async def test_reading_an_empty_cart_unlocks(sent):
     assert names(sent).count("cart_filled") == 2
 
 
+async def test_an_order_after_checkout_counts_without_a_read_first(sent):
+    await fill()
+    server._store("fake").cart.clear()  # paid on the store's site; no tool read the cart
+    await fill()  # the model fills next week's cart straight away
+    assert names(sent).count("cart_filled") == 2
+
+
+async def test_a_cart_paid_before_30_minutes_still_counts(sent):
+    await server.set_cart_quantities("fake", {"2": 3})
+    server._store("fake").cart.clear()  # paid at once
+    await server.get_cart("fake")
+    assert names(sent).count("cart_filled") == 1
+    await fill()
+    assert names(sent).count("cart_filled") == 2
+
+
+async def test_the_daily_file_write_and_the_lock_do_not_lose_each_other(sent):
+    await fill()
+    telemetry.start()
+    state = json.loads((registry.CONFIG_DIR / "telemetry.json").read_text())
+    assert state["counted"] == ["fake"] and "server_started" in state["days"]
+
+
 async def test_reading_a_full_cart_keeps_the_lock(sent):
     await fill()
     await server.get_cart("fake")

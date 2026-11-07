@@ -49,7 +49,8 @@ Læs mere: https://github.com/NJohansen/handle-mcp#brugsstatistik
 _off = False
 _noticed = False  # notice() asked the file once in this process
 _sent_today: dict[str, str] = {}  # event key -> day, so the file is read once per day
-_lock = threading.Lock()
+_lock = threading.Lock()  # _pending
+_file_lock = threading.Lock()  # telemetry.json: the timer thread and the event loop both write
 _pending: dict[str, tuple[threading.Timer, dict[str, Any]]] = {}
 
 
@@ -96,6 +97,13 @@ def _state() -> dict[str, Any]:
     return state if isinstance(state, dict) else {}
 
 
+def _update(change: Callable[[dict[str, Any]], dict[str, Any] | None]) -> None:
+    """Read, change and write the file in one step. `change` returns None to leave it as is."""
+    with _file_lock:
+        if (new := change(_state())) is not None:
+            _save(new)
+
+
 def _save(state: dict[str, Any]) -> None:
     path = _state_file()
     path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)  # the login folder: owner only
@@ -120,10 +128,11 @@ def notice() -> str | None:
         return None
     _noticed = True
     try:
-        state = _state()
-        if state.get("notice_shown"):
-            return None
-        _save({**state, "notice_shown": True})
+        with _file_lock:
+            state = _state()
+            if state.get("notice_shown"):
+                return None
+            _save({**state, "notice_shown": True})
     except Exception:
         log.debug("telemetry notice failed", exc_info=True)
         return None
@@ -161,12 +170,19 @@ def _daily(event: str, data: dict[str, Any], key: str | None = None) -> None:
     if _sent_today.get(key) == today or not enabled():
         return
     _sent_today[key] = today
-    state = _state()
-    days = state.get("days") if isinstance(state.get("days"), dict) else {}
-    if days.get(key) == today:
-        return
-    _save({**state, "days": {**days, key: today}})
-    _send(event, data)
+    new = False
+
+    def mark(state: dict[str, Any]) -> dict[str, Any] | None:
+        nonlocal new
+        days = state.get("days") if isinstance(state.get("days"), dict) else {}
+        if days.get(key) == today:
+            return None
+        new = True
+        return {**state, "days": {**days, key: today}}
+
+    _update(mark)
+    if new:
+        _send(event, data)
 
 
 def _get(obj: Any, key: str) -> Any:
@@ -182,17 +198,18 @@ def basket(cart: Any) -> tuple[int, int]:
 
 @_safe
 def cart_filled(store: str, cart: Any, results: list[Any]) -> None:
-    """A cart changed. A model fills a cart in many calls, and the human edits it after, so:
-    the event waits until the cart is quiet for QUIET seconds, then the store is locked and
-    edits send nothing. An empty cart (after checkout) unlocks it: the next order counts.
-    Counted only when every line went in."""
+    """A cart changed. Counted once per order, only when every line went in: the event waits
+    for QUIET seconds without changes, then the store is locked until a read sees it empty."""
     if not enabled() or not all(_get(r, "ok") for r in results):
         return
     total, items = basket(cart)
-    if not items:  # an emptied cart is not a filled one
-        cart_seen(store, cart)
+    if not items:  # the human had the cart emptied: not a filled one, and not an order
+        with _lock:
+            if old := _pending.pop(store, None):
+                old[0].cancel()
+        _update(lambda state: _with_counted(state, _counted(state) - {store}))
         return
-    if store in _counted():
+    if store in _counted(_state()):
         return
     with _lock:
         if old := _pending.pop(store, None):
@@ -208,21 +225,28 @@ def cart_filled(store: str, cart: Any, results: list[Any]) -> None:
 
 @_safe
 def cart_seen(store: str, cart: Any) -> None:
-    """Every cart read. An empty cart means the order went through or was cleared: unlock."""
+    """Every cart read. An empty cart means the order went through (or the human cleared it on
+    the store's site): a cart still waiting counts now, and the store is unlocked."""
     if basket(cart)[1]:
         return
-    with _lock:
-        if old := _pending.pop(store, None):
-            old[0].cancel()
-    if store in (counted := _counted()):
-        state = _state()
-        _save({**state, "counted": sorted(counted - {store})})
+    _flush(store)
+    _update(lambda state: _with_counted(state, _counted(state) - {store}))
 
 
-def _counted() -> set[str]:
+def locked(store: str) -> bool:
+    """The store's cart was counted and no tool has seen it empty since. The server then reads
+    the cart before a write, so a new order after checkout is not missed."""
+    return enabled() and store in _counted(_state())
+
+
+def _counted(state: dict[str, Any]) -> set[str]:
     """Stores whose cart was counted and has not been empty since. Store names, never an id."""
-    value = _state().get("counted")
+    value = state.get("counted")
     return {str(s) for s in value} if isinstance(value, list) else set()
+
+
+def _with_counted(state: dict[str, Any], stores: set[str]) -> dict[str, Any] | None:
+    return None if stores == _counted(state) else {**state, "counted": sorted(stores)}
 
 
 @_safe
@@ -231,8 +255,7 @@ def _flush(store: str, wait: bool = False) -> None:
         entry = _pending.pop(store, None)
     if entry:
         entry[0].cancel()
-        state = _state()
-        _save({**state, "counted": sorted(_counted() | {store})})
+        _update(lambda state: _with_counted(state, _counted(state) | {store}))
         _send("cart_filled", entry[1], wait)
 
 
