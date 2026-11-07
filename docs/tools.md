@@ -11,8 +11,8 @@
 | `get_cart(store?)` | no | nemlig, BilkaToGo | Cart lines, fees, total, minimum order, `url` (the cart page with UTM tags). Without `store`: every store's cart, keyed by store name |
 | `set_cart_quantities(store, items)` | **yes** | nemlig, BilkaToGo | Absolute quantities (0 removes). Only the cart. Returns the new cart with `url` |
 | `add_recipe_to_cart(store, recipe, persons?, skip?, swap?, include?)` | **yes** | nemlig, BilkaToGo | A recipe's products from `get_recipe` into the cart, added to what is there (twice adds twice). Ask first. `have_at_home` items only with `include`; `skip` and `swap` (to an alternative's id) by ingredient or product id. Answers before/added/after per product and what was skipped (sold out, have at home, left out) |
-| `get_delivery_info(store)` | no | nemlig, BilkaToGo | Chosen delivery time, next free day, fees |
-| `list_delivery_slots(stores?, days?)` | no | nemlig, BilkaToGo | Free delivery times with the fee per slot, the 3 cheapest first |
+| `get_delivery_info(store)` | no | nemlig, BilkaToGo | Chosen delivery time, next free day, fees, `delivery_mode` (`home`, `pickup` or `null`) and `pickup_store`. BilkaToGo can be pickup, see [ADR 0006](adr/0006-pickup-is-a-delivery-mode.md) |
+| `list_delivery_slots(stores?, days?)` | no | nemlig, BilkaToGo | Free delivery times with the fee per slot, the 3 cheapest first. BilkaToGo pickup carts: pickup times, `kind: "Afhentning"` |
 | `get_orders(store)` / `get_order(store, id)` | no | nemlig, BilkaToGo | Past orders, for "what we usually buy" |
 
 Money is a string in kroner with two decimals (`"12.95"`, `"39.00"`) in every store. Dates are ISO. A fact the store does not give is `null`, never left out.

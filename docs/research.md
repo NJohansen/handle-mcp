@@ -20,7 +20,7 @@ Skrevet før de første live kald. Punkter markeret **⚠ live** er stadig ikke 
 | Valgt tid | `GET /webapi/Order/DeliverySpot` → `TimeSlot` | Kurvens `deliveryDate` → `intervalStart/End` |
 | Gebyrer fra API | Ja: `DeliveryPrice` i kurv | Ja: `stat.delivery_price`, `stat.packing` (Pakkeservice) |
 | Minimumskøb fra API | Ja: `MinimumOrderTotal`, `IsMinTotalValid` | Ja: `stat.minimum_left`, `deliveryAddress.minimum_buy` |
-| Hjemlevering eller afhentning | Altid hjemlevering | Kurven har `hd_available`, `missing_hd_address` |
+| Hjemlevering eller afhentning | Altid hjemlevering | Kurven har `hd_available`, `missing_hd_address`. Hjem: `dawa_uid` eller `recipient_name`. Afhentning: `sid` og `name` "Bilka …" (ADR 0006) |
 | EAN/GTIN i søgning | **Nej** (ikke i kendte svar) | **Ja:** `gtin` i Algolia-hit |
 
 ## nemlig.com

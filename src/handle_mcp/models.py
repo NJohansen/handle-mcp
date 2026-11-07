@@ -108,6 +108,8 @@ class Cart:
     minimum_met: bool | None = None
     delivery: str | None = None  # chosen delivery time as text, if any
     warnings: list[str] = field(default_factory=list)
+    delivery_mode: str | None = None  # "home", "pickup" or None when unknown (docs/adr/0006)
+    pickup_store: str | None = None  # the store's name when delivery_mode is "pickup"
 
 
 @dataclass
@@ -127,6 +129,8 @@ class StoreTerms:
     other_fees: dict[str, Decimal] = field(default_factory=dict)
     minimum_order: Decimal | None = None
     source: str = "api"  # "api" or "config"
+    delivery_mode: str | None = None  # "home", "pickup" or None when unknown (docs/adr/0006)
+    pickup_store: str | None = None  # the store's name when delivery_mode is "pickup"
 
 
 @dataclass
@@ -137,6 +141,8 @@ class DeliveryInfo:
     edit_deadline: datetime | None = None
     next_available: date | None = None
     note: str | None = None
+    delivery_mode: str | None = None  # "home", "pickup" or None when unknown (docs/adr/0006)
+    pickup_store: str | None = None  # the store's name when delivery_mode is "pickup"
 
 
 @dataclass

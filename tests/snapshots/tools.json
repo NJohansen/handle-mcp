@@ -153,7 +153,7 @@
  },
  {
   "name": "get_delivery_info",
-  "description": "Show the chosen delivery time, edit deadline and next free day, plus fees and minimum order.",
+  "description": "Show the chosen delivery time, edit deadline and next free day, plus fees and minimum order.\n`delivery_mode` is \"home\", \"pickup\" (BilkaToGo, with `pickup_store`) or null when unknown.",
   "inputSchema": {
    "properties": {
     "store": {
@@ -268,7 +268,7 @@
  },
  {
   "name": "list_delivery_slots",
-  "description": "List free delivery times for the next `days` days with the delivery fee per slot, in time\norder, plus the 3 cheapest per store. nemlig: \"Personlig\" (you are home) or \"Fleksibel\"\n(left at the door). BilkaToGo: one flat fee, night delivery. Only reads: it never chooses\na time. The human chooses the time on the store's website.",
+  "description": "List free delivery times for the next `days` days with the delivery fee per slot, in time\norder, plus the 3 cheapest per store. nemlig: \"Personlig\" (you are home) or \"Fleksibel\"\n(left at the door). BilkaToGo: one flat fee, night delivery, or pickup times (\"Afhentning\")\nwhen the cart is set to pickup. Only reads: it never chooses a time, store or mode. The\nhuman chooses on the store's website.",
   "inputSchema": {
    "properties": {
     "stores": {
