@@ -358,6 +358,14 @@ async def test_terms_and_delivery_info(store, monkeypatch):
     assert "17-20" in info.note
 
 
+async def test_nemlig_is_always_home_delivery(store):
+    modes = {
+        (x.delivery_mode, x.pickup_store)
+        for x in (await store.get_cart(), await store.terms(), await store.delivery_info())
+    }
+    assert modes == {("home", None)}
+
+
 async def test_an_ended_slot_is_not_the_chosen_one(store, monkeypatch):
     """nemlig keeps the last order's slot in the basket. Offers must not be priced for it."""
     monkeypatch.setattr(

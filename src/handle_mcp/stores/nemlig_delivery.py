@@ -54,6 +54,7 @@ class DeliveryMixin:
             start, end, deadline, chosen = None, None, None, None
         return DeliveryInfo(
             store=self.name,
+            delivery_mode="home",
             chosen_start=start,
             chosen_end=end,
             edit_deadline=deadline,

@@ -234,6 +234,16 @@ async def test_not_home_delivery_is_noted(monkeypatch):
     assert result["stores"]["bilkatogo"]["notes"] == ["Kurven er ikke sat til hjemlevering."]
 
 
+async def test_pickup_is_noted(monkeypatch):
+    class Pickup(Bilka):
+        terms_ = StoreTerms("bilkatogo", False, delivery_mode="pickup", pickup_store="Bilka Vejle")
+
+    monkeypatch.setattr(registry, "STORES", {"bilkatogo": Pickup})
+    quote = (await server.compare_basket(["rugbrød"]))["stores"]["bilkatogo"]
+    assert quote["notes"] == ["Afhentning i Bilka Vejle: du henter selv varerne."]
+    assert (quote["delivery_mode"], quote["pickup_store"]) == ("pickup", "Bilka Vejle")
+
+
 async def test_empty_or_too_long_list_is_refused(two_stores):
     from mcp.server.mcpserver.exceptions import ToolError
 
