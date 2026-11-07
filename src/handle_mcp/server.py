@@ -273,7 +273,7 @@ async def add_recipe_to_cart(
         raise ToolError("Ingen varer at lægge i kurven.")
     if len(lines) > MAX_ITEMS:
         raise ToolError(f"Højst {MAX_ITEMS} varer pr. kald.")
-    before = recipe_cart.in_cart(await _call(store, "get_cart"))
+    before = recipe_cart.in_cart(await _call(store, "cart"))
     targets = {pid: before.get(pid, 0) + ln["quantity"] for pid, ln in lines.items()}
     if bad := [pid for pid, qty in targets.items() if qty > MAX_QUANTITY]:
         raise ToolError(f"Højst {MAX_QUANTITY} stk. pr. vare. For mange af: {', '.join(bad)}.")

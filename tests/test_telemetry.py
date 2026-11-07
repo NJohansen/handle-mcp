@@ -70,6 +70,48 @@ async def test_many_changes_count_as_one_cart(sent):
     assert sent[-1]["payload"]["data"]["item_count"] == 5
 
 
+def test_a_cart_counts_after_30_quiet_minutes():
+    assert telemetry.QUIET == 1800
+
+
+async def test_edits_after_the_count_send_nothing(sent):
+    await fill()
+    await fill(items={"2": 5})  # the human changes the cart the next day
+    telemetry._pending.clear()  # and after a restart: the lock is in the file
+    await fill(items={"1": 4})
+    assert names(sent).count("cart_filled") == 1
+
+
+async def test_an_empty_cart_unlocks_so_the_next_order_counts(sent):
+    await fill()
+    await server.set_cart_quantities("fake", {"1": 0, "2": 0})  # checkout empties the cart
+    await server.get_cart("fake")
+    await fill(items={"2": 2})
+    assert names(sent).count("cart_filled") == 2
+
+
+async def test_reading_an_empty_cart_unlocks(sent):
+    await fill()
+    server._store("fake").cart.clear()  # the order went through on the store's site
+    await server.get_cart("fake")
+    await fill()
+    assert names(sent).count("cart_filled") == 2
+
+
+async def test_reading_a_full_cart_keeps_the_lock(sent):
+    await fill()
+    await server.get_cart("fake")
+    await fill(items={"2": 7})
+    assert names(sent).count("cart_filled") == 1
+
+
+def test_the_lock_keeps_store_names_only(sent):
+    telemetry.cart_filled("bilkatogo", {"total": "100", "lines": [{"quantity": 1}]}, [])
+    telemetry._flush_all()
+    state = json.loads((registry.CONFIG_DIR / "telemetry.json").read_text())
+    assert state == {"counted": ["bilkatogo"]}
+
+
 async def test_an_emptied_cart_is_not_counted(sent):
     await server.set_cart_quantities("fake", {"2": 2})
     await server.set_cart_quantities("fake", {"1": 0, "2": 0})

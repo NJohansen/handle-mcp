@@ -1,8 +1,8 @@
 """Anonymous usage counts: how many carts and kroner handle-mcp fills in each store per week.
 
 No id, no names, no addresses, no logins, no products, no order ids (docs/adr/0005). The only
-file is `telemetry.json` in the config folder: the notice was shown, and the last day each
-daily event went out. The funnel: server_started, first_tool_call, login_ok, cart_filled.
+file is `telemetry.json` in the config folder: the notice was shown, the last day each
+daily event went out, and which stores have a counted cart that is not empty yet. The funnel: server_started, first_tool_call, login_ok, cart_filled.
 Off with HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or `--no-telemetry`.
 Every send runs in a background thread with a short timeout. A failure is logged, never raised.
 """
@@ -33,7 +33,7 @@ URL = "https://cloud.umami.is/api/send"  # Umami's event API; HANDLE_TELEMETRY_U
 WEBSITE = "a6431afb-4982-436d-8b11-bfb33da3baa9"  # handlemcp.dk in Umami; the hostname splits app from site
 HOSTNAME = "app.handlemcp.dk"  # a label in Umami, not a server
 TIMEOUT = 2.0  # seconds
-QUIET = 300.0  # seconds without a cart change before the cart counts as filled
+QUIET = 1800.0  # seconds without a cart change before the cart counts as filled
 ROUND_TO = Decimal(50)  # kroner
 STORE_NAMES = {"bilkatogo": "bilka"}
 OFF = {"0", "false", "no", "off"}
@@ -182,16 +182,21 @@ def basket(cart: Any) -> tuple[int, int]:
 
 @_safe
 def cart_filled(store: str, cart: Any, results: list[Any]) -> None:
-    """A cart changed. Counted only when every line went in. A model fills a cart in many
-    calls, so the event waits until the cart is quiet for QUIET seconds and counts it once."""
+    """A cart changed. A model fills a cart in many calls, and the human edits it after, so:
+    the event waits until the cart is quiet for QUIET seconds, then the store is locked and
+    edits send nothing. An empty cart (after checkout) unlocks it: the next order counts.
+    Counted only when every line went in."""
     if not enabled() or not all(_get(r, "ok") for r in results):
         return
     total, items = basket(cart)
+    if not items:  # an emptied cart is not a filled one
+        cart_seen(store, cart)
+        return
+    if store in _counted():
+        return
     with _lock:
         if old := _pending.pop(store, None):
             old[0].cancel()
-        if not items:  # an emptied cart is not a filled one
-            return
         data: dict[str, Any] = {"store": STORE_NAMES.get(store, store)}
         data["basket_total_dkk"] = total
         data["item_count"] = items
@@ -202,11 +207,32 @@ def cart_filled(store: str, cart: Any, results: list[Any]) -> None:
 
 
 @_safe
+def cart_seen(store: str, cart: Any) -> None:
+    """Every cart read. An empty cart means the order went through or was cleared: unlock."""
+    if basket(cart)[1]:
+        return
+    with _lock:
+        if old := _pending.pop(store, None):
+            old[0].cancel()
+    if store in (counted := _counted()):
+        state = _state()
+        _save({**state, "counted": sorted(counted - {store})})
+
+
+def _counted() -> set[str]:
+    """Stores whose cart was counted and has not been empty since. Store names, never an id."""
+    value = _state().get("counted")
+    return {str(s) for s in value} if isinstance(value, list) else set()
+
+
+@_safe
 def _flush(store: str, wait: bool = False) -> None:
     with _lock:
         entry = _pending.pop(store, None)
     if entry:
         entry[0].cancel()
+        state = _state()
+        _save({**state, "counted": sorted(_counted() | {store})})
         _send("cart_filled", entry[1], wait)
 
 

@@ -28,9 +28,11 @@ def cart_url(store: object) -> str | None:
 
 async def cart(store: Any) -> Any:
     """The store's cart with `url`: the cart page, tagged, where the human checks and pays.
-    Only a logged-in user gets a cart back, so this also counts the day's login_ok."""
+    Only a logged-in user gets a cart back, so this also counts the day's login_ok, and an
+    empty cart unlocks the store's cart_filled (telemetry.cart_seen)."""
     result = jsonable(await store.get_cart())
     telemetry.login_ok(store.name)
+    telemetry.cart_seen(store.name, result)
     if isinstance(result, dict) and (url := cart_url(store)):
         result["url"] = url
     return result
