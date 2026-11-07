@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+from handle_mcp import telemetry
 from handle_mcp.privacy import jsonable
 
 UTM = {"utm_source": "handlemcp", "utm_medium": "mcp", "utm_campaign": "cart"}
@@ -26,8 +27,10 @@ def cart_url(store: object) -> str | None:
 
 
 async def cart(store: Any) -> Any:
-    """The store's cart with `url`: the cart page, tagged, where the human checks and pays."""
+    """The store's cart with `url`: the cart page, tagged, where the human checks and pays.
+    Only a logged-in user gets a cart back, so this also counts the day's login_ok."""
     result = jsonable(await store.get_cart())
+    telemetry.login_ok(store.name)
     if isinstance(result, dict) and (url := cart_url(store)):
         result["url"] = url
     return result

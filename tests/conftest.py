@@ -185,6 +185,7 @@ def no_telemetry(monkeypatch, tmp_path):
     monkeypatch.setenv("HANDLE_TELEMETRY", "0")
     monkeypatch.setattr(telemetry, "_off", False)
     monkeypatch.setattr(telemetry, "_sent_today", {})
+    monkeypatch.setattr(telemetry, "_noticed", False)
     monkeypatch.setattr(telemetry, "_pending", {})
     monkeypatch.setattr(registry, "CONFIG_DIR", tmp_path / "config")
 

@@ -46,6 +46,7 @@ Læs mere: https://github.com/NJohansen/handle-mcp#brugsstatistik
 """
 
 _off = False
+_noticed = False  # notice() asked the file once in this process
 _sent_today: dict[str, str] = {}  # event key -> day, so the file is read once per day
 _lock = threading.Lock()
 _pending: dict[str, tuple[threading.Timer, dict[str, Any]]] = {}
@@ -105,11 +106,27 @@ def start() -> None:
     """At server start: the notice once per machine, then today's "server_started"."""
     if not enabled():
         return
-    state = _state()
-    if not state.get("notice_shown"):
-        sys.stderr.write(NOTICE)
-        _save({**state, "notice_shown": True})
+    if not _state().get("notice_shown"):
+        sys.stderr.write(NOTICE)  # the log; notice() puts it where the human sees it
     _daily("server_started", {"os": platform.system().lower() or "unknown"})
+
+
+def notice() -> str | None:
+    """The notice for the first tool answer on this machine, once. The model tells the human:
+    stderr ends in a log file nobody reads, and counting must never be a secret."""
+    global _noticed
+    if _noticed or not enabled():
+        return None
+    _noticed = True
+    try:
+        state = _state()
+        if state.get("notice_shown"):
+            return None
+        _save({**state, "notice_shown": True})
+    except Exception:
+        log.debug("telemetry notice failed", exc_info=True)
+        return None
+    return " ".join(NOTICE.split())
 
 
 @_safe

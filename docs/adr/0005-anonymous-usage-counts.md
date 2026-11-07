@@ -1,6 +1,6 @@
 # 0005: Anonymous usage counts, no id
 
-handle-mcp sends four events to Umami, a funnel from install to a filled cart: `server_started` (os), `first_tool_call` (tool name) and `login_ok` (store), each at most once per machine (and store) per day, and `cart_filled` (store, total rounded to 50 kr, item count). Every event has version and date (day only). Every cart link the human clicks carries `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`. On by default. Off with `HANDLE_TELEMETRY=0`, `DO_NOT_TRACK=1` or `--no-telemetry`. A notice on stderr at the first start says what is counted and how to turn it off.
+handle-mcp sends four events to Umami, a funnel from install to a filled cart: `server_started` (os), `first_tool_call` (tool name) and `login_ok` (store), each at most once per machine (and store) per day, and `cart_filled` (store, total rounded to 50 kr, item count). Every event has version and date (day only). Every cart link the human clicks carries `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`. On by default. Off with `HANDLE_TELEMETRY=0`, `DO_NOT_TRACK=1` or `--no-telemetry`. The first tool answer on a machine carries `telemetry_notice`, and the server instructions tell the model to pass it on: the human hears it once, in the chat. The same text goes to stderr (the client's log) until then.
 
 ## Why
 
@@ -9,6 +9,9 @@ To show the stores how many carts and kroner handle-mcp sends them, for a partne
 No install id. A random id saved on the user's machine is pseudonymous personal data, and saving it for statistics needs consent under the ePrivacy rules. Without an id, nothing points to a person: the events are counts. Unique machines per week come from Umami's own daily-rotating visitor hash, as on handlemcp.dk. The local file holds only a flag and the last day per daily event.
 
 ## Consequences
+
+- Opt-out only works if people know. A notice in a log file nobody reads would be hidden tracking, so the notice goes where the human reads: the chat. The README says it in the first lines.
+- Umami sees the sender's IP address (to answer and to guess the country). It does not save it. The privacy page says so.
 
 - A cart counts once after 5 minutes without changes (a model fills a cart in many calls). A cart changed again an hour later counts again. An emptied cart and a cart with a refused line do not count.
 - Weekly active machines and retention are estimates, not exact. Daily events count machine-days.

@@ -154,6 +154,7 @@ async def test_no_login_no_login_ok(sent, monkeypatch):
 def test_the_file_keeps_days_never_an_id(sent):
     telemetry.start()
     telemetry.login_ok("bilkatogo")
+    telemetry.notice()
     state = json.loads((registry.CONFIG_DIR / "telemetry.json").read_text())
     today = date.today().isoformat()
     assert state == {
@@ -190,12 +191,28 @@ def test_flag_works_before_a_cli_command(monkeypatch):
     assert calls == [["logout", "fake"]]
 
 
-def test_the_notice_is_shown_once(sent, capsys):
+def test_the_notice_goes_to_stderr_never_stdout(sent, capsys):
     telemetry.start()
-    telemetry.start()
-    err = capsys.readouterr().err
-    assert err.count("HANDLE_TELEMETRY=0") == 1 and "--no-telemetry" in err
-    assert capsys.readouterr().out == ""  # stdout is JSON-RPC
+    out, err = capsys.readouterr()
+    assert out == ""  # stdout is JSON-RPC
+    assert "HANDLE_TELEMETRY=0" in err and "--no-telemetry" in err
+
+
+async def test_the_first_answer_tells_the_human_once(sent, monkeypatch):
+    first = await server.get_cart("fake")
+    assert "HANDLE_TELEMETRY=0" in first["telemetry_notice"]
+    assert "telemetry_notice" not in await server.get_cart("fake")
+    monkeypatch.setattr(telemetry, "_noticed", False)  # a restart: the file remembers
+    assert "telemetry_notice" not in await server.get_cart("fake")
+
+
+async def test_no_notice_when_it_is_off(sent, monkeypatch):
+    monkeypatch.setenv("HANDLE_TELEMETRY", "0")
+    assert "telemetry_notice" not in await server.get_cart("fake")
+
+
+async def test_the_model_is_told_to_pass_the_notice_on():
+    assert "telemetry_notice" in server.mcp.instructions
 
 
 async def test_a_failing_endpoint_never_breaks_a_tool(sent, monkeypatch):
