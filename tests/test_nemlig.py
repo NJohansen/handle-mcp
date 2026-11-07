@@ -355,6 +355,14 @@ async def test_terms_and_delivery_info(store):
     assert "17-20" in info.note
 
 
+async def test_nemlig_is_always_home_delivery(store):
+    modes = {
+        (x.delivery_mode, x.pickup_store)
+        for x in (await store.get_cart(), await store.terms(), await store.delivery_info())
+    }
+    assert modes == {("home", None)}
+
+
 async def test_orders_and_order(store):
     [order] = await store.orders(limit=5)
     assert (order.id, order.status, order.total) == ("900001", "Leveret", Decimal("612.5"))

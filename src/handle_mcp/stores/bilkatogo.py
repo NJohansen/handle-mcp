@@ -432,7 +432,7 @@ class BilkaStore(BilkaRecipesMixin):
     def _fee(self, data: dict, cart: Cart) -> Decimal | None:
         """Pickup is often free: a delivery_price of 0 is a known fee, not a missing one."""
         stat = data.get("stat") or {}
-        if cart.delivery_mode == "pickup" and "delivery_price" in stat:
+        if cart.delivery_mode == "pickup" and stat.get("delivery_price") is not None:
             return _kr(stat["delivery_price"])
         return cart.fees.get("levering")
 

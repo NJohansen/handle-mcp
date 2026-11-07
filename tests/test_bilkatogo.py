@@ -256,6 +256,12 @@ async def test_pickup_cart(store, fake):
     assert (info.delivery_mode, info.pickup_store, info.note) == ("pickup", "Bilka Vejle", None)
 
 
+async def test_pickup_fee_null_is_unknown(store, fake):
+    data = fixture("cart_logged_in")
+    fake.cart = {**data, "stat": {**data["stat"], "delivery_price": None}}
+    assert (await store.terms()).delivery_fee is None
+
+
 @pytest.mark.parametrize(
     "address",
     [
