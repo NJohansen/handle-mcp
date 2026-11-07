@@ -19,7 +19,7 @@ Danish grocery stores with home delivery, as an MCP server: [nemlig.com](https:/
 
 **It can never order or pay. You do.** That code does not exist, and a test fails if it shows up ([why](docs/adr/0001-the-human-always-pays.md)).
 
-**It counts anonymous usage, and tells you so.** Starts, first tool call, logins and filled carts, with no id and no personal data, so we can show the stores what handle-mcp sends them. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#brugsstatistik).
+**It counts anonymous usage, and tells you so.** Starts, first tool call, logins and filled carts, with no id and no personal data. They show the stores what handle-mcp sends them, so it can stay free and open source. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#brugsstatistik).
 
 ## How it works
 
