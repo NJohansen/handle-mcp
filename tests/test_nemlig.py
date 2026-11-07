@@ -10,7 +10,7 @@ import pytest
 
 from handle_mcp import compare, server
 from handle_mcp import stores as registry
-from handle_mcp.stores import StoreError, _http, nemlig, nemlig_offers
+from handle_mcp.stores import StoreError, _http, nemlig_delivery, nemlig_offers
 from handle_mcp.stores.nemlig import NemligStore
 from handle_mcp.stores.nemlig_offers import offer_product
 
@@ -343,7 +343,9 @@ async def test_set_quantities_one_failure_does_not_stop_the_rest(store, fake):
 
 
 async def test_terms_and_delivery_info(store, monkeypatch):
-    monkeypatch.setattr(nemlig, "_now", lambda: datetime(2026, 11, 1, 12, tzinfo=nemlig.DK))
+    monkeypatch.setattr(
+        nemlig_delivery, "_now", lambda: datetime(2026, 11, 1, 12, tzinfo=nemlig_delivery.DK)
+    )
     terms = await store.terms()
     assert (terms.home_delivery, terms.delivery_fee, terms.minimum_order) == (
         True,
@@ -358,7 +360,9 @@ async def test_terms_and_delivery_info(store, monkeypatch):
 
 async def test_an_ended_slot_is_not_the_chosen_one(store, monkeypatch):
     """nemlig keeps the last order's slot in the basket. Offers must not be priced for it."""
-    monkeypatch.setattr(nemlig, "_now", lambda: datetime(2026, 11, 3, 20, 1, tzinfo=nemlig.DK))
+    monkeypatch.setattr(
+        nemlig_delivery, "_now", lambda: datetime(2026, 11, 3, 20, 1, tzinfo=nemlig_delivery.DK)
+    )
     info = await store.delivery_info()
     assert (info.chosen_start, info.chosen_end, info.edit_deadline) == (None, None, None)
     assert info.note.startswith("Ingen tid valgt.")
@@ -367,7 +371,9 @@ async def test_an_ended_slot_is_not_the_chosen_one(store, monkeypatch):
 @pytest.mark.parametrize(("hour", "ended"), [(19, False), (20, True)])
 async def test_a_slot_without_a_zone_is_danish_time(store, fake, monkeypatch, hour, ended):
     fake.spot = {"TimeSlot": {"Start": "2026-11-03T17:00:00", "End": "2026-11-03T20:00:00"}}
-    monkeypatch.setattr(nemlig, "_now", lambda: datetime(2026, 11, 3, hour, 1, tzinfo=nemlig.DK))
+    monkeypatch.setattr(
+        nemlig_delivery, "_now", lambda: datetime(2026, 11, 3, hour, 1, tzinfo=nemlig_delivery.DK)
+    )
     assert ((await store.delivery_info()).chosen_end is None) == ended
 
 
