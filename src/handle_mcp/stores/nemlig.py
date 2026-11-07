@@ -13,18 +13,15 @@ import os
 import re
 import time
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from typing import Any
-from zoneinfo import ZoneInfo
 
 import httpx
 
 from handle_mcp.models import (
     Cart,
     CartLine,
-    DeliveryInfo,
-    DeliverySlot,
     Order,
     Product,
     QuantityResult,
@@ -32,6 +29,7 @@ from handle_mcp.models import (
 )
 from handle_mcp.stores import StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
+from handle_mcp.stores.nemlig_delivery import DK, DeliveryMixin, _money, _time
 from handle_mcp.stores.nemlig_offers import OffersMixin
 from handle_mcp.stores.nemlig_recipes import RecipesMixin
 
@@ -42,7 +40,6 @@ BASE = "https://www.nemlig.com"
 SEARCH = "https://webapi.prod.knl.nemlig.it/searchgateway/api/search"
 APP_VERSION = os.environ.get("HANDLE_NEMLIG_APP_VERSION", "11.201.0")
 SETTINGS_TTL = 600  # seconds to reuse timeslot/zone for search
-SLOT_KINDS = {0: "Personlig", 1: "Fleksibel"}  # Type: attended / unattended delivery
 STATUS = {1: "Bestilt", 2: "Under behandling", 4: "Leveret"}
 UNITS = {"kg": "kg", "l": "l", "ltr": "l", "stk": "stk"}
 FREE = "ProductCampaignFreeProduct"
@@ -61,21 +58,6 @@ def _bag_fee() -> Decimal:
     except InvalidOperation:
         log.warning("HANDLE_NEMLIG_BAG_FEE=%r er ikke et tal. Bruger %s kr.", raw, BAG_FEE)
         return BAG_FEE
-
-
-def _money(value: Any) -> Decimal | None:
-    return None if value is None else Decimal(str(value))
-
-
-def _time(value: str | None) -> datetime | None:
-    """An ISO time, or None. nemlig sometimes sends text: OrderDate "03/11-2026 kl. 14-21"."""
-    if not value or value.startswith(("0001-", "9999-")):
-        return None
-    try:
-        return datetime.fromisoformat(value)
-    except ValueError:
-        log.debug("nemlig: ikke en tid: %r", value)
-        return None
 
 
 def _unit(label: str | None) -> str | None:
@@ -110,7 +92,6 @@ def _discount_price(campaign: dict | None) -> Decimal | None:
     return _money(campaign.get("CampaignPrice")) or None
 
 
-DK = ZoneInfo("Europe/Copenhagen")
 LOGIN_FLAGS = {"CheckForExistingProducts": True, "DoMerge": True}
 LOGIN_FLAGS |= {"AppInstalled": False, "SaveExistingBasket": False}
 AUTH_COOKIE = ".ASPXAUTH"  # set by /webapi/login, lives 1 year
@@ -126,7 +107,7 @@ def _kr(value: Decimal) -> str:
     return f"{value:.2f}".replace(".", ",").removesuffix(",00")
 
 
-class NemligStore(RecipesMixin, OffersMixin):
+class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin):
     name = "nemlig"
     cart_page = f"{BASE}/kurv"  # the page the human opens to see the cart and pay
 
@@ -456,55 +437,6 @@ class NemligStore(RecipesMixin, OffersMixin):
             if bags
             else {},
             minimum_order=_money(basket.get("MinimumOrderTotal")),
-        )
-
-    async def delivery_info(self) -> DeliveryInfo:
-        basket = await self._basket()
-        spot = await self._api("GET", f"{BASE}/webapi/Order/DeliverySpot") or {}
-        slot = spot.get("TimeSlot") or {}
-        chosen = basket.get("FormattedDeliveryTime")
-        return DeliveryInfo(
-            store=self.name,
-            delivery_mode="home",
-            chosen_start=_time(slot.get("Start")),
-            chosen_end=_time(slot.get("End")),
-            edit_deadline=_time(spot.get("EditDeadline")),
-            note=(
-                f"Valgt tid i kurven: {chosen}. Gebyret afhænger af tiden (ca. 19-51 kr.)."
-                if chosen
-                else "Ingen tid valgt. Gebyret afhænger af tiden (ca. 19-51 kr.). Vælg på nemlig.com."
-            ),
-        )
-
-    async def delivery_slots(self, days: int = 7) -> list[DeliverySlot]:
-        """The time picker's list (GET). Logged in, so prices are for our zone. Never choose a
-        slot here: the human does (docs/adr/0001)."""
-        slots: list[DeliverySlot] = []
-        start, seen = None, 0
-        for _page in range(days):  # every page has at least one day, so this is the cap
-            params = {"days": days - seen, "showForSubscriptions": "false", "startDate": start}
-            url = f"{BASE}/webapi/v2/Delivery/GetDeliveryDays"
-            data = await self._api("GET", url, params={k: v for k, v in params.items() if v})
-            day_list = (data or {}).get("DayRangeHours") or []
-            for day in day_list:
-                slots += [self._slot(h) for h in day.get("DayHours") or []]
-            seen, start = seen + len(day_list), (data or {}).get("NextRangeStart")
-            if not day_list or not start or seen >= days:
-                break
-        return [s for s in slots if s]
-
-    def _slot(self, hour: dict) -> DeliverySlot | None:
-        day, deadline = _time(hour.get("Date")), _time(hour.get("Deadline"))
-        if day is None or None in (hour.get("StartHour"), hour.get("EndHour")):
-            return None
-        return DeliverySlot(
-            store=self.name,
-            start=day.replace(tzinfo=DK) + timedelta(hours=hour["StartHour"]),
-            end=day.replace(tzinfo=DK) + timedelta(hours=hour["EndHour"]),
-            price=_money(hour.get("DeliveryPrice")),
-            available=hour.get("Availability") == 0,  # 1 past deadline, 2 sold out, 3 off
-            kind=SLOT_KINDS.get(hour.get("Type")),
-            note=f"Bestil senest {deadline:%d/%m kl. %H:%M}" if deadline else None,
         )
 
     def _order(self, o: dict, lines: list[CartLine] | None = None) -> Order:
