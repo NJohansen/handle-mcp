@@ -128,6 +128,7 @@ def _kr(value: Decimal) -> str:
 
 class NemligStore(RecipesMixin, OffersMixin):
     name = "nemlig"
+    cart_page = f"{BASE}/basket"  # the page the human opens to see the cart and pay
 
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         self._client = client or httpx.AsyncClient(timeout=20, follow_redirects=True)

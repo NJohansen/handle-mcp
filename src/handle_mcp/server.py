@@ -16,7 +16,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
-from handle_mcp import compare, recipe_cart
+from handle_mcp import compare, links, recipe_cart, telemetry
 from handle_mcp import stores as registry
 from handle_mcp.privacy import jsonable, scrub, scrub_text
 
@@ -71,6 +71,7 @@ def _persons(persons: int | None) -> int | None:
 
 
 def _out(value: Any) -> dict[str, Any]:
+    telemetry.active()
     result = scrub(jsonable(value))
     return result if isinstance(result, dict) else {"result": result}
 
@@ -91,6 +92,8 @@ def _error_reason(store: str, exc: BaseException) -> str:
 
 async def _call(store: str, method: str, *args: Any) -> Any:
     try:
+        if method == "cart":  # the cart with its tagged link (links.py)
+            return await links.cart(_store(store))
         return await getattr(_store(store), method)(*args)
     except ToolError:
         raise
@@ -202,8 +205,8 @@ async def get_cart(store: str | None = None) -> dict:
     that store's cart; without, every store's cart keyed by store name, a failing store
     (e.g. no login) as {"error": ...} next to the others."""
     if store is not None:
-        return _out(await _call(store, "get_cart"))
-    return _out(await _each(_names(None), lambda s: s.get_cart()))
+        return _out(await _call(store, "cart"))
+    return _out(await _each(_names(None), links.cart))
 
 
 @mcp.tool(annotations=WRITE)
@@ -217,7 +220,9 @@ async def set_cart_quantities(store: str, items: dict[str, int]) -> dict:
     if bad:
         raise ToolError(f"Antal skal være 0-{MAX_QUANTITY}. Forkert for: {', '.join(bad)}.")
     results = await _call(store, "set_quantities", dict(items))
-    return _out({"results": results, "cart": await _call(store, "get_cart")})
+    cart = await _call(store, "cart")
+    telemetry.cart_filled(store, cart, results)
+    return _out({"results": results, "cart": cart})
 
 
 @mcp.tool(annotations=ADD)
@@ -252,7 +257,9 @@ async def add_recipe_to_cart(
         raise ToolError(f"Højst {MAX_QUANTITY} stk. pr. vare. For mange af: {', '.join(bad)}.")
     results = await _call(store, "set_quantities", targets)
     added = recipe_cart.report(lines, before, results)
-    return _out({"added": added, "skipped": skipped, "cart": await _call(store, "get_cart")})
+    cart = await _call(store, "cart")
+    telemetry.cart_filled(store, cart, results)
+    return _out({"added": added, "skipped": skipped, "cart": cart})
 
 
 @mcp.tool(annotations=READ)
@@ -302,10 +309,15 @@ def configure_logging() -> None:
 
 def main() -> None:
     configure_logging()
-    if len(sys.argv) > 1:  # `handle-mcp login <store>` from a terminal, not from an MCP client
+    args = sys.argv[1:]
+    if "--no-telemetry" in args:
+        telemetry.disable()
+        args.remove("--no-telemetry")
+    if args:  # `handle-mcp login <store>` from a terminal, not from an MCP client
         from handle_mcp.cli import run
 
-        sys.exit(run(sys.argv[1:]))
+        sys.exit(run(args))
+    telemetry.start()
     mcp.run("stdio")
 
 

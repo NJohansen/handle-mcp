@@ -69,6 +69,31 @@ BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <s
 
 Full arguments and fields: [docs/tools.md](docs/tools.md).
 
+## Brugsstatistik
+
+handle-mcp counts filled carts, anonymously, so we can show nemlig.com and BilkaToGo how many carts and kroner it sends them each week. It is on by default and easy to turn off.
+
+What is sent, and nothing else:
+
+| Event | Fields |
+|---|---|
+| `cart_filled` (once per cart, after 5 minutes without changes, only when every line went in) | `store` (`nemlig` or `bilka`), `basket_total_dkk` (rounded to the nearest 50 kr), `item_count`, `version`, `date` (day only) |
+| `active` (at most once per machine per day) | `version`, `date` |
+
+Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS, with a 2 second timeout, in the background. A failed send never breaks a tool. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, and the date of the last `active` event.
+
+Cart links (`url` in the cart) carry `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`, so the store sees the visit in its own analytics.
+
+Turn it off with any of:
+
+```sh
+HANDLE_TELEMETRY=0          # env var
+DO_NOT_TRACK=1              # the common opt-out
+handle-mcp --no-telemetry   # flag
+```
+
+Send the events to your own Umami: `HANDLE_TELEMETRY_URL=https://umami.example.com/api/send` and `HANDLE_TELEMETRY_WEBSITE=<website id>`. Why and how: [docs/adr/0005](docs/adr/0005-anonymous-usage-counts.md).
+
 ## More
 
 [Setup](docs/setup.md) · [Skills](docs/skills.md) · [Security](docs/security.md) · [Troubleshooting](docs/troubleshooting.md) · [Testing](docs/testing.md) · [Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md) · [Credits](CREDITS.md)

@@ -22,6 +22,8 @@ src/handle_mcp/
   match.py         words: does this product match the item?
   pricing.py       kroner: packs for the amount, offers, delivery day
   recipe_cart.py   add_recipe_to_cart: a recipe's products as absolute cart counts
+  links.py         with_utm(): UTM tags on every cart link the human clicks
+  telemetry.py     anonymous counts (cart_filled, active); off with HANDLE_TELEMETRY=0
   models.py        dataclasses; money is Decimal DKK
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES

@@ -8,7 +8,7 @@ import pytest
 from keyring.backend import KeyringBackend
 from keyring.errors import PasswordDeleteError
 
-from handle_mcp import server
+from handle_mcp import server, telemetry
 from handle_mcp import stores as registry
 from handle_mcp.models import (
     Cart,
@@ -57,6 +57,7 @@ class FakeStore:
     """A store that answers from memory. Smuggles LEAK into every answer."""
 
     name = "fake"
+    cart_page = "https://example.com/kurv?ref=1"
 
     def __init__(self) -> None:
         self.cart: dict[str, int] = {"1": 2}
@@ -176,6 +177,16 @@ class BrokenStore(FakeStore):
 
     async def orders(self, limit=10):
         raise NotImplementedError
+
+
+@pytest.fixture(autouse=True)
+def no_telemetry(monkeypatch, tmp_path):
+    """Tests never send an event. tests/test_telemetry.py turns it on with a fake sender."""
+    monkeypatch.setenv("HANDLE_TELEMETRY", "0")
+    monkeypatch.setattr(telemetry, "_off", False)
+    monkeypatch.setattr(telemetry, "_active_day", None)
+    monkeypatch.setattr(telemetry, "_pending", {})
+    monkeypatch.setattr(registry, "CONFIG_DIR", tmp_path / "config")
 
 
 @pytest.fixture(autouse=True)

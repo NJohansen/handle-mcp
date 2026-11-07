@@ -142,6 +142,7 @@ class _GigyaRefused(StoreError):
 
 class BilkaStore(BilkaRecipesMixin):
     name = "bilkatogo"
+    cart_page = "https://www.bilkatogo.dk/kurv"  # the page the human opens to see the cart and pay
 
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         self._client = client or httpx.AsyncClient(timeout=30)
