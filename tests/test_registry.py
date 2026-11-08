@@ -28,7 +28,7 @@ def test_description_fits_registry_limit():
 
 
 def test_install_commands_use_latest():
-    # ADR 0007: users get the newest release; no pin to forget at release time.
+    # ADR 0008: users get the newest release; no pin to forget at release time.
     files = [_root / "README.md", *(_root / "docs").glob("*.md")]
     pins = {
         (f.name, pin)

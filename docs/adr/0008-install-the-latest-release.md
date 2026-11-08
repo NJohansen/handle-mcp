@@ -1,4 +1,4 @@
-# 0007: Install the latest release
+# 0008: Install the latest release
 
 The install commands in README and docs say `uvx handle-mcp@latest`, not a fixed version.
 

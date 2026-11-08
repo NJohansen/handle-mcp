@@ -48,6 +48,6 @@ Claude Desktop (`claude_desktop_config.json`):
 }
 ```
 
-**Updates.** `@latest` runs the newest release from PyPI at each start, so store fixes reach you by themselves. Want to choose when to update? Put a version instead of `latest` in every command, e.g. `handle-mcp@1.5.2`, and change it when you want ([ADR 0007](adr/0007-install-the-latest-release.md)).
+**Updates.** `@latest` runs the newest release from PyPI at each start, so store fixes reach you by themselves. Want to choose when to update? Put a version instead of `latest` in every command, e.g. `handle-mcp@1.5.2`, and change it when you want ([ADR 0008](adr/0008-install-the-latest-release.md)).
 
 Then ask: *"Compare this week's list in nemlig and Bilka, and fill the cheapest cart."* Open the store's website to check the cart, choose a time and pay.
