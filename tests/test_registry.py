@@ -27,13 +27,14 @@ def test_description_fits_registry_limit():
     assert len(_server["description"]) <= 100
 
 
-def test_install_pins_match_pyproject():
-    # Every `handle-mcp@x.y.z` in README and docs pins the current release.
+def test_install_commands_use_latest():
+    # ADR 0008: users get the newest release; no pin to forget at release time.
+    # A pin is allowed only as a prose example: "e.g. `handle-mcp@1.5.2`".
     files = [_root / "README.md", *(_root / "docs").glob("*.md")]
-    pins = {
-        (f.name, pin)
+    found = {
+        (f.name, ref)
         for f in files
-        for pin in re.findall(r"handle-mcp@(\d+\.\d+\.\d+)", f.read_text("utf-8"))
+        for ref in re.findall(r"(?<!e\.g\. `)handle-mcp@([\w.]+)", f.read_text("utf-8"))
     }
-    assert pins
-    assert {pin for _, pin in pins} == {_version}, sorted(pins)
+    assert found
+    assert {ref for _, ref in found} == {"latest"}, sorted(found)
