@@ -11,6 +11,7 @@ The install commands in README and docs say `uvx handle-mcp@latest`, not a fixed
 ## Cost
 
 - A bad release reaches everyone at their next start. The fix is a new patch release, which reaches them the same way.
+- A stolen maintainer GitHub account could push a tag and approve the deploy. A pin would not save users who update anyway; 2FA on GitHub and PyPI is the guard. There is no PyPI upload token to steal.
 - Users who want to choose when to update pin a version themselves, e.g. `handle-mcp@1.5.2`. `docs/security.md` says how.
 
 `tests/test_registry.py` fails if an install command in README or `docs/` uses anything but `@latest`.
