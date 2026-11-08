@@ -44,9 +44,11 @@ Taste, budget and meal rules live in your own prompt or skill. The server finds 
 ## Install
 
 ```sh
-uvx handle-mcp@1.5.2 login nemlig
-claude mcp add handle -- uvx handle-mcp@1.5.2
+uvx handle-mcp@latest login nemlig
+claude mcp add handle -- uvx handle-mcp@latest
 ```
+
+`@latest` runs the newest release at each start. To choose when to update, use a version instead, e.g. `handle-mcp@1.5.2` ([more](docs/setup.md)).
 
 Then ask:
 
