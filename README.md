@@ -4,22 +4,22 @@
 
 # handle-mcp
 
-<a href="https://modelcontextprotocol.io"><img src="docs/badges/mcp.svg" alt="made for MCP" height="26"></a>
-<img src="docs/badges/stores.svg" alt="stores: nemlig, BilkaToGo" height="26">
-<img src="docs/badges/python.svg" alt="built with Python 3.12+" height="26">
-<a href="LICENSE"><img src="docs/badges/license.svg" alt="license MIT" height="26"></a>
+<a href="https://github.com/NJohansen/handle-mcp/stargazers"><img src="https://img.shields.io/github/stars/NJohansen/handle-mcp?label=%E2%98%85&labelColor=555&color=blue" alt="GitHub stars"></a>
+<a href="https://github.com/NJohansen/handle-mcp/graphs/traffic"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FNJohansen%2Fhandle-mcp%2Fbadges%2Fclones.json" alt="git clones"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license MIT"></a>
+<br>
+<img src="https://img.shields.io/badge/macOS%20%7C%20Windows%20%7C%20Linux-4c8eda" alt="macOS, Windows, Linux">
 
-**Your AI agent plans the week's meals on a budget, prices them at nemlig.com and BilkaToGo and fills the cheapest cart. You approve and pay.**
+**Your AI agent fills the cheapest cart at [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.bilkatogo.dk). You pay.**<br>
+An MCP server: it reads the offers, plans the week on your budget and compares both stores.
 
-[handlemcp.dk](https://handlemcp.dk)
+**[Install →](#install)** · [handlemcp.dk](https://handlemcp.dk)
 
 </div>
 
-Danish grocery stores with home delivery, as an MCP server: [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.bilkatogo.dk).
-
 **It can never order or pay. You do.** That code does not exist, and a test fails if it shows up ([why](docs/adr/0001-the-human-always-pays.md)).
 
-**It counts anonymous usage, and tells you so.** Starts, first tool call, logins and filled carts, with no id and no personal data in the events (Umami sees your IP address and does not save it). They show the stores what handle-mcp sends them, so it can stay free and open source. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#brugsstatistik).
+**It counts anonymous usage, and tells you so.** No id, no personal data. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#brugsstatistik).
 
 ## How it works
 
@@ -37,7 +37,7 @@ Taste, budget and meal rules live in your own prompt or skill. The server finds 
 - An MCP client, Grok, Claude Code, Claude Desktop or Codex etc.
 - An account at nemlig.com or BilkaToGo with home delivery to your address.
 
-## Try it
+## Install
 
 ```sh
 uvx --from git+https://github.com/NJohansen/handle-mcp@v1.4.0 handle-mcp login nemlig
@@ -50,7 +50,7 @@ Then ask:
 - *"What is on offer this week? Any free gifts?"*
 - *"Which delivery times are cheapest tomorrow?"*
 
-BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <store> --from-env`): [setup](docs/setup.md). nemlig's offers work with no login at all.
+BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <store> --from-env`): [setup](docs/setup.md). nemlig's offers work with no login at all. No terminal? [Join the waitlist](https://handlemcp.dk).
 
 ## Tools
 
