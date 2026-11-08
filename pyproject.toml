@@ -12,6 +12,11 @@ dependencies = [
     "tzdata>=2024.1",  # Windows has no system time zone database (#91)
 ]
 
+[project.urls]
+Homepage = "https://handlemcp.dk"
+Source = "https://github.com/NJohansen/handle-mcp"
+Issues = "https://github.com/NJohansen/handle-mcp/issues"
+
 [project.scripts]
 handle-mcp = "handle_mcp.server:main"
 
