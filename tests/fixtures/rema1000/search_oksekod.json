@@ -1,0 +1,254 @@
+{
+ "data": [
+  {
+   "id": 400466,
+   "name": "HK. OKSEKØD, 35% GRØNT",
+   "underline": "400 GR. / REMA 1000",
+   "department": {
+    "id": 30,
+    "name": "Kød, fisk & fjerkræ"
+   },
+   "category": {
+    "id": 3020,
+    "name": "Hakket kød"
+   },
+   "barcodes": [
+    "5705830613509",
+    "5705830616449"
+   ],
+   "labels": [
+    {
+     "id": 70,
+     "name": "Dansk"
+    }
+   ],
+   "prices": [
+    {
+     "price": 29.95,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-05-07T00:00:00+00:00",
+     "ending_at": "2026-11-14T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 74.88,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": true,
+   "is_weight_item": false
+  },
+  {
+   "id": 400171,
+   "name": "HK. OKSEKØD 8-12%",
+   "underline": "400 GR. / REMA 1000",
+   "department": {
+    "id": 30,
+    "name": "Kød, fisk & fjerkræ"
+   },
+   "category": {
+    "id": 3020,
+    "name": "Hakket kød"
+   },
+   "barcodes": [
+    "5701200164459",
+    "5701200190953",
+    "5705451004502",
+    "5705830613561",
+    "5705830613608",
+    "5705830616463",
+    "5705830619617",
+    "5709149092024",
+    "5709149093229",
+    "5710238901455"
+   ],
+   "labels": [
+    {
+     "id": 70,
+     "name": "Dansk"
+    }
+   ],
+   "prices": [
+    {
+     "price": 39.95,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-05-07T00:00:00+00:00",
+     "ending_at": "2099-12-31T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 99.88,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": true,
+   "is_weight_item": false
+  },
+  {
+   "id": 400172,
+   "name": "HK. OKSEKØD 8-12%",
+   "underline": "800 GR. / REMA 1000",
+   "department": {
+    "id": 30,
+    "name": "Kød, fisk & fjerkræ"
+   },
+   "category": {
+    "id": 3020,
+    "name": "Hakket kød"
+   },
+   "barcodes": [
+    "1570583061785",
+    "5701050413820",
+    "5701200164435",
+    "5701200191035",
+    "5705451004564",
+    "5705830613578",
+    "5705830616470",
+    "5705830617897",
+    "5705830619624",
+    "5709149092222",
+    "5710238004057",
+    "5710238901462"
+   ],
+   "labels": [
+    {
+     "id": 70,
+     "name": "Dansk"
+    }
+   ],
+   "prices": [
+    {
+     "price": 76.95,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-05-07T00:00:00+00:00",
+     "ending_at": "2099-12-31T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 96.19,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": false,
+   "is_weight_item": false
+  },
+  {
+   "id": 400176,
+   "name": "HK. OKSEKØD 15-18%",
+   "underline": "400 GR. / REMA 1000",
+   "department": {
+    "id": 30,
+    "name": "Kød, fisk & fjerkræ"
+   },
+   "category": {
+    "id": 3020,
+    "name": "Hakket kød"
+   },
+   "barcodes": [
+    "5701050227885",
+    "5705451008074",
+    "5705830613585",
+    "5705830613615",
+    "5705830616487",
+    "5705830619631",
+    "5710238901639"
+   ],
+   "labels": [
+    {
+     "id": 70,
+     "name": "Dansk"
+    }
+   ],
+   "prices": [
+    {
+     "price": 37.95,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-05-07T00:00:00+00:00",
+     "ending_at": "2026-11-21T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 94.88,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": true,
+   "is_weight_item": false
+  },
+  {
+   "id": 400179,
+   "name": "HK. OKSEKØD 4-7%",
+   "underline": "350 GR. / FRILAND, ØKOLOGISK",
+   "department": {
+    "id": 30,
+    "name": "Kød, fisk & fjerkræ"
+   },
+   "category": {
+    "id": 3020,
+    "name": "Hakket kød"
+   },
+   "barcodes": [
+    "5701050275930",
+    "5701050279587",
+    "5701200159288",
+    "5707196372366"
+   ],
+   "labels": [
+    {
+     "id": 6,
+     "name": "Økologi"
+    },
+    {
+     "id": 40,
+     "name": "Nøglehul"
+    },
+    {
+     "id": 70,
+     "name": "Dansk"
+    },
+    {
+     "id": 203,
+     "name": "Bedre dyrevelfærd 3"
+    }
+   ],
+   "prices": [
+    {
+     "price": 64.95,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-01-29T00:00:00+00:00",
+     "ending_at": "2099-12-31T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 185.57,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": false,
+   "is_weight_item": false
+  }
+ ],
+ "meta": {
+  "pagination": {
+   "current_page": 1,
+   "last_page": 1,
+   "per_page": 100,
+   "total": 57
+  }
+ }
+}

@@ -5,6 +5,7 @@ Needs logins in env vars or ~/.config/handle-mcp/<store>.json.
 These tests NEVER change the cart.
 """
 
+import functools
 import os
 
 import pytest
@@ -23,6 +24,19 @@ def store(request):
     return STORES[request.param]()
 
 
+def not_yet_skips(test):
+    """A store that cannot do a thing yet (REMA 1000's cart) skips the test, never fails it."""
+
+    @functools.wraps(test)
+    async def run(*args, **kwargs):
+        try:
+            return await test(*args, **kwargs)
+        except NotImplementedError:
+            pytest.skip("butikken kan ikke det endnu")
+
+    return run
+
+
 async def test_search(store):
     products = await store.search("minimælk", limit=3)
     assert products and all(p.price > 0 for p in products)
@@ -37,6 +51,7 @@ async def test_cheapest_first(store):
     assert hits and prices == sorted(prices)
 
 
+@not_yet_skips
 async def test_cart_terms_delivery(store):
     cart = await store.get_cart()
     assert cart.total >= 0
@@ -52,6 +67,7 @@ async def test_cart_terms_delivery(store):
     )
 
 
+@not_yet_skips
 async def test_delivery_slots(store):
     """GET only: lists slots, never chooses one. Printed for a human check of the prices."""
     slots = [s for s in await store.delivery_slots(days=3) if s.available]
@@ -141,6 +157,7 @@ async def test_nemlig_recipes_by_tag():
     assert recipes and all(r.url.startswith("https://www.nemlig.com/maaltider/") for r in recipes)
 
 
+@not_yet_skips
 async def test_orders(store):
     orders = await store.orders(limit=2)
     if orders:

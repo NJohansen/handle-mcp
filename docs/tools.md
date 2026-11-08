@@ -2,16 +2,16 @@
 
 | Tool | Writes? | Butikker | What |
 |---|---|---|---|
-| `search_products(query, stores?)` | no | nemlig, BilkaToGo | Price, price per kg/l, offers, EAN when known. Both stores need a login |
+| `search_products(query, stores?)` | no | nemlig, BilkaToGo, REMA 1000 | Price, price per kg/l, offers, EAN when known. nemlig and BilkaToGo need a login; REMA 1000 does not |
 | `search_recipes(query, stores?)` | no | nemlig | The store's own recipes: name and link. `get_recipe` gives time, persons and products. BilkaToGo has no recipe search: use `list_recipes` with `category` |
 | `list_recipes(stores?, tags?, category?, limit?)` | no | nemlig, BilkaToGo | This week's featured recipes (nemlig "Ugens udvalgte"), or with `tags` all recipes that have every tag, e.g. `["Familievenlig", "Budgetvenlig"]` or `["Under 30 min", "Kylling"]`. `category`: aftensmad (default), frokost, madpakke, ... An unknown tag answers with nemlig's list. BilkaToGo has no tags: without `category` it is this week's "Madplan" (7 dinners, Monday first), with `category` every recipe in that part of bilkatogo.dk/inspiration/opskrifter (`aftensmad`, `aftensmad/pastaretter`, `boern-i-koekkenet` ...), mixed across sub-categories. An unknown category answers with BilkaToGo's list |
 | `get_recipe(store, recipe, persons?)` | no | nemlig, BilkaToGo | The products behind the store's "Se varer og læg i kurv": per ingredient the product, packs for `persons`, price and alternatives. `have_at_home` items (salt, oil) are left out of `total`. Also the dish's photo (`image`), `description`, `method` (sections with steps) and `tip`. The `ingredients` text is for `ingredients_persons`, not `persons`. Fill the cart with `add_recipe_to_cart` after a yes. BilkaToGo: one pack of each product on the page's "Det skal du bruge" (no amounts, no alternatives, no `have_at_home`); `persons` is not used, the recipe's own persons come back (`null` when written for pieces, e.g. "16 stk."); `missing` lists product ids not sold at your address; prices need a login |
-| `list_offers(stores?, limit?)` | no | nemlig, BilkaToGo | This week's offers, also items you would not search for: nemlig Skarp pris, Priskup, Dagstilbud, Undgå madspild, gifts; BilkaToGo offers. Free gifts have price 0 and a max per order. nemlig needs no login (with one, the offers fit your delivery time); BilkaToGo does, because the store follows your address |
-| `compare_basket(items, stores?)` | no | nemlig, BilkaToGo | Prices a shopping list in each store: up to 5 candidates per item with facts and flags, fees, minimum order, unsure and missing items marked, cheapest store |
+| `list_offers(stores?, limit?)` | no | nemlig, BilkaToGo, REMA 1000 | This week's offers, also items you would not search for: nemlig Skarp pris, Priskup, Dagstilbud, Undgå madspild, gifts; BilkaToGo offers; REMA 1000's leaflet (Avisvarer), no login, a max per customer in `offer_text`. Free gifts have price 0 and a max per order. nemlig needs no login (with one, the offers fit your delivery time); BilkaToGo does, because the store follows your address |
+| `compare_basket(items, stores?)` | no | nemlig, BilkaToGo, REMA 1000 | Prices a shopping list in each store: up to 5 candidates per item with facts and flags, fees, minimum order, unsure and missing items marked, cheapest store. REMA 1000 is pickup or in the store, and its packing fee is not known: a note says so |
 | `get_cart(store?)` | no | nemlig, BilkaToGo | Cart lines, fees, total, minimum order, `url` (the cart page with UTM tags). Without `store`: every store's cart, keyed by store name |
 | `set_cart_quantities(store, items)` | **yes** | nemlig, BilkaToGo | Absolute quantities (0 removes). Only the cart. Returns the new cart with `url` |
 | `add_recipe_to_cart(store, recipe, persons?, skip?, swap?, include?)` | **yes** | nemlig, BilkaToGo | A recipe's products from `get_recipe` into the cart, added to what is there (twice adds twice). Ask first. `have_at_home` items only with `include`; `skip` and `swap` (to an alternative's id) by ingredient or product id. Answers before/added/after per product and what was skipped (sold out, have at home, left out) |
-| `get_delivery_info(store)` | no | nemlig, BilkaToGo | Chosen delivery time, next free day, fees, `delivery_mode` (`home`, `pickup` or `null`) and `pickup_store`. BilkaToGo can be pickup, see [ADR 0006](adr/0006-pickup-is-a-delivery-mode.md) |
+| `get_delivery_info(store)` | no | nemlig, BilkaToGo, REMA 1000 | Chosen delivery time, next free day, fees, `delivery_mode` (`home`, `pickup` or `null`) and `pickup_store`. BilkaToGo can be pickup, see [ADR 0006](adr/0006-pickup-is-a-delivery-mode.md). REMA 1000 is always `pickup`, with a note |
 | `list_delivery_slots(stores?, days?)` | no | nemlig, BilkaToGo | Free delivery times with the fee per slot, the 3 cheapest first. BilkaToGo pickup carts: pickup times, `kind: "Afhentning"` |
 | `get_orders(store)` / `get_order(store, id)` | no | nemlig, BilkaToGo | Past orders, for "what we usually buy" |
 
@@ -19,10 +19,10 @@ Money is a string in kroner with two decimals (`"12.95"`, `"39.00"`) in every st
 
 Every product from `search_products` and `list_offers` has the same fields. Two of them are often `null`:
 
-| Field | nemlig | BilkaToGo |
-|---|---|---|
-| `before_price` (the price without the offer) | when nemlig shows a crossed-out price; a "Skarp pris" without one has `null` | when the offer has a normal price |
-| `offer_until` (last day of the offer, ISO date) | from `search_products`; nemlig's offer lists (`list_offers`) do not say, so `null` | always `null`: BilkaToGo does not say |
+| Field | nemlig | BilkaToGo | REMA 1000 |
+|---|---|---|---|
+| `before_price` (the price without the offer) | when nemlig shows a crossed-out price; a "Skarp pris" without one has `null` | when the offer has a normal price | the price after the offer week |
+| `offer_until` (last day of the offer, ISO date) | from `search_products`; nemlig's offer lists (`list_offers`) do not say, so `null` | always `null`: BilkaToGo does not say | always, from the price period |
 
 `compare_basket` candidates list only the facts that are known, to stay short.
 

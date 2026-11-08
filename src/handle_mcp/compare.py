@@ -228,9 +228,9 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
     fees = {k: v for k, v in {"levering": terms.delivery_fee, **terms.other_fees}.items() if v}
     notes = [note] if note else []
     mode, pickup_store = get(terms, "delivery_mode"), get(terms, "pickup_store")
-    if mode == "pickup":
+    if mode == "pickup" and pickup_store:
         notes.append(f"Afhentning i {pickup_store}: du henter selv varerne.")
-    elif not terms.home_delivery and not note:
+    elif mode != "pickup" and not terms.home_delivery and not note:
         notes.append("Kurven er ikke sat til hjemlevering.")
     minimum = terms.minimum_order
     if minimum is not None and 0 < products_total < minimum:  # in words, for the human
@@ -279,6 +279,8 @@ def verdict(quotes: dict[str, Any]) -> dict[str, Any]:
     cheapest = min(totals, key=lambda n: totals[n])
     summary = f"Billigst: {cheapest} ({totals[cheapest]} kr. inkl. gebyrer"
     summary += f" for de {len(common)} varer, alle butikker har)."
+    if ok[cheapest].delivery_mode == "pickup":  # no delivery: the trip and unknown fees count
+        summary += f" {cheapest} er afhentning: du henter selv varerne. Se noter."
     if any(q.missing for q in ok.values()) or any(
         not ln.sure for q in ok.values() for ln in q.lines
     ):
