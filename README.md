@@ -16,6 +16,8 @@ An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on 
 
 **[Install →](#install)** · [handlemcp.dk](https://handlemcp.dk)
 
+<img src="docs/demo.png" alt="The agent compares nemlig.com (693 kr) and BilkaToGo (741 kr) and fills the cheaper cart; nothing is ordered" width="800">
+
 </div>
 
 **It can never order or pay. You do.** That code does not exist, and a test fails if it shows up ([why](docs/adr/0001-the-human-always-pays.md)).
