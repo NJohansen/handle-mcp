@@ -44,8 +44,8 @@ Taste, budget and meal rules live in your own prompt or skill. The server finds 
 ## Install
 
 ```sh
-uvx handle-mcp@1.5.1 login nemlig
-claude mcp add handle -- uvx handle-mcp@1.5.1
+uvx handle-mcp@1.5.2 login nemlig
+claude mcp add handle -- uvx handle-mcp@1.5.2
 ```
 
 Then ask:
