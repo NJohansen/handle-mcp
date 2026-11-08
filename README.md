@@ -4,11 +4,12 @@
 
 # handle-mcp
 
-<a href="https://github.com/NJohansen/handle-mcp/stargazers"><img src="https://img.shields.io/github/stars/NJohansen/handle-mcp?label=%E2%98%85&labelColor=555&color=blue" alt="GitHub stars"></a>
-<a href="https://github.com/NJohansen/handle-mcp/graphs/traffic"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FNJohansen%2Fhandle-mcp%2Fbadges%2Fclones.json" alt="git clones"></a>
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license MIT"></a>
+<a href="https://github.com/NJohansen/handle-mcp/stargazers"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/NJohansen/handle-mcp/stars.svg?mode=dark"><img src="https://shieldcn.dev/github/NJohansen/handle-mcp/stars.svg?mode=light" alt="GitHub stars"></picture></a>
+<a href="https://github.com/NJohansen/handle-mcp/graphs/traffic"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2FNJohansen%2Fhandle-mcp%2Fbadges%2Fclones.json&query=%24.message&label=clones&mode=dark"><img src="https://shieldcn.dev/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2FNJohansen%2Fhandle-mcp%2Fbadges%2Fclones.json&query=%24.message&label=clones&mode=light" alt="git clones"></picture></a>
+<a href="https://pypi.org/project/handle-mcp/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/pypi/handle-mcp.svg?mode=dark"><img src="https://shieldcn.dev/pypi/handle-mcp.svg?mode=light" alt="PyPI version"></picture></a>
+<a href="LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-MIT-blue.svg?mode=dark"><img src="https://shieldcn.dev/badge/license-MIT-blue.svg?mode=light" alt="license MIT"></picture></a>
 <br>
-<img src="https://img.shields.io/badge/macOS%20%7C%20Windows%20%7C%20Linux-4c8eda" alt="macOS, Windows, Linux">
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/platforms-macOS_%7C_Windows_%7C_Linux-blue.svg?mode=dark"><img src="https://shieldcn.dev/badge/platforms-macOS_%7C_Windows_%7C_Linux-blue.svg?mode=light" alt="macOS, Windows, Linux"></picture>
 
 **Your AI agent fills the cheapest cart at [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.bilkatogo.dk). You pay.**<br>
 An MCP server: it reads the offers, plans the week on your budget and compares both stores.
