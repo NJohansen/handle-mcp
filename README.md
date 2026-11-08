@@ -11,10 +11,12 @@
 <br>
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/platforms-macOS_%7C_Windows_%7C_Linux-blue.svg?mode=dark"><img src="https://shieldcn.dev/badge/platforms-macOS_%7C_Windows_%7C_Linux-blue.svg?mode=light" alt="macOS, Windows, Linux"></picture>
 
-**Your AI agent fills the cheapest cart at [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.bilkatogo.dk). You pay.**<br>
-An MCP server: it reads the offers, plans the week on your budget and compares both stores.
+**Let your AI agent shop at [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.bilkatogo.dk).**<br>
+An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on your budget and fills the cheapest cart. You pay.
 
 **[Install →](#install)** · [handlemcp.dk](https://handlemcp.dk)
+
+<img src="docs/demo.png" alt="Example from the demo: the agent compares nemlig.com (693 kr) and BilkaToGo (741 kr) and fills the cheaper cart; nothing is ordered. Prices are examples" width="800">
 
 </div>
 
