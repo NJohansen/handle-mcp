@@ -94,7 +94,7 @@ One PR per change. Run the tests before you push, show the result, wait for OK.
 
 1. Bump `version` in `pyproject.toml` (`uv lock` follows), both versions in `server.json` and every pin: `grep -rn "handle-mcp@" README.md docs/` (README, `docs/setup.md`, `docs/security.md`). The website lives in [NJohansen/handlemcp.dk](https://github.com/NJohansen/handlemcp.dk): bump its pin in `index.html` there too.
 2. Merge, then tag the merge commit on `main`: `git fetch origin main && git tag vX.Y.Z origin/main && git push origin vX.Y.Z`. The tag runs `.github/workflows/release.yml`: tests, build, publish to PyPI (Trusted Publishing, environment `pypi`). It fails if the tag and `version` differ.
-3. After PyPI has the release, `.github/workflows/registry.yml` lists it in the official MCP Registry (`server.json`; the README holds the `mcp-name` line the registry checks). If it failed, run it by hand from Actions.
+3. After PyPI has the release, the `registry` job in `release.yml` lists it in the official MCP Registry (`server.json`; the README holds the `mcp-name` line the registry checks). If it failed, re-run that job.
 4. Semver: a tool's args or answer shape changes in a way old skills notice → major. New tool or field → minor. Fix → patch.
 
 ## Branches, commits and PRs (gitmoji)
