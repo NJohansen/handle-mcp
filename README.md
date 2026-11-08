@@ -1,3 +1,4 @@
+<!-- mcp-name: io.github.NJohansen/handle-mcp -->
 <div align="center">
 
 <img src="docs/hero.svg" alt="Give AI a budget, fill it cheaply, you pay and they deliver, unpack the week, enjoy dinner" width="800">
