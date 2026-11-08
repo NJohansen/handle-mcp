@@ -1,3 +1,4 @@
+<!-- mcp-name: io.github.NJohansen/handle-mcp -->
 <div align="center">
 
 <img src="docs/hero.svg" alt="Give AI a budget, fill it cheaply, you pay and they deliver, unpack the week, enjoy dinner" width="800">
@@ -43,8 +44,8 @@ Taste, budget and meal rules live in your own prompt or skill. The server finds 
 ## Install
 
 ```sh
-uvx handle-mcp@1.5.1 login nemlig
-claude mcp add handle -- uvx handle-mcp@1.5.1
+uvx handle-mcp@1.5.2 login nemlig
+claude mcp add handle -- uvx handle-mcp@1.5.2
 ```
 
 Then ask:

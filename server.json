@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.NJohansen/handle-mcp",
+  "title": "handle-mcp",
+  "description": "Let your AI agent search offers and fill the cheapest cart at nemlig.com and BilkaToGo. You pay.",
+  "websiteUrl": "https://handlemcp.dk",
+  "repository": {
+    "url": "https://github.com/NJohansen/handle-mcp",
+    "source": "github"
+  },
+  "version": "1.5.2",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "handle-mcp",
+      "version": "1.5.2",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
