@@ -2,6 +2,7 @@
 
 import json
 import pathlib
+import re
 import tomllib
 
 _root = pathlib.Path(__file__).parents[1]
@@ -24,3 +25,15 @@ def test_readme_proves_pypi_ownership():
 
 def test_description_fits_registry_limit():
     assert len(_server["description"]) <= 100
+
+
+def test_install_pins_match_pyproject():
+    # Every `handle-mcp@x.y.z` in README and docs pins the current release.
+    files = [_root / "README.md", *(_root / "docs").glob("*.md")]
+    pins = {
+        (f.name, pin)
+        for f in files
+        for pin in re.findall(r"handle-mcp@(\d+\.\d+\.\d+)", f.read_text("utf-8"))
+    }
+    assert pins
+    assert {pin for _, pin in pins} == {_version}, sorted(pins)
