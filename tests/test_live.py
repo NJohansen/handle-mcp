@@ -12,6 +12,7 @@ import pytest
 
 from handle_mcp import compare, recipe_cart
 from handle_mcp.stores import STORES
+from handle_mcp.stores.rema1000_pickup import GateClosed
 
 pytestmark = [
     pytest.mark.live,
@@ -25,7 +26,8 @@ def store(request):
 
 
 def not_yet_skips(test):
-    """A store that cannot do a thing yet (REMA 1000's cart) skips the test, never fails it."""
+    """A store that cannot do a thing yet (REMA 1000's cart), or has no pickup store chosen on
+    this machine, skips the test, never fails it."""
 
     @functools.wraps(test)
     async def run(*args, **kwargs):
@@ -33,6 +35,8 @@ def not_yet_skips(test):
             return await test(*args, **kwargs)
         except NotImplementedError:
             pytest.skip("butikken kan ikke det endnu")
+        except GateClosed as exc:
+            pytest.skip(str(exc))
 
     return run
 

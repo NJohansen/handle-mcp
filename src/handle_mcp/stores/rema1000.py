@@ -1,12 +1,14 @@
 """REMA 1000: the API behind shop.rema1000.dk. See docs/research.md and docs/adr/0007.
 
-Search and the weekly leaflet (Avisvare) are public: no login. The webshop is pickup only
-(Køb & Hent). REMA's own cart, store choice, pickup time and payment are never touched here
-(docs/adr/0001, docs/adr/0007). The cart will be a shopping list; it is not built yet.
+Search, the weekly leaflet (Avisvare) and the store list are public: no login. Pickup times
+need one (rema1000_auth.py, rema1000_pickup.py). The webshop is pickup only (Køb & Hent).
+REMA's own cart, store choice, pickup time and payment are never touched here (docs/adr/0001,
+docs/adr/0007). The cart will be a shopping list; it is not built yet.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
@@ -14,38 +16,18 @@ from typing import Any
 
 import httpx
 
-from handle_mcp.models import (
-    Cart,
-    DeliveryInfo,
-    DeliverySlot,
-    Order,
-    Product,
-    QuantityResult,
-    Recipe,
-    RecipeDetails,
-    StoreTerms,
-)
+from handle_mcp.models import Cart, Order, Product, QuantityResult, Recipe, RecipeDetails
 from handle_mcp.stores import StoreError
 from handle_mcp.stores._http import request
+from handle_mcp.stores.rema1000_auth import API, HEADERS, NAME, SHOP, RemaAuthMixin
+from handle_mcp.stores.rema1000_pickup import NOTE, RemaPickupMixin
 
 log = logging.getLogger(__name__)
 
-API = "https://api.digital.rema1000.dk/api"
-SHOP = "https://shop.rema1000.dk"
-NAME = "REMA 1000"
-HEADERS = {
-    "Accept": "application/json",
-    "X-Device": "web",
-    "X-Locale": "da",
-    "X-Timezone": "Copenhagen/Europe",
-}
 LEAFLET = 9001  # the label "Avisvare": this week's leaflet
 PER_PAGE = 100  # the most one page gives
 UNITS = {"kg": "kg", "ltr": "l", "l": "l", "stk": "stk"}
-NOTE = (
-    "REMA 1000 har kun Køb & Hent eller handel i butikken, ingen levering. "
-    "Køb & Hent har et pakkegebyr efter ordrens størrelse, som REMA ikke oplyser her."
-)
+__all__ = ["NOTE", "Rema1000Store", "product"]
 
 
 def _money(value: Any) -> Decimal | None:
@@ -132,12 +114,23 @@ def product(hit: dict, now: datetime | None = None) -> Product | None:
     )
 
 
-class Rema1000Store:
+class Rema1000Store(RemaAuthMixin, RemaPickupMixin):
     name = "rema1000"
     cart_page = SHOP  # the list lives in REMA's app and webshop; no page per list is known
 
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+    def __init__(
+        self, client: httpx.AsyncClient | None = None, auth: httpx.AsyncClient | None = None
+    ) -> None:
         self._client = client or httpx.AsyncClient(timeout=20, follow_redirects=True)
+        # The login has its own client, so its cookies never ride along with a search.
+        self._auth = auth or httpx.AsyncClient(timeout=20)
+        self._cookies: dict[str, str] = {}  # the site's session (rema1000_auth.py)
+        self._token: str | None = None
+        self._until = datetime.min.replace(tzinfo=UTC)
+        self._user: int | None = None  # the user id in the token, for the list (not yet)
+        self._stores = ""  # the chosen store ids, comma-separated (rema1000_pickup.py)
+        self._gate = None
+        self._auth_lock = asyncio.Lock()
 
     async def _get(self, path: str, params: dict[str, Any]) -> dict:
         resp = await request(
@@ -177,12 +170,6 @@ class Rema1000Store:
         params = {"filter[labels]": LEAFLET, "sort": "department"}
         return await self._products(params, limit, offers_only=True)
 
-    async def terms(self) -> StoreTerms:
-        return StoreTerms(store=self.name, home_delivery=False, delivery_mode="pickup")
-
-    async def delivery_info(self) -> DeliveryInfo:
-        return DeliveryInfo(store=self.name, note=NOTE, delivery_mode="pickup")
-
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
         raise NotImplementedError
 
@@ -203,14 +190,8 @@ class Rema1000Store:
     async def set_quantities(self, items: dict[str, int]) -> list[QuantityResult]:
         raise NotImplementedError
 
-    async def delivery_slots(self, days: int = 7) -> list[DeliverySlot]:
-        raise NotImplementedError
-
     async def orders(self, limit: int = 10) -> list[Order]:
         raise NotImplementedError
 
     async def order(self, order_id: str) -> Order:
         raise NotImplementedError
-
-    def session(self) -> dict[str, str] | None:
-        return None
