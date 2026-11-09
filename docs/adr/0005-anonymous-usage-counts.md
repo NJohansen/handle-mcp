@@ -18,3 +18,4 @@ No install id. A random id saved on the user's machine is pseudonymous personal 
 - `login_ok` means a store sent back the user's cart; a login that is never used is not counted. `first_tool_call` counts a call when it starts, also one that fails (e.g. no login): the user tried. Its file read and write run once a day on the event loop; a tiny local file, accepted.
 - Sends run in a daemon thread with a 2 s timeout. Every error is logged at debug level and never reaches a tool. Waiting carts are sent when the server stops.
 - Tests and CI never send: `tests/conftest.py` sets `HANDLE_TELEMETRY=0`.
+- REMA 1000 has a shopping list, not a cart ([ADR 0007](0007-rema-cart-is-a-shopping-list.md)). A filled list will count as its own event, `list_filled` (store, total rounded to 50 kr, item count), with the same once-per-list rule. It is added with the list code, together with `telemetry.py`, the README and the privacy page.

@@ -1,4 +1,4 @@
-# Research: nemlig.com og BilkaToGo
+# Research: nemlig.com, BilkaToGo og REMA 1000
 
 Trin 1 af v1. Skrevet 2026-11-01.
 
@@ -120,6 +120,22 @@ Nyttige felter pr. hit: `objectID` (varenummer til kurven), `gtin` (**EAN findes
 
 ### Ordrer
 `POST shop/v7/OrderHistory`, `GET shop/v7/OrderDetails`. Status-koder (`Bestilt`, `Leveret`, `Faktureret`) mappes til hjemmesidens ord (nickknissen ADR 0003). Ordrer kan have `home_delivery` og adresse → privacy-filter.
+
+## REMA 1000 (fra Go-porten, 2026-11-07)
+
+Kilde: [McAndersDK/handle-mcp-go](https://github.com/McAndersDK/handle-mcp-go) (MIT), `docs/research.md` og ADR 0008. Kun GET og ét login. Vi har ikke selv kaldt REMA endnu: punkterne bekræftes, når vores egne fixtures fanges.
+
+- **Net og API:** siden er `shop.rema1000.dk`, API'et `api.digital.rema1000.dk/api`. Ingen kø og intet bot-tjek set. Headers: `Accept: application/json`, `X-Device: web`, `X-Locale: da`, `X-Timezone: Copenhagen/Europe`, og `Authorization: Bearer <access_token>` med login.
+- **Levering:** kun Køb & Hent (afhentning), kun i nogle butikker (`is_click_and_collect_active`). Ingen hjemlevering.
+- **Søgning (offentlig):** `GET search/products?query=&per_page=&page=`, ens logget ind og ud. `prices` er en liste af perioder, den gældende først: `price`, `compare_unit`/`compare_unit_price`, `is_campaign`, `is_advertised`, `starting_at`, `ending_at`, `max_quantity`, `price_over_max_quantity`. `underline` er "størrelse / mærke". `barcodes` er EAN. REMA skriver `HK.` for hakket.
+- **Tilbud (offentlig):** avisvarer er `search/products?filter[labels]=9001&sort=department` (mærket Avisvare). 285 varer set 2026-11-07.
+- **Opskrifter (offentlig):** `GET search/recipes?query=` og `GET rema1000dk/entities?filter[type]=recipe&filter[slug]=...`. Ingredienser har `digitalProduct` med `amount` = pakker ved opskriftens egne personer.
+- **Login:** REMA's egen OAuth: `POST cphapp.rema1000.dk/api/oauth2/login` med e-mail og kode, derefter redirects, der sætter cookies `access_token` (JWT, ca. 1 time), `refresh_token`, `api_session`, `AWSALB`, `AWSALBCORS`. Fornyelse: `POST shop.rema1000.dk/api/auth/refresh`; uden `api_session` og `AWSALB` svarer den 500. Hvor længe `refresh_token` lever, er ukendt.
+- **Butikker og tider:** `GET v3/stores` (pagineret) og `GET v3/stores/{id}/time-slots` (dag -> `{from, to, is_available}` i UTC, 2 timer pr. tid, ingen pris).
+- **Indkøbslister:** `GET v3/users/{id}/shopping-lists`, `GET v2/shoppinglists/{id}?with=items` (aldrig `with=users`). Linjer har `amount`, `bought`, `store_item_id` og `store_item.pricing` (`price`, `normal_price`, `max_quantity`, `price_over_max`, `deposit`). Skrivning som sidens SDK: `POST v2/shoppinglists`, `POST .../items`, `PATCH .../items/{id}`, `PATCH v2/shoppinglists/{id}` med `{items:[{id, delete:true}]}`. **Ikke prøvet live.** Se ADR 0007.
+- **Kurv og betaling:** en rigtig kurv knyttet til butik, tid og kupon, og betalingsjobs. Rører vi aldrig (ADR 0001, 0007).
+- **Mangler:** intet ordre-endpoint, intet gebyr og intet minimumskøb i de kendte kald. Køb & Hent har pakke- og emballagegebyr efter ordrens størrelse ([handelsbetingelser](https://rema1000.dk/information/handelsbetingelser-scan-selv), 7.1).
+- **Vilkår (læst 2026-11-08):** en Køb & Hent-ordre starter fra indkøbslisten (afsnit 3). Intet forbud mod automatisk adgang fundet; REMA kan spærre ved mistanke om misbrug. `rema1000.dk/robots.txt` udelukker `/api/*` og `/konto/*` (sider, ikke `api.digital.rema1000.dk`).
 
 ## Konsekvenser for v1
 
