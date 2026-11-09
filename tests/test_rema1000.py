@@ -165,3 +165,30 @@ def test_verdict_says_cheapest_is_pickup():
         {"rema1000": quote("rema1000", "pickup", 8), "nemlig": quote("nemlig", "home", 9)}
     )
     assert result["cheapest"] == "rema1000" and "afhentning" in result["summary"]
+
+
+async def test_offers_skip_ended_offers_and_still_fill_the_limit(fake):
+    page1, page2 = fixture("offers"), fixture("offers")
+    for p in page1["data"]:  # the offer week is over: normal price only
+        p["prices"] = [p["prices"][1]]
+    page1["meta"]["pagination"] |= {"last_page": 2}
+    page2["meta"]["pagination"] |= {"current_page": 2, "last_page": 2}
+    pages = iter([page1, page2])
+
+    def handle(request):
+        fake.requests.append(request)
+        return httpx.Response(200, json=next(pages))
+
+    store = Rema1000Store(httpx.AsyncClient(transport=httpx.MockTransport(handle)))
+    offers = await store.offers(limit=2)
+    assert len(offers) == 2 and all(p.on_offer for p in offers)
+    assert len(fake.requests) == 2
+
+
+def test_comma_blend_only_for_rema():
+    from handle_mcp.match import mixed
+
+    rema = {"store": "rema1000", "name": "HK. OKSEKØD, 35% GRØNT"}
+    nemlig = {"store": "nemlig", "name": "Skinke, 12% vand"}
+    assert mixed(["hakket", "oksekød"], rema) == 1
+    assert mixed(["skinke"], nemlig) == 0

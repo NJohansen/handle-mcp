@@ -230,10 +230,12 @@ def _compound(word: str, token: str) -> bool:
 def mixed(words: list[str], product: Any) -> int:
     """1 for a blend the item does not ask for: 'Hakket oksekød m. 50% grønt'. A share of
     another food ('50% grønt') means a mix. A share of fat or sugar ('m. 0,5% fedt') does not,
-    nor 'Rugbrød m. kerner' or 'Laks m. skind'. REMA 1000 writes a comma: 'HK. OKSEKØD, 35% GRØNT'."""
+    nor 'Rugbrød m. kerner' or 'Laks m. skind'. REMA 1000 writes a comma: 'HK. OKSEKØD, 35% GRØNT'.
+    Only REMA 1000: elsewhere a comma is no blend ('Skinke, 12% vand')."""
     name = get(product, "name") or ""
     parts = FLAVOUR_RE.split(name, maxsplit=1)
-    parts = parts if len(parts) == 2 else name.split(",", 1)
+    if len(parts) != 2 and get(product, "store") == "rema1000":
+        parts = name.split(",", 1)
     shares = BLEND_RE.findall(parts[1]) if len(parts) == 2 else []
     if not any(w.lower() not in NUTRIENTS for w in shares):
         return 0

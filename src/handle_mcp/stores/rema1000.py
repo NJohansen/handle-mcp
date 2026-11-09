@@ -151,12 +151,17 @@ class Rema1000Store:
             raise StoreError("REMA 1000 har ændret sit svar. handle-mcp skal opdateres.")
         return data
 
-    async def _products(self, params: dict[str, Any], limit: int) -> list[Product]:
+    async def _products(
+        self, params: dict[str, Any], limit: int, offers_only: bool = False
+    ) -> list[Product]:
+        """Page until `limit` products. `offers_only` skips a leaflet product whose offer has
+        ended, before counting, so the limit is still filled."""
         found: list[Product] = []
         page = 1
         while len(found) < limit:
             data = await self._get("search/products", params | {"per_page": PER_PAGE, "page": page})
-            found += [p for hit in data["data"] if isinstance(hit, dict) and (p := product(hit))]
+            hits = [product(hit) for hit in data["data"] if isinstance(hit, dict)]
+            found += [p for p in hits if p and (p.on_offer or not offers_only)]
             last = ((data.get("meta") or {}).get("pagination") or {}).get("last_page") or 1
             if page >= last or not data["data"]:
                 break
@@ -168,7 +173,7 @@ class Rema1000Store:
 
     async def offers(self, limit: int = 25) -> list[Product]:
         params = {"filter[labels]": LEAFLET, "sort": "department"}
-        return [p for p in await self._products(params, limit) if p.on_offer]
+        return await self._products(params, limit, offers_only=True)
 
     async def terms(self) -> StoreTerms:
         return StoreTerms(store=self.name, home_delivery=False, delivery_mode="pickup")
