@@ -2,6 +2,8 @@
 
 REMA 1000 is the third store. Its webshop is pickup only (Køb & Hent), in some stores. handle-mcp never touches REMA's own cart: it is tied to a pickup store, a pickup time, a coupon and payment jobs, and all of that is the human's (ADR 0001, ADR 0006). The cart in handle-mcp is a shopping list in REMA's app, the same lists the human already uses.
 
+This extends ADR 0001: for REMA 1000, the list is the cart, and the list writes below are the only writes allowed. The list is close to an order, because REMA's terms say a Køb & Hent order starts from it. So the same lines hold as for a cart: the human opens the list, turns it into an order, picks the time and pays. handle-mcp never does any of those.
+
 ## One list called "handle-mcp"
 
 - `get_cart` and `set_cart_quantities` use the one list named exactly `handle-mcp`. It is created on the first write and never made primary.
