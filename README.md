@@ -87,8 +87,9 @@ What is sent, and nothing else. Every event also has `version` and `date` (day o
 |---|---|---|
 | `server_started` | the server starts, at most once per machine per day | `os` (`darwin`, `linux` or `windows`) |
 | `first_tool_call` | the first tool call of the day (a client that only lists the tools sends nothing) | `tool` (e.g. `compare_basket`) |
-| `login_ok` | a store answers with your cart, at most once per store per day | `store` (`nemlig` or `bilka`) |
+| `login_ok` | a store answers with your cart, at most once per store per day | `store` (`nemlig`, `bilka` or `rema1000`) |
 | `cart_filled` | once per order: after 30 minutes without changes, only when every line went in. Later edits send nothing until the cart is empty again (after checkout) | `store`, `basket_total_dkk` (rounded to the nearest 50 kr), `item_count` |
+| `list_filled` | the same as `cart_filled`, for REMA 1000, where the cart is the shopping list "handle-mcp". Kept apart so lists and carts never mix | `store` (`rema1000`), `basket_total_dkk`, `item_count` |
 
 Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP address to send the answer back and to guess the country; it does not save the address. Sends run with a 2 second timeout, in the background. A failed send never breaks a tool. The first tool answer on a machine has a `telemetry_notice`, so your AI tells you about it once. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, the day each daily event was last sent, and which stores have a counted cart that is not empty yet.
 

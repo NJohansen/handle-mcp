@@ -227,7 +227,8 @@ async def get_cart(store: str | None = None) -> dict:
     """Show the cart: lines, fees, total, whether the minimum order is met and `url`, the
     store's cart page where the human checks the cart and pays: give it to the human. With `store`
     that store's cart; without, every store's cart keyed by store name, a failing store
-    (e.g. no login) as {"error": ...} next to the others."""
+    (e.g. no login) as {"error": ...} next to the others. REMA 1000: the cart is the shopping
+    list "handle-mcp" in REMA's app, where the human orders."""
     if store is not None:
         return _out(await _call(store, "cart"))
     return _out(await _each(_names(None), links.cart))
@@ -235,7 +236,7 @@ async def get_cart(store: str | None = None) -> dict:
 
 @_tool(WRITE)
 async def set_cart_quantities(store: str, items: dict[str, Count]) -> dict:
-    """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart with its `url`: give the human that link to check and pay."""
+    """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart with its `url`: give the human that link to check and pay. REMA 1000: sets the shopping list "handle-mcp", never another list."""
     if not items:
         raise ToolError("Ingen varer angivet.")
     if len(items) > MAX_ITEMS:

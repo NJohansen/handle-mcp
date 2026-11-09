@@ -3,7 +3,7 @@
 Search, the weekly leaflet (Avisvare) and the store list are public: no login. Pickup times
 need one (rema1000_auth.py, rema1000_pickup.py). The webshop is pickup only (Køb & Hent).
 REMA's own cart, store choice, pickup time and payment are never touched here (docs/adr/0001,
-docs/adr/0007). The cart will be a shopping list; it is not built yet.
+docs/adr/0007). The cart is the shopping list "handle-mcp" (rema1000_list.py).
 """
 
 from __future__ import annotations
@@ -16,10 +16,11 @@ from typing import Any
 
 import httpx
 
-from handle_mcp.models import Cart, Order, Product, QuantityResult, Recipe, RecipeDetails
+from handle_mcp.models import Order, Product, Recipe, RecipeDetails
 from handle_mcp.stores import StoreError
 from handle_mcp.stores._http import request
 from handle_mcp.stores.rema1000_auth import API, HEADERS, NAME, SHOP, RemaAuthMixin
+from handle_mcp.stores.rema1000_list import RemaListMixin
 from handle_mcp.stores.rema1000_pickup import NOTE, RemaPickupMixin
 
 log = logging.getLogger(__name__)
@@ -114,7 +115,7 @@ def product(hit: dict, now: datetime | None = None) -> Product | None:
     )
 
 
-class Rema1000Store(RemaAuthMixin, RemaPickupMixin):
+class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin):
     name = "rema1000"
     cart_page = SHOP  # the list lives in REMA's app and webshop; no page per list is known
 
@@ -127,10 +128,11 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin):
         self._cookies: dict[str, str] = {}  # the site's session (rema1000_auth.py)
         self._token: str | None = None
         self._until = datetime.min.replace(tzinfo=UTC)
-        self._user: int | None = None  # the user id in the token, for the list (not yet)
+        self._user: int | None = None  # the user id in the token, for the list
         self._stores = ""  # the chosen store ids, comma-separated (rema1000_pickup.py)
         self._gate = None
         self._auth_lock = asyncio.Lock()
+        self._write_lock = asyncio.Lock()  # one list write at a time (rema1000_list.py)
 
     async def _get(self, path: str, params: dict[str, Any]) -> dict:
         resp = await request(
@@ -182,12 +184,6 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin):
     async def recipes_by_tag(
         self, tags: list[str], category: str | None = None, limit: int = 20
     ) -> list[Recipe]:
-        raise NotImplementedError
-
-    async def get_cart(self) -> Cart:
-        raise NotImplementedError
-
-    async def set_quantities(self, items: dict[str, int]) -> list[QuantityResult]:
         raise NotImplementedError
 
     async def orders(self, limit: int = 10) -> list[Order]:

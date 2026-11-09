@@ -34,6 +34,9 @@ FORBIDDEN = [
     r"v3/jobs",  # REMA 1000: payment jobs
     r"vendor-baskets",  # REMA 1000: imports a basket into the cart
     r"checkoutCallback",  # REMA 1000: checkout
+    r"\"primary\":\s*True",  # REMA 1000: the human's own list stays primary (docs/adr/0007)
+    r"\"DELETE\",",  # no HTTP DELETE anywhere; a REMA list line goes with "delete": true
+    r"with=users|\"with\":\s*\"[^\"]*users",  # REMA 1000: a list read with names and emails
 ]
 
 

@@ -23,13 +23,13 @@ src/handle_mcp/
   pricing.py       kroner: packs for the amount, offers, delivery day
   recipe_cart.py   add_recipe_to_cart: a recipe's products as absolute cart counts
   links.py         with_utm(): UTM tags on every cart link the human clicks
-  telemetry.py     anonymous counts (server_started, first_tool_call, login_ok, cart_filled); off with HANDLE_TELEMETRY=0
+  telemetry.py     anonymous counts (server_started, first_tool_call, login_ok, cart_filled, list_filled); off with HANDLE_TELEMETRY=0
   models.py        dataclasses; money is Decimal DKK
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES
   stores/_http.py     one request with the retries every store needs
   stores/<store>.py   one file per store: login, calls and parsing for that store
-  stores/<store>_<topic>.py  mixins when a store outgrows one file (nemlig_offers, nemlig_recipes, nemlig_delivery, rema1000_auth, rema1000_pickup)
+  stores/<store>_<topic>.py  mixins when a store outgrows one file (nemlig_offers, nemlig_recipes, nemlig_delivery, rema1000_auth, rema1000_pickup, rema1000_list)
 tests/             no network, no logins
 tests/snapshots/tools.json  every tool as the model sees it (name, description, args)
 docs/adr/          one short file per hard decision
