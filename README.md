@@ -91,7 +91,9 @@ Anonymous counts, so we can show the stores what handle-mcp sends them. On by de
 | `cart_filled` | once per filled cart, after 30 quiet minutes | `store`, `basket_total_dkk` (nearest 50 kr), `item_count` |
 | `list_filled` | the same, for REMA 1000's shopping list | `store`, `basket_total_dkk`, `item_count` |
 
-Never sent: names, addresses, email, logins, products, order ids or any id. Events go to [Umami Cloud](https://umami.is), which does not save your IP. A failed send never breaks a tool. Cart links carry `utm_source=handlemcp`.
+Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. Events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP to answer and to guess the country; it does not save it. Sends run in the background with a 2 second timeout, and a failed send never breaks a tool. Cart links carry `utm_source=handlemcp`.
+
+Your AI tells you once: the first tool answer on a machine has a `telemetry_notice`. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, the day each daily event was last sent, and which stores have a counted cart that is not empty yet.
 
 Off:
 
