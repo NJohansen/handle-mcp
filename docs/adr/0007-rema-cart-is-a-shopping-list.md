@@ -17,7 +17,7 @@ Creating the list and adding a line are POSTs, not absolute. They are never retr
 
 A read that lags can still let a second list or line through. The adapter recovers by itself, so the human never has to clean up:
 
-- Two or more lists named `handle-mcp`: the one with the lowest id is the list. The others are left alone, never deleted, and `get_cart` names them in a warning.
+- Two or more lists named `handle-mcp`: the one with the lowest id is the list. Ids are compared as numbers. The others are left alone, never deleted, and `get_cart` warns with their count, never their names.
 - A product on two lines of the list: its quantity is the sum. The next write sets the first line and removes the others.
 
 ## The pickup store
