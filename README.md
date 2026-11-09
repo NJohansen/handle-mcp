@@ -23,7 +23,7 @@ An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on 
 
 **It can never order or pay. You do.** That code does not exist, and a test fails if it shows up ([why](docs/adr/0001-the-human-always-pays.md)).
 
-**It counts anonymous usage, and tells you so.** No id, no personal data. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#brugsstatistik).
+**It counts anonymous usage, and tells you so.** No id, no personal data. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#usage-counts).
 
 ## How it works
 
@@ -77,33 +77,29 @@ BilkaToGo, REMA 1000, Claude Desktop, headless machines and AI agents (`handle-m
 
 Full arguments and fields: [docs/tools.md](docs/tools.md).
 
-## Brugsstatistik
+<a name="brugsstatistik"></a>
 
-handle-mcp counts, anonymously, how far people get from install to a filled cart, so we can show the stores how many carts and kroner it sends them each week. It is on by default and easy to turn off.
+## Usage counts
 
-What is sent, and nothing else. Every event also has `version` and `date` (day only):
+Anonymous counts, so we can show the stores what handle-mcp sends them. On by default. Every event has `version` and `date` (day only):
 
 | Event | When | Fields |
 |---|---|---|
-| `server_started` | the server starts, at most once per machine per day | `os` (`darwin`, `linux` or `windows`) |
-| `first_tool_call` | the first tool call of the day (a client that only lists the tools sends nothing) | `tool` (e.g. `compare_basket`) |
-| `login_ok` | a store answers with your cart, at most once per store per day | `store` (`nemlig`, `bilka` or `rema1000`) |
-| `cart_filled` | once per order: after 30 minutes without changes, only when every line went in. Later edits send nothing until the cart is empty again (after checkout) | `store`, `basket_total_dkk` (rounded to the nearest 50 kr), `item_count` |
-| `list_filled` | the same as `cart_filled`, for REMA 1000, where the cart is the shopping list "handle-mcp". Kept apart so lists and carts never mix | `store` (`rema1000`), `basket_total_dkk`, `item_count` |
+| `server_started` | once a day per machine | `os` |
+| `first_tool_call` | the first tool call of the day | `tool` |
+| `login_ok` | once a day per store | `store` |
+| `cart_filled` | once per filled cart, after 30 quiet minutes | `store`, `basket_total_dkk` (nearest 50 kr), `item_count` |
+| `list_filled` | the same, for REMA 1000's shopping list | `store`, `basket_total_dkk`, `item_count` |
 
-Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP address to send the answer back and to guess the country; it does not save the address. Sends run with a 2 second timeout, in the background. A failed send never breaks a tool. The first tool answer on a machine has a `telemetry_notice`, so your AI tells you about it once. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, the day each daily event was last sent, and which stores have a counted cart that is not empty yet.
+Never sent: names, addresses, email, logins, products, order ids or any id. Events go to [Umami Cloud](https://umami.is), which does not save your IP. A failed send never breaks a tool. Cart links carry `utm_source=handlemcp`.
 
-Cart links (`url` in the cart) carry `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`, so the store sees the visit in its own analytics.
-
-Turn it off with any of:
+Off:
 
 ```sh
-HANDLE_TELEMETRY=0          # env var
-DO_NOT_TRACK=1              # the common opt-out
-handle-mcp --no-telemetry   # flag
+HANDLE_TELEMETRY=0          # or DO_NOT_TRACK=1, or --no-telemetry
 ```
 
-Send the events to your own Umami: `HANDLE_TELEMETRY_URL=https://umami.example.com/api/send` and `HANDLE_TELEMETRY_WEBSITE=<website id>`. Why and how: [docs/adr/0005](docs/adr/0005-anonymous-usage-counts.md).
+Your own Umami: `HANDLE_TELEMETRY_URL` and `HANDLE_TELEMETRY_WEBSITE`. Why: [ADR 0005](docs/adr/0005-anonymous-usage-counts.md).
 
 ## More
 
