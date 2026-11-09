@@ -128,7 +128,7 @@ async def test_pickup_only_terms(store):
 
 @pytest.mark.parametrize(
     "method,args",
-    [("get_cart", ()), ("set_quantities", ({"1": 1},)), ("orders", ())],
+    [("orders", ()), ("recipes", ("suppe",))],
 )
 async def test_not_yet(store, method, args):
     with pytest.raises(NotImplementedError):

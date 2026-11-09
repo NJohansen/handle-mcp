@@ -3,7 +3,7 @@
 No id, no names, no addresses, no logins, no products, no order ids (docs/adr/0005). The only
 file is `telemetry.json` in the config folder: the notice was shown, the last day each
 daily event went out, and which stores have a counted cart that is not empty yet.
-The funnel: server_started, first_tool_call, login_ok, cart_filled.
+The funnel: server_started, first_tool_call, login_ok, cart_filled (list_filled for REMA 1000).
 Off with HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or `--no-telemetry`.
 Every send runs in a background thread with a short timeout. A failure is logged, never raised.
 """
@@ -37,6 +37,7 @@ TIMEOUT = 2.0  # seconds
 QUIET = 1800.0  # seconds without a cart change before the cart counts as filled
 ROUND_TO = Decimal(50)  # kroner
 STORE_NAMES = {"bilkatogo": "bilka"}
+FILLED = {"rema1000": "list_filled"}  # REMA's cart is a shopping list: never mixed with carts
 OFF = {"0", "false", "no", "off"}
 
 NOTICE = """\
@@ -257,7 +258,7 @@ def _flush(store: str, wait: bool = False) -> None:
     if entry:
         entry[0].cancel()
         _update(lambda state: _with_counted(state, _counted(state) | {store}))
-        _send("cart_filled", entry[1], wait)
+        _send(FILLED.get(store, "cart_filled"), entry[1], wait)
 
 
 @atexit.register

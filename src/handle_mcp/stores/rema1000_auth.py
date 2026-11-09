@@ -23,7 +23,7 @@ from urllib.parse import unquote
 import httpx
 
 from handle_mcp.stores import StoreError, expired, load_login, save_session
-from handle_mcp.stores._http import request
+from handle_mcp.stores._http import RETRYABLE, request
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +47,10 @@ MAX_HOPS = 12
 MARGIN = timedelta(minutes=2)  # renew this long before the token ends
 FALLBACK = timedelta(minutes=50)  # the life of a token that says nothing about its end
 IDS = re.compile(r"\d+")
+
+
+class Unsure(StoreError):
+    """A POST whose answer was lost: it may or may not have landed. Read before sending again."""
 
 
 def queue() -> StoreError:
@@ -262,24 +266,40 @@ class RemaAuthMixin:
         raise StoreError("REMA 1000 login gik i ring. API'et kan have ændret sig.")
 
     async def _api(
-        self, method: str, path: str, *, params: dict | None = None, body: Any = None
+        self,
+        method: str,
+        path: str,
+        *,
+        params: dict | None = None,
+        body: Any = None,
+        once: bool = False,
     ) -> httpx.Response:
         """One call with the token. A 401 renews once; a second one means the session is over.
-        A 403 or a redirect is a queue or a bot check: reported, never worked around."""
+        A 403 or a redirect is a queue or a bot check: reported, never worked around. `once`
+        (a POST that creates something) is never retried: a lost answer, a 429 or a 5xx raises
+        Unsure, and the caller reads before it sends again (docs/adr/0007)."""
         used = None
         for attempt in range(2):
             token = await self._bearer(force=attempt > 0, used=used)
             used = token
-            resp = await request(
-                self._client,
-                method,
-                f"{API}/{path}",
-                NAME,
-                params=params,
-                json=body,
-                headers=HEADERS | {"Authorization": f"Bearer {token}"},
-                follow_redirects=False,
-            )
+            kwargs: dict[str, Any] = {
+                "params": params,
+                "json": body,
+                "headers": HEADERS | {"Authorization": f"Bearer {token}"},
+                "follow_redirects": False,
+            }
+            url = f"{API}/{path}"
+            if once:
+                try:
+                    resp = await self._client.request(method, url, **kwargs)
+                except RETRYABLE as exc:
+                    raise Unsure(f"{NAME} svarer ikke ({type(exc).__name__}).") from exc
+                except httpx.HTTPError as exc:
+                    raise StoreError(f"Kan ikke nå {NAME} ({type(exc).__name__}).") from exc
+                if resp.status_code == 429 or resp.status_code >= 500:
+                    raise Unsure(f"{NAME} svarer {resp.status_code}.")
+            else:
+                resp = await request(self._client, method, url, NAME, **kwargs)
             status = resp.status_code
             if status == 401 and attempt == 0:
                 continue
