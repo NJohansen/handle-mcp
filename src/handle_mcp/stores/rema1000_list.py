@@ -97,7 +97,7 @@ class RemaListMixin:
                 for r in rows
                 if isinstance(r, dict) and r.get("name") == LIST and (i := _id(r.get("id")))
             ]
-            last = ((data.get("meta") or {}).get("pagination") or {}).get("last_page") or 1
+            last = _id(((data.get("meta") or {}).get("pagination") or {}).get("last_page")) or 1
             if page >= last or not rows:
                 break
         return (min(ids), len(ids) - 1) if ids else (None, 0)
@@ -106,7 +106,7 @@ class RemaListMixin:
         """One list with its lines only. Never with the users: that brings names and emails."""
         data = await self._api_json(f"v2/shoppinglists/{list_id}", "listen", {"with": "items"})
         data = data["data"] if isinstance(data.get("data"), dict) else data
-        if _id(data.get("id")) != list_id or not isinstance(data.get("items", []), list):
+        if _id(data.get("id")) != list_id or not isinstance(data.get("items") or [], list):
             raise StoreError(
                 "REMA 1000 sendte en anden liste end bedt om. API'et kan have ændret sig."
             )
@@ -249,7 +249,9 @@ class RemaListMixin:
                 found = [i for i in (await self._read(list_id))["items"] if _product(i) == pid]
                 if found:
                     return found
-        raise StoreError("REMA 1000 svarer ikke, og varen kom ikke på listen. Prøv igen om lidt.")
+        # Noted per product, so the changes already made in this call are still reported.
+        failed[pid] = "REMA 1000 svarer ikke, og varen kom ikke på listen. Prøv igen om lidt."
+        return []
 
     async def _create(self) -> int:
         """Make the list, never primary. After a lost answer, look again before a new POST."""

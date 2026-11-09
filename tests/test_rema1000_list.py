@@ -9,7 +9,7 @@ import pytest
 
 from handle_mcp import stores as registry
 from handle_mcp import telemetry
-from handle_mcp.stores import StoreError, rema1000_list
+from handle_mcp.stores import rema1000_list
 from handle_mcp.stores.rema1000 import Rema1000Store
 from tests.test_rema1000_login import STORES, jwt
 
@@ -232,10 +232,33 @@ async def test_dropped_post_is_sent_again(store, api):
     assert [i["amount"] for i in api.mine()["items"]] == [2]
 
 
-async def test_post_that_never_lands_stops(store, api):
-    api.lost = ["ok", "dropped", "dropped", "dropped"]
-    with pytest.raises(StoreError, match="kom ikke på listen"):
-        await store.set_quantities({"20302": 2})
+async def test_post_that_never_lands_fails_that_product_only(store, api):
+    await store.set_quantities({"100": 1})
+    api.lost = ["dropped", "dropped", "dropped"]
+    results = await store.set_quantities({"100": 3, "20302": 2})
+    assert results[0].ok and results[0].applied == 3
+    assert not results[1].ok and "kom ikke på listen" in results[1].message
+
+
+async def test_items_null_and_odd_last_page(store, api):
+    real = api.handle
+
+    def odd(req: httpx.Request) -> httpx.Response:
+        resp = real(req)
+        path = req.url.path
+        if path.endswith("/shopping-lists"):
+            data = json.loads(resp.content)
+            data["meta"]["pagination"]["last_page"] = "1"
+            return httpx.Response(200, json=data)
+        if req.method == "GET" and path.startswith("/api/v2/shoppinglists/"):
+            return httpx.Response(200, json=json.loads(resp.content) | {"items": None})
+        return resp
+
+    store._client = httpx.AsyncClient(transport=httpx.MockTransport(odd))
+    await store.set_quantities({"20302": 0})
+    api.lists[1001] = {"id": 1001, "name": "handle-mcp", "primary": False, "items": []}
+    cart = await store.get_cart()
+    assert cart.lines == []
 
 
 async def test_lagging_read_after_create(store, api):
