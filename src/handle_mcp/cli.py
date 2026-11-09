@@ -7,6 +7,9 @@
                                         For a headless machine or an AI agent with no terminal.
     handle-mcp logout nemlig            removes the login from the keychain and the file
 
+A store that needs a pickup store (REMA 1000) asks for it after the login, on this terminal.
+With --from-env, set HANDLE_<STORE>_STORE_ID (store ids, comma-separated) for the server.
+
 The password is used for one login and then forgotten: never saved, echoed or logged. Only the
 session the store gives back is saved (docs/adr/0003). When it expires, log in again.
 """
@@ -75,7 +78,7 @@ def run(args: list[str]) -> int:
         _say("Email og kodeord skal udfyldes. Intet er gemt.")
         return 1
     try:  # log in first, save after: a failed login never touches a saved one
-        session = _check(store, email, password)
+        session = _check(store, email, password, choose=True)
     except registry.StoreError as exc:
         _say(f"Login blev ikke gemt: {exc}\nEt tidligere gemt login er uændret.")
         return 1
@@ -131,16 +134,56 @@ def _login_from_env(store: str) -> int:
     return 0
 
 
-def _check(store: str, email: str, password: str) -> dict[str, str]:
+def _ask(text: str) -> str:
+    sys.stderr.write(text)
+    sys.stderr.flush()
+    return sys.stdin.readline().strip()
+
+
+def _numbers(raw: str, most: int) -> list[int]:
+    """ "2, 1" as list positions 1..most, in order, without repeats."""
+    out: list[int] = []
+    for part in raw.replace(" ", ",").split(","):
+        if part.isdigit() and 1 <= int(part) <= most and int(part) not in out:
+            out.append(int(part))
+    return out
+
+
+async def _choose(instance: Any) -> None:
+    """Pick the stores in order of preference. The list is the store's own, shown here only."""
+    _say("Vælg de butikker, du vil bruge, i den rækkefølge du foretrækker dem.")
+    while query := _ask("Søg efter butik (postnummer, by eller navn; tom = spring over): "):
+        choices = await instance.store_choices(query)
+        if not choices:
+            _say("Ingen butikker passer. Prøv en anden søgning.")
+            continue
+        for i, (_, text) in enumerate(choices, 1):
+            _say(f"{i:>3}. {text}")
+        picked = _numbers(_ask("Skriv numrene, fx 2,1 (tom = søg igen): "), len(choices))
+        if picked:
+            instance.choose_stores([choices[i - 1][0] for i in picked])
+            _say("Valgt: " + " | ".join(choices[i - 1][1] for i in picked))
+            return
+    _say(f"Ingen butik valgt. Vælg senere med: handle-mcp login {instance.name}")
+
+
+async def _verify(instance: Any, choose: bool) -> None:
+    check = getattr(instance, "check_login", None)  # a store with no cart to read yet
+    await (check() if check else instance.get_cart())
+    if choose and hasattr(instance, "store_choices"):
+        await _choose(instance)
+
+
+def _check(store: str, email: str, password: str, choose: bool = False) -> dict[str, str]:
     """A real, read-only login with these values (they win over saved ones via env vars).
-    Returns the session to save."""
+    With `choose`, a store that needs a pickup store asks for it. Returns the session."""
     prefix = f"HANDLE_{store.upper()}_"
     keys = {prefix + "EMAIL": email, prefix + "PASSWORD": password}
     before = {k: os.environ.get(k) for k in keys}
     os.environ.update(keys)
     instance = registry.STORES[store]()
     try:
-        asyncio.run(instance.get_cart())
+        asyncio.run(_verify(instance, choose))
     finally:
         for k, v in before.items():
             if v is None:

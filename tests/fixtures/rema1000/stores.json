@@ -1,0 +1,54 @@
+{
+ "data": [
+  {
+   "id": 263,
+   "name": "Aalborg C, Hasseris",
+   "postal_code": "9000",
+   "city": "Aalborg",
+   "is_click_and_collect_active": true
+  },
+  {
+   "id": 265,
+   "name": "Aalborg C, Østerbro",
+   "postal_code": "9000",
+   "city": "Aalborg",
+   "is_click_and_collect_active": true
+  },
+  {
+   "id": 270,
+   "name": "Aarhus C, Frederiksgade",
+   "postal_code": "8000",
+   "city": "Aarhus C",
+   "is_click_and_collect_active": true
+  },
+  {
+   "id": 329,
+   "name": "Aabenraa, Cimbria Parken",
+   "postal_code": "6200",
+   "city": "Aabenraa",
+   "is_click_and_collect_active": false
+  },
+  {
+   "id": 258,
+   "name": "Aabenraa, Nyløkke",
+   "postal_code": "6200",
+   "city": "Aabenraa",
+   "is_click_and_collect_active": false
+  },
+  {
+   "id": 259,
+   "name": "Aabenraa, Rugkobbel",
+   "postal_code": "6200",
+   "city": "Aabenraa",
+   "is_click_and_collect_active": false
+  }
+ ],
+ "meta": {
+  "pagination": {
+   "current_page": 1,
+   "last_page": 1,
+   "per_page": 100,
+   "total": 6
+  }
+ }
+}

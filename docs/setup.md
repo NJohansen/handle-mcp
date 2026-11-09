@@ -7,7 +7,10 @@ Works on macOS, Linux and Windows. Needs [uv](https://docs.astral.sh/uv/getting-
 ```sh
 uvx handle-mcp@latest login nemlig
 uvx handle-mcp@latest login bilkatogo
+uvx handle-mcp@latest login rema1000
 ```
+
+`login rema1000` then asks for your REMA 1000 stores: search by postcode, city or name, and pick one or more in the order you prefer. The choice is saved on your machine with the session; nothing is set at REMA. A store without Køb & Hent is fine: the first one with Køb & Hent gives the pickup times. With `--from-env`, set `HANDLE_REMA1000_STORE_ID` (store ids, comma-separated) for the server instead. REMA's access token lasts about an hour; the server renews it by itself with the saved session.
 
 `handle-mcp logout <store>` removes it again. From a clone, use `uv run handle-mcp login nemlig`.
 
@@ -25,7 +28,7 @@ HANDLE_NEMLIG_EMAIL=you@example.com HANDLE_NEMLIG_PASSWORD='...' \
 
 The env vars are only needed for that one command; the MCP server reads the file afterwards. Remove them again: the file has no password. `handle-mcp logout <store>` removes the file. Nothing is written when the login fails.
 
-Without any login, `list_offers` still works for nemlig; `search_products` needs a login (nemlig's search answers 500 without one). BilkaToGo needs a login for everything: the store, prices and offers follow your delivery address.
+Without any login, `list_offers` still works for nemlig; `search_products` needs a login (nemlig's search answers 500 without one). BilkaToGo needs a login for everything: the store, prices and offers follow your delivery address. REMA 1000's search and offers need no login; its pickup times do.
 
 **2. BilkaToGo:** choose home delivery (not pickup) once on bilkatogo.dk. The server reads the store and fees from your cart.
 

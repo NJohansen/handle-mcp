@@ -29,7 +29,7 @@ src/handle_mcp/
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES
   stores/_http.py     one request with the retries every store needs
   stores/<store>.py   one file per store: login, calls and parsing for that store
-  stores/<store>_<topic>.py  mixins when a store outgrows one file (nemlig_offers, nemlig_recipes, nemlig_delivery)
+  stores/<store>_<topic>.py  mixins when a store outgrows one file (nemlig_offers, nemlig_recipes, nemlig_delivery, rema1000_auth, rema1000_pickup)
 tests/             no network, no logins
 tests/snapshots/tools.json  every tool as the model sees it (name, description, args)
 docs/adr/          one short file per hard decision
