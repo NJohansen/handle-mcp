@@ -6,3 +6,4 @@ Built on what these projects found out. Thank you.
 - [kraenhansen/nemlig-mcp](https://github.com/kraenhansen/nemlig-mcp): nemlig MCP server and the privacy-marker idea. MIT.
 - [nickknissen/bilkatogo](https://github.com/nickknissen/bilkatogo): BilkaToGo login, cart and order flow, and the test fixtures in `tests/fixtures/bilkatogo/`. MIT, Copyright (c) 2026 Nick Nissen.
 - [stigvoss/bilkatogo-mcp](https://github.com/stigvoss/bilkatogo-mcp): read for facts about BilkaToGo. No code copied.
+- [McAndersDK/handle-mcp-go](https://github.com/McAndersDK/handle-mcp-go): the REMA 1000 API map (search, login, pickup times, shopping lists), verified live. MIT.

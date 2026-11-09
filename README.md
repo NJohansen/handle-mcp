@@ -12,7 +12,7 @@
 <br>
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/platforms-macOS_%7C_Windows_%7C_Linux-blue.svg?mode=dark"><img src="https://shieldcn.dev/badge/platforms-macOS_%7C_Windows_%7C_Linux-blue.svg?mode=light" alt="macOS, Windows, Linux"></picture>
 
-**Let your AI agent shop at [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.bilkatogo.dk).**<br>
+**Let your AI agent shop at [nemlig.com](https://www.nemlig.com), [BilkaToGo](https://www.bilkatogo.dk) and [REMA 1000](https://shop.rema1000.dk).**<br>
 An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on your budget and fills the cheapest cart. You pay.
 
 **[Install →](#install)** · [handlemcp.dk](https://handlemcp.dk)
@@ -27,10 +27,10 @@ An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on 
 
 ## How it works
 
-1. **Plan.** Give your agent a budget. It reads this week's offers on nemlig.com and BilkaToGo, and both stores' recipes, and plans the meals around them.
-2. **Compare.** It prices the whole list in both stores: pack sizes, offers, delivery fee and minimum order.
-3. **Fill.** It puts the list in the cheapest store's cart, with your login. Only the cart, nothing else.
-4. **Pay.** You open nemlig.com or BilkaToGo, check the cart, pick a delivery time and pay.
+1. **Plan.** Give your agent a budget. It reads this week's offers in each store, and the stores' recipes, and plans the meals around them.
+2. **Compare.** It prices the whole list in every store: pack sizes, offers, delivery fee and minimum order.
+3. **Fill.** It puts the list in the cheapest store's cart, with your login. Only the cart, nothing else. At REMA 1000 the cart is your shopping list "handle-mcp" in REMA's app.
+4. **Pay.** You open the store, check the cart, pick a delivery or pickup time and pay.
 
 Taste, budget and meal rules live in your own prompt or skill. The server finds and counts. [Build your own skill](docs/skills.md).
 
@@ -39,7 +39,7 @@ Taste, budget and meal rules live in your own prompt or skill. The server finds 
 - macOS, Linux or Windows (x64). Windows on ARM is not supported yet: a dependency (`cryptography`) has no ready-made build for it.
 - [uv](https://docs.astral.sh/uv/). It fetches Python 3.12+ if you do not have it.
 - An MCP client, Grok, Claude Code, Claude Desktop or Codex etc.
-- An account at nemlig.com or BilkaToGo with home delivery to your address.
+- An account at nemlig.com or BilkaToGo with home delivery to your address, or at REMA 1000 (Køb & Hent or shopping in the store yourself).
 
 ## Install
 
@@ -56,7 +56,7 @@ Then ask:
 - *"What is on offer this week? Any free gifts?"*
 - *"Which delivery times are cheapest tomorrow?"*
 
-BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <store> --from-env`): [setup](docs/setup.md). nemlig's offers work with no login at all. No terminal? [Join the waitlist](https://handlemcp.dk).
+BilkaToGo, REMA 1000, Claude Desktop, headless machines and AI agents (`handle-mcp login <store> --from-env`): [setup](docs/setup.md). `login rema1000` also asks for your REMA 1000 stores. nemlig's offers, and REMA 1000's search and offers, work with no login at all. No terminal? [Join the waitlist](https://handlemcp.dk).
 
 ## Tools
 
@@ -69,17 +69,17 @@ BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <s
 | `list_offers` | no | This week's offers and free gifts |
 | `compare_basket` | no | Prices a list in every store, fees included, cheapest first |
 | `get_cart` | no | Cart lines, fees, total, in one store or every store |
-| `set_cart_quantities` | **yes** | Sets quantities in the cart. Nothing else |
+| `set_cart_quantities` | **yes** | Sets quantities in the cart (REMA 1000: the list "handle-mcp"). Nothing else |
 | `add_recipe_to_cart` | **yes** | Puts a recipe's products in the cart, after your yes. Nothing else |
 | `get_delivery_info` | no | Chosen time, fees |
-| `list_delivery_slots` | no | Free times, cheapest first |
+| `list_delivery_slots` | no | Free times, cheapest first (REMA 1000: Køb & Hent times) |
 | `get_orders` / `get_order` | no | What you usually buy |
 
 Full arguments and fields: [docs/tools.md](docs/tools.md).
 
 ## Brugsstatistik
 
-handle-mcp counts, anonymously, how far people get from install to a filled cart, so we can show nemlig.com and BilkaToGo how many carts and kroner it sends them each week. It is on by default and easy to turn off.
+handle-mcp counts, anonymously, how far people get from install to a filled cart, so we can show the stores how many carts and kroner it sends them each week. It is on by default and easy to turn off.
 
 What is sent, and nothing else. Every event also has `version` and `date` (day only):
 
@@ -109,7 +109,7 @@ Send the events to your own Umami: `HANDLE_TELEMETRY_URL=https://umami.example.c
 
 [Setup](docs/setup.md) · [Skills](docs/skills.md) · [Security](docs/security.md) · [Troubleshooting](docs/troubleshooting.md) · [Testing](docs/testing.md) · [Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md) · [Credits](CREDITS.md)
 
-Unofficial. Uses the stores' private website APIs, so it can break any day. Not affiliated with nemlig.com or Salling Group.
+Unofficial. Uses the stores' private website APIs, so it can break any day. Not affiliated with nemlig.com, Salling Group or REMA 1000.
 
 [MIT](LICENSE)
 
