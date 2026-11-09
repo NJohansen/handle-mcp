@@ -8,12 +8,12 @@
     "url": "https://github.com/NJohansen/handle-mcp",
     "source": "github"
   },
-  "version": "1.5.2",
+  "version": "1.6.0",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "handle-mcp",
-      "version": "1.5.2",
+      "version": "1.6.0",
       "transport": {
         "type": "stdio"
       }
