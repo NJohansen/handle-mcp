@@ -27,9 +27,9 @@ An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on 
 
 ## How it works
 
-1. **Plan.** Give your agent a budget. It reads this week's offers in each store, and the stores' recipes, and plans the meals around them.
+1. **Plan.** Give your agent a budget. It reads this week's offers and the recipes, and plans the meals around them.
 2. **Compare.** It prices the whole list in every store: pack sizes, offers, delivery fee and minimum order.
-3. **Fill.** It puts the list in the cheapest store's cart, with your login. Only the cart, nothing else. At REMA 1000 the cart is your shopping list "handle-mcp" in REMA's app.
+3. **Fill.** It fills the cheapest store's cart with your login. Only the cart. (At REMA 1000: your shopping list "handle-mcp".)
 4. **Pay.** You open the store, check the cart, pick a delivery or pickup time and pay.
 
 Taste, budget and meal rules live in your own prompt or skill. The server finds and counts. [Build your own skill](docs/skills.md).
@@ -56,7 +56,7 @@ Then ask:
 - *"What is on offer this week? Any free gifts?"*
 - *"Which delivery times are cheapest tomorrow?"*
 
-BilkaToGo, REMA 1000, Claude Desktop, headless machines and AI agents (`handle-mcp login <store> --from-env`): [setup](docs/setup.md). `login rema1000` also asks for your REMA 1000 stores. nemlig's offers, and REMA 1000's search and offers, work with no login at all. No terminal? [Join the waitlist](https://handlemcp.dk).
+Other stores, Claude Desktop, headless machines and AI agents (`--from-env`): [setup](docs/setup.md). nemlig's offers and REMA 1000's search work with no login. No terminal? [Join the waitlist](https://handlemcp.dk).
 
 ## Tools
 
