@@ -268,9 +268,25 @@ async def test_lagging_read_after_create(store, api):
 
 
 async def test_unknown_product_is_refused_and_the_rest_goes_in(store, api):
-    results = await store.set_quantities({"999": 1, "20302": 1, "x": 1})
-    assert [r.ok for r in results] == [False, True, False]
+    results = await store.set_quantities({"999": 1, "20302": 1, "x": 1, "²": 1})
+    assert [r.ok for r in results] == [False, True, False, False]
     assert "afviste varen (422)" in results[0].message and "Ugyldigt" in results[2].message
+    assert "Ugyldigt" in results[3].message
+
+
+async def test_failed_cleanup_still_reports_each_product(store, api):
+    await store.set_quantities({"20302": 1, "100": 1})
+    real = api.handle
+
+    def refuse_cleanup(req: httpx.Request) -> httpx.Response:
+        if req.method == "PATCH" and req.url.path.count("/") == 4:  # the list itself
+            return httpx.Response(422)
+        return real(req)
+
+    store._client = httpx.AsyncClient(transport=httpx.MockTransport(refuse_cleanup))
+    results = await store.set_quantities({"20302": 3, "100": 0})
+    assert results[0].ok and "fjernede ikke" in results[0].message
+    assert not results[1].ok and "Listen har 1" in results[1].message
 
 
 async def test_store_without_click_and_collect_still_has_the_list(store, api):

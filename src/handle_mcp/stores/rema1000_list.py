@@ -40,7 +40,7 @@ def _id(value: Any) -> int | None:
     """An id as REMA sends it: a number or a numeric string."""
     if isinstance(value, bool):
         return None
-    if isinstance(value, int) or (isinstance(value, str) and value.isdigit()):
+    if isinstance(value, int) or (isinstance(value, str) and value.isascii() and value.isdigit()):
         return int(value)
     return None
 
@@ -162,7 +162,7 @@ class RemaListMixin:
 
     async def set_quantities(self, items: dict[str, int]) -> list[QuantityResult]:
         """Absolute amounts on the list; 0 removes. Read back and compared. Never orders or pays."""
-        want = {pid: n for pid, n in items.items() if pid.isdigit() and int(pid) > 0 and n >= 0}
+        want = {pid: n for pid, n in items.items() if (_id(pid) or 0) > 0 and n >= 0}
         failed = {pid: "Ugyldigt varenummer eller antal." for pid in items if pid not in want}
         applied: dict[str, int] = {}
         warn = None
@@ -202,15 +202,19 @@ class RemaListMixin:
         gone = [i["id"] for i in full["items"] if i.get("bought") is True and id(i) not in reused]
         for pid, n in want.items():
             gone += await self._reconcile(base, pid, n, lines.get(pid, []), failed)
+        cleanup = None
         if gone:
             body = {"items": [{"id": i, "delete": True} for i in dict.fromkeys(gone)]}
-            await self._write("PATCH", base, body, None, failed)
+            try:
+                await self._write("PATCH", base, body, None, failed)
+            except StoreError:  # the changes above have landed: still read back and report
+                cleanup = "REMA 1000 fjernede ikke de gamle linjer. Se listen i appen."
         back = await self._read(list_id)
         applied: dict[str, int] = {}
         for item in back["items"]:
             if (pid := _product(item)) and item.get("bought") is not True:
                 applied[pid] = applied.get(pid, 0) + _qty(item)
-        return applied, PRIMARY if back.get("primary") is True else None
+        return applied, PRIMARY if back.get("primary") is True else cleanup
 
     async def _reconcile(
         self, base: str, pid: str, n: int, lines: list[dict], failed: dict[str, str]
