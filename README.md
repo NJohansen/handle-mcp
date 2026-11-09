@@ -86,9 +86,9 @@ Anonymous counts, so we can show the stores what handle-mcp sends them. On by de
 | Event | When | Fields |
 |---|---|---|
 | `server_started` | once a day per machine | `os` |
-| `first_tool_call` | the first tool call of the day | `tool` |
+| `first_tool_call` | the first tool call of the day (listing tools is not a call) | `tool` |
 | `login_ok` | once a day per store | `store` |
-| `cart_filled` | once per filled cart, after 30 quiet minutes | `store`, `basket_total_dkk` (nearest 50 kr), `item_count` |
+| `cart_filled` | after 30 quiet minutes, only if every line went in; then nothing until the cart is empty again | `store`, `basket_total_dkk` (nearest 50 kr), `item_count` |
 | `list_filled` | the same, for REMA 1000's shopping list | `store`, `basket_total_dkk`, `item_count` |
 
 Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. Events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP to answer and to guess the country; it does not save it. Sends run in the background with a 2 second timeout, and a failed send never breaks a tool. Cart links carry `utm_source=handlemcp`.
