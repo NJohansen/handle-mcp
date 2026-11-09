@@ -192,3 +192,13 @@ def test_comma_blend_only_for_rema():
     nemlig = {"store": "nemlig", "name": "Skinke, 12% vand"}
     assert mixed(["hakket", "oksekød"], rema) == 1
     assert mixed(["skinke"], nemlig) == 0
+
+
+def test_every_period_ended_never_shows_an_old_offer():
+    late = datetime(2027, 6, 1, tzinfo=UTC)  # after both periods in offers.json
+    bread = product(fixture("offers")["data"][0], late)
+    assert bread is not None and not bread.on_offer and bread.price == Decimal("22.5")
+    only_offer = fixture("offers")["data"][0] | {
+        "prices": [fixture("offers")["data"][0]["prices"][0]]
+    }
+    assert product(only_offer, late) is None

@@ -68,12 +68,14 @@ def _time(value: Any) -> datetime | None:
 
 
 def _current(prices: list[dict], now: datetime) -> int | None:
-    """Index of the price that holds now. REMA lists the current period first."""
+    """Index of the price that holds now. REMA lists the current period first. When none holds,
+    the last normal (no offer) price, never an ended offer; None when there is none."""
     for i, period in enumerate(prices):
         start, end = _time(period.get("starting_at")), _time(period.get("ending_at"))
         if (start is None or start <= now) and (end is None or now.date() <= end.date()):
             return i
-    return 0 if prices else None
+    normal = [i for i, p in enumerate(prices) if not p.get("is_campaign")]
+    return normal[-1] if normal else None
 
 
 def _kr(value: Decimal) -> str:
