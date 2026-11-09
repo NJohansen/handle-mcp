@@ -12,25 +12,25 @@
 <br>
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/platforms-macOS_%7C_Windows_%7C_Linux-blue.svg?mode=dark"><img src="https://shieldcn.dev/badge/platforms-macOS_%7C_Windows_%7C_Linux-blue.svg?mode=light" alt="macOS, Windows, Linux"></picture>
 
-**Let your AI agent shop at [nemlig.com](https://www.nemlig.com) and [BilkaToGo](https://www.bilkatogo.dk).**<br>
+**Let your AI agent shop at [nemlig.com](https://www.nemlig.com), [BilkaToGo](https://www.bilkatogo.dk) and [REMA 1000](https://shop.rema1000.dk).**<br>
 An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on your budget and fills the cheapest cart. You pay.
 
 **[Install →](#install)** · [handlemcp.dk](https://handlemcp.dk)
 
-<img src="docs/demo.png" alt="Example from the demo: the agent compares nemlig.com (693 kr) and BilkaToGo (741 kr) and fills the cheaper cart; nothing is ordered. Prices are examples" width="800">
+<img src="docs/demo.png" alt="Example from the demo: the agent compares nemlig.com (693 kr), REMA 1000 (712 kr) and BilkaToGo (741 kr) and fills the cheapest cart; nothing is ordered. Prices are examples" width="800">
 
 </div>
 
 **It can never order or pay. You do.** That code does not exist, and a test fails if it shows up ([why](docs/adr/0001-the-human-always-pays.md)).
 
-**It counts anonymous usage, and tells you so.** No id, no personal data. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#brugsstatistik).
+**It counts anonymous usage, and tells you so.** No id, no personal data. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#usage-counts).
 
 ## How it works
 
-1. **Plan.** Give your agent a budget. It reads this week's offers on nemlig.com and BilkaToGo, and both stores' recipes, and plans the meals around them.
-2. **Compare.** It prices the whole list in both stores: pack sizes, offers, delivery fee and minimum order.
-3. **Fill.** It puts the list in the cheapest store's cart, with your login. Only the cart, nothing else.
-4. **Pay.** You open nemlig.com or BilkaToGo, check the cart, pick a delivery time and pay.
+1. **Plan.** Give your agent a budget. It reads this week's offers and the recipes, and plans the meals around them.
+2. **Compare.** It prices the whole list in every store: pack sizes, offers, delivery fee and minimum order.
+3. **Fill.** It fills the cheapest store's cart with your login. Only the cart. (At REMA 1000: your shopping list "handle-mcp".)
+4. **Pay.** You open the store, check the cart, pick a delivery or pickup time and pay.
 
 Taste, budget and meal rules live in your own prompt or skill. The server finds and counts. [Build your own skill](docs/skills.md).
 
@@ -39,7 +39,7 @@ Taste, budget and meal rules live in your own prompt or skill. The server finds 
 - macOS, Linux or Windows (x64). Windows on ARM is not supported yet: a dependency (`cryptography`) has no ready-made build for it.
 - [uv](https://docs.astral.sh/uv/). It fetches Python 3.12+ if you do not have it.
 - An MCP client, Grok, Claude Code, Claude Desktop or Codex etc.
-- An account at nemlig.com or BilkaToGo with home delivery to your address.
+- An account at nemlig.com or BilkaToGo with home delivery to your address, or at REMA 1000 (Køb & Hent or shopping in the store yourself).
 
 ## Install
 
@@ -56,7 +56,7 @@ Then ask:
 - *"What is on offer this week? Any free gifts?"*
 - *"Which delivery times are cheapest tomorrow?"*
 
-BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <store> --from-env`): [setup](docs/setup.md). nemlig's offers work with no login at all. No terminal? [Join the waitlist](https://handlemcp.dk).
+Other stores, Claude Desktop, headless machines and AI agents (`--from-env`): [setup](docs/setup.md). nemlig's offers and REMA 1000's search work with no login. No terminal? [Join the waitlist](https://handlemcp.dk).
 
 ## Tools
 
@@ -69,47 +69,45 @@ BilkaToGo, Claude Desktop, headless machines and AI agents (`handle-mcp login <s
 | `list_offers` | no | This week's offers and free gifts |
 | `compare_basket` | no | Prices a list in every store, fees included, cheapest first |
 | `get_cart` | no | Cart lines, fees, total, in one store or every store |
-| `set_cart_quantities` | **yes** | Sets quantities in the cart. Nothing else |
+| `set_cart_quantities` | **yes** | Sets quantities in the cart (REMA 1000: the list "handle-mcp"). Nothing else |
 | `add_recipe_to_cart` | **yes** | Puts a recipe's products in the cart, after your yes. Nothing else |
 | `get_delivery_info` | no | Chosen time, fees |
-| `list_delivery_slots` | no | Free times, cheapest first |
+| `list_delivery_slots` | no | Free times, cheapest first (REMA 1000: Køb & Hent times) |
 | `get_orders` / `get_order` | no | What you usually buy |
 
 Full arguments and fields: [docs/tools.md](docs/tools.md).
 
-## Brugsstatistik
+<a name="brugsstatistik"></a>
 
-handle-mcp counts, anonymously, how far people get from install to a filled cart, so we can show nemlig.com and BilkaToGo how many carts and kroner it sends them each week. It is on by default and easy to turn off.
+## Usage counts
 
-What is sent, and nothing else. Every event also has `version` and `date` (day only):
+Anonymous counts, so we can show the stores what handle-mcp sends them. On by default. Every event has `version` and `date` (day only):
 
 | Event | When | Fields |
 |---|---|---|
-| `server_started` | the server starts, at most once per machine per day | `os` (`darwin`, `linux` or `windows`) |
-| `first_tool_call` | the first tool call of the day (a client that only lists the tools sends nothing) | `tool` (e.g. `compare_basket`) |
-| `login_ok` | a store answers with your cart, at most once per store per day | `store` (`nemlig`, `bilka` or `rema1000`) |
-| `cart_filled` | once per order: after 30 minutes without changes, only when every line went in. Later edits send nothing until the cart is empty again (after checkout) | `store`, `basket_total_dkk` (rounded to the nearest 50 kr), `item_count` |
-| `list_filled` | the same as `cart_filled`, for REMA 1000, where the cart is the shopping list "handle-mcp". Kept apart so lists and carts never mix | `store` (`rema1000`), `basket_total_dkk`, `item_count` |
+| `server_started` | once a day per machine | `os` |
+| `first_tool_call` | the first tool call of the day (listing tools is not a call) | `tool` |
+| `login_ok` | once a day per store | `store` |
+| `cart_filled` | after 30 quiet minutes, only if every line went in; then nothing until the cart is empty again | `store`, `basket_total_dkk` (nearest 50 kr), `item_count` |
+| `list_filled` | the same, for REMA 1000's shopping list | `store`, `basket_total_dkk`, `item_count` |
 
-Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. The events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP address to send the answer back and to guess the country; it does not save the address. Sends run with a 2 second timeout, in the background. A failed send never breaks a tool. The first tool answer on a machine has a `telemetry_notice`, so your AI tells you about it once. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, the day each daily event was last sent, and which stores have a counted cart that is not empty yet.
+Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. Events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP to answer and to guess the country; it does not save it. Sends run in the background with a 2 second timeout, and a failed send never breaks a tool. Cart links carry `utm_source=handlemcp`.
 
-Cart links (`url` in the cart) carry `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`, so the store sees the visit in its own analytics.
+Your AI tells you once: the first tool answer on a machine has a `telemetry_notice`. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, the day each daily event was last sent, and which stores have a counted cart that is not empty yet.
 
-Turn it off with any of:
+Off:
 
 ```sh
-HANDLE_TELEMETRY=0          # env var
-DO_NOT_TRACK=1              # the common opt-out
-handle-mcp --no-telemetry   # flag
+HANDLE_TELEMETRY=0          # or DO_NOT_TRACK=1, or --no-telemetry
 ```
 
-Send the events to your own Umami: `HANDLE_TELEMETRY_URL=https://umami.example.com/api/send` and `HANDLE_TELEMETRY_WEBSITE=<website id>`. Why and how: [docs/adr/0005](docs/adr/0005-anonymous-usage-counts.md).
+Your own Umami: `HANDLE_TELEMETRY_URL` and `HANDLE_TELEMETRY_WEBSITE`. Why: [ADR 0005](docs/adr/0005-anonymous-usage-counts.md).
 
 ## More
 
 [Setup](docs/setup.md) · [Skills](docs/skills.md) · [Security](docs/security.md) · [Troubleshooting](docs/troubleshooting.md) · [Testing](docs/testing.md) · [Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md) · [Credits](CREDITS.md)
 
-Unofficial. Uses the stores' private website APIs, so it can break any day. Not affiliated with nemlig.com or Salling Group.
+Unofficial. Uses the stores' private website APIs, so it can break any day. Not affiliated with nemlig.com, Salling Group or REMA 1000.
 
 [MIT](LICENSE)
 

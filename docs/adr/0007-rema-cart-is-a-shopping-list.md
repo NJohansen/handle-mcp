@@ -44,6 +44,10 @@ A filled list is not a filled cart. It is counted as its own event, `list_filled
 
 Facts and design from the Go port [McAndersDK/handle-mcp-go](https://github.com/McAndersDK/handle-mcp-go) (MIT): its ADR 0008 and research, verified live 2026-11-07. It uses one list per day; we use one fixed list.
 
+## Proven live
+
+The list writes ran live on 9 November 2026 (`tests/test_live_rema_list.py`): the list "handle-mcp" was made, not primary, one product went on and off again, and the human's own primary list was not touched.
+
 ## Not proven live
 
-The list writes have not been tried live. The PR that adds the list starts with one live write test, and stops if it fails. REMA's own terms say a Køb & Hent order starts from the shopping list ([handelsbetingelser](https://rema1000.dk/information/handelsbetingelser-scan-selv), part 3). Whether the order ticks the lines off is not known.
+REMA's own terms say a Køb & Hent order starts from the shopping list ([handelsbetingelser](https://rema1000.dk/information/handelsbetingelser-scan-selv), part 3). Whether the order ticks the lines off is not known.
