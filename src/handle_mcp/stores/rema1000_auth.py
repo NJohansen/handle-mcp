@@ -85,6 +85,7 @@ class RemaAuthMixin:
 
     name: str
     _client: httpx.AsyncClient
+    _auth: httpx.AsyncClient  # the login's own client: its cookies never reach other calls
     _cookies: dict[str, str]
     _token: str | None
     _until: datetime
@@ -160,12 +161,12 @@ class RemaAuthMixin:
         jar = "; ".join(f"{k}={v}" for k, v in self._cookies.items())
         headers = HEADERS | {"Origin": SHOP, "Cookie": jar}
         try:
-            resp = await self._client.post(
+            resp = await self._auth.post(
                 f"{SHOP}/api/auth/refresh", headers=headers, follow_redirects=False
             )
         except httpx.HTTPError as exc:
             raise StoreError(f"Kan ikke nå {NAME} ({type(exc).__name__}).") from exc
-        self._client.cookies.clear()  # the cookies live in self._cookies, nowhere else
+        self._auth.cookies.clear()  # the cookies live in self._cookies, nowhere else
         log.info("REMA 1000 renewal answered %s", resp.status_code)
         if resp.status_code >= 500 and complete:
             raise StoreError(
@@ -189,7 +190,7 @@ class RemaAuthMixin:
 
     async def _login(self, email: str, password: str) -> str:
         """The site's own login. Only the cookies of the shop's session are kept."""
-        self._client.cookies.clear()
+        self._auth.cookies.clear()
         page = await self._follow(f"{SHOP}/konto/auth?redirect_uri=%2Fkonto", lambda u: False)
         if page.status_code != 200 or page.url.host != LOGIN_HOST:
             raise StoreError("REMA 1000: loginsiden blev ikke nået. API'et kan have ændret sig.")
@@ -199,7 +200,7 @@ class RemaAuthMixin:
             "Referer": str(page.url),
         }
         resp = await request(
-            self._client,
+            self._auth,
             "POST",
             f"https://{APP_HOST}/api/oauth2/login",
             NAME,
@@ -225,8 +226,8 @@ class RemaAuthMixin:
             nxt = "https://" + nxt.removeprefix("http://")
         # Stop once the callback has answered: it sets the cookies; the rest is the webshop.
         await self._follow(nxt, lambda u: u.host == SHOP_HOST and u.path == CALLBACK)
-        cookies = {c.name: c.value for c in self._client.cookies.jar if c.name in KEPT}
-        self._client.cookies.clear()
+        cookies = {c.name: c.value for c in self._auth.cookies.jar if c.name in KEPT}
+        self._auth.cookies.clear()
         if not cookies.get("access_token"):
             raise StoreError("REMA 1000 login gav ingen adgangsnøgle. API'et kan have ændret sig.")
         self._set(cookies)
@@ -249,7 +250,7 @@ class RemaAuthMixin:
                     raise queue()
                 raise changed()
             resp = await request(
-                self._client, "GET", url, NAME, headers={"Accept": "text/html"},
+                self._auth, "GET", url, NAME, headers={"Accept": "text/html"},
                 follow_redirects=False,
             )  # fmt: skip
             where = resp.headers.get("location")

@@ -118,8 +118,12 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin):
     name = "rema1000"
     cart_page = SHOP  # the list lives in REMA's app and webshop; no page per list is known
 
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+    def __init__(
+        self, client: httpx.AsyncClient | None = None, auth: httpx.AsyncClient | None = None
+    ) -> None:
         self._client = client or httpx.AsyncClient(timeout=20, follow_redirects=True)
+        # The login has its own client, so its cookies never ride along with a search.
+        self._auth = auth or httpx.AsyncClient(timeout=20)
         self._cookies: dict[str, str] = {}  # the site's session (rema1000_auth.py)
         self._token: str | None = None
         self._until = datetime.min.replace(tzinfo=UTC)

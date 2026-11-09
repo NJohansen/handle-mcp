@@ -1,5 +1,6 @@
 """REMA 1000 login, renewal, the store choice and pickup times, against a fake site. No network."""
 
+import asyncio
 import base64
 import io
 import json
@@ -19,6 +20,7 @@ from handle_mcp.stores.rema1000_pickup import GateClosed, parse_ids
 FIXTURES = Path(__file__).parent / "fixtures" / "rema1000"
 NOW = datetime(2026, 11, 10, 9, tzinfo=UTC)
 STORES = json.loads((FIXTURES / "stores.json").read_text(encoding="utf-8"))
+OFFERS = json.loads((FIXTURES / "offers.json").read_text(encoding="utf-8"))
 
 
 def jwt(exp: datetime, sub: int = 4242) -> str:
@@ -83,7 +85,8 @@ class FakeSite:
                 "AWSALB=lb1",
                 "AWSALBCORS=lb1",
             ]
-            headers = [("Location", "/konto")] + [("Set-Cookie", f"{c}; Path=/") for c in cookies]
+            headers = [("Location", "/konto")]
+            headers += [("Set-Cookie", f"{c}; Domain=rema1000.dk; Path=/") for c in cookies]
             return httpx.Response(302, headers=headers)
         if host == "shop.rema1000.dk" and path == "/api/auth/refresh":
             assert "refresh_token=r1" in req.headers.get("cookie", "")
@@ -97,6 +100,8 @@ class FakeSite:
         if host == "api.digital.rema1000.dk":
             if path == "/api/v3/stores":
                 return httpx.Response(200, json=STORES)
+            if path == "/api/search/products":
+                return httpx.Response(200, json=OFFERS)
             if req.headers.get("authorization") not in (
                 f"Bearer {self.access}",
                 f"Bearer {self.renewed}",
@@ -105,6 +110,11 @@ class FakeSite:
             if path.endswith("/time-slots"):
                 return httpx.Response(200, json=self.slots)
         return httpx.Response(404)
+
+    def api_only(self, req: httpx.Request) -> httpx.Response:
+        """The client for search and the API: the login never runs on it (its cookies would)."""
+        assert req.url.host == "api.digital.rema1000.dk", req.url.host
+        return self.handle(req)
 
     def _spend(self) -> bool:
         self.api_401 -= 1
@@ -118,7 +128,10 @@ def site():
 
 @pytest.fixture
 def store(site, monkeypatch):
-    s = Rema1000Store(client=httpx.AsyncClient(transport=httpx.MockTransport(site.handle)))
+    s = Rema1000Store(
+        httpx.AsyncClient(transport=httpx.MockTransport(site.api_only)),
+        httpx.AsyncClient(transport=httpx.MockTransport(site.handle)),
+    )
     monkeypatch.setattr(s, "_now", lambda: NOW)
     return s
 
@@ -153,7 +166,7 @@ async def test_login_keeps_the_cookies_never_the_password(store, site, env_login
     assert login.headers["referer"] == "https://login.rema1000.dk/?r=1"
     assert site.calls("/authorize") == 1  # http:// became https://
     assert site.calls("/konto") == 0  # stops at the callback
-    assert not store._client.cookies.jar  # the cookies live in the session only
+    assert not store._client.cookies.jar and not store._auth.cookies.jar  # in the session only
 
 
 @pytest.mark.parametrize("status", [400, 401, 422])
@@ -353,8 +366,9 @@ async def test_skip_the_choice(store, monkeypatch, capsys):
 
 
 def test_login_saves_session_and_stores(site, monkeypatch, capsys):
-    client = httpx.AsyncClient(transport=httpx.MockTransport(site.handle))
-    monkeypatch.setattr(registry, "STORES", {"rema1000": lambda: Rema1000Store(client=client)})
+    transport = httpx.MockTransport(site.handle)
+    clients = (httpx.AsyncClient(transport=transport), httpx.AsyncClient(transport=transport))
+    monkeypatch.setattr(registry, "STORES", {"rema1000": lambda: Rema1000Store(*clients)})
     monkeypatch.setattr("sys.stdin", io.StringIO("a@example.com\nhasseris\n1\n"))
     monkeypatch.setattr(cli.getpass, "getpass", lambda _prompt: "hemmelig")
     assert cli.run(["login", "rema1000"]) == 0
@@ -374,3 +388,20 @@ async def test_reads_only_and_logs_no_secrets(store, site, env_login, caplog):
     assert api and all(r.method == "GET" for r in api)
     for secret in ("hemmelig", site.access, site.renewed, "r1", "s1", "4242"):
         assert secret not in caplog.text
+
+
+async def test_search_never_carries_the_login_cookies(store, site, env_login):
+    """The login runs on its own client (see FakeSite.api_only): a search gets none of its
+    cookies, also while a login runs."""
+    await asyncio.gather(store.check_login(), store.offers(1))
+    await store.offers(1)
+    search = [r for r in site.requests if r.url.path == "/api/search/products"]
+    assert search and all("cookie" not in r.headers for r in search)
+
+
+async def test_delivery_info_survives_failing_times(store, site):
+    site.access, site.refresh_status = jwt(NOW - timedelta(minutes=1)), 401
+    saved(site, store_ids="263")
+    info = await store.delivery_info()  # an expired session: the store is still known
+    assert info.pickup_store == "Aalborg C, Hasseris" and info.next_available is None
+    assert "Tiderne kunne ikke læses" in info.note and "udløbet" in info.note

@@ -183,7 +183,10 @@ class RemaPickupMixin:
             note += f" Din foretrukne butik har ikke Køb & Hent endnu; bruger {pickup.name}."
         nxt: date | None = None
         if has_login(self.name):  # the times need a login; the store list does not
-            nxt = next((s.start.date() for s in await self._slots(pickup) if s.available), None)
+            try:
+                nxt = next((s.start.date() for s in await self._slots(pickup) if s.available), None)
+            except StoreError as exc:  # the store and the note still hold
+                note += f" Tiderne kunne ikke læses: {exc}"
         else:
             note += " Log ind for at se tiderne: handle-mcp login rema1000"
         return DeliveryInfo(
