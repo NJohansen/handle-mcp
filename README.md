@@ -17,7 +17,7 @@ An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on 
 
 **[Install →](#install)** · [handlemcp.dk](https://handlemcp.dk)
 
-<img src="docs/demo.png" alt="Example from the demo: the agent compares nemlig.com (693 kr) and BilkaToGo (741 kr) and fills the cheaper cart; nothing is ordered. Prices are examples" width="800">
+<img src="docs/demo.png" alt="Example from the demo: the agent compares nemlig.com (693 kr), REMA 1000 (712 kr) and BilkaToGo (741 kr) and fills the cheapest cart; nothing is ordered. Prices are examples" width="800">
 
 </div>
 
