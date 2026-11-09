@@ -162,7 +162,8 @@ class RemaListMixin:
 
     async def set_quantities(self, items: dict[str, int]) -> list[QuantityResult]:
         """Absolute amounts on the list; 0 removes. Read back and compared. Never orders or pays."""
-        want = {pid: n for pid, n in items.items() if (_id(pid) or 0) > 0 and n >= 0}
+        # Only the id as REMA writes it ("7", never "007"), so it matches the lines read back.
+        want = {pid: n for pid, n in items.items() if str(_id(pid) or "") == pid and n >= 0}
         failed = {pid: "Ugyldigt varenummer eller antal." for pid in items if pid not in want}
         applied: dict[str, int] = {}
         warn = None

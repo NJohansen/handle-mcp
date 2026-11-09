@@ -268,8 +268,11 @@ async def test_lagging_read_after_create(store, api):
 
 
 async def test_unknown_product_is_refused_and_the_rest_goes_in(store, api):
-    results = await store.set_quantities({"999": 1, "20302": 1, "x": 1, "²": 1})
-    assert [r.ok for r in results] == [False, True, False, False]
+    results = await store.set_quantities(
+        {"999": 1, "20302": 1, "x": 1, "²": 1, "020302": 1, "0": 1}
+    )
+    assert [r.ok for r in results] == [False, True, False, False, False, False]
+    assert len(api.mine()["items"]) == 1  # "020302" added no second line
     assert "afviste varen (422)" in results[0].message and "Ugyldigt" in results[2].message
     assert "Ugyldigt" in results[3].message
 
