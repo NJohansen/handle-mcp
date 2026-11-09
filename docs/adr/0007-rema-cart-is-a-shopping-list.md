@@ -9,12 +9,16 @@ This extends ADR 0001: for REMA 1000, the list is the cart, and the list writes 
 - `get_cart` and `set_cart_quantities` use the one list named exactly `handle-mcp`. It is created on the first write and never made primary.
 - A line the human ticks off in the app (`bought: true`) is bought: `get_cart` leaves it out, and the next write removes it. The list empties itself while the human shops.
 - Quantities are absolute, and every write is read back, as in the other stores.
-- More than one list named `handle-mcp`: nothing is written, and the answer asks the human to delete the extra in the app.
 - If a Køb & Hent order does not tick the lines off, the model asks "Er listen handlet?" and empties the list after a yes.
 
 ## Safe writes
 
-Creating the list and adding a line are POSTs, not absolute. They are never retried blindly: after a timeout, a network error, a 429 or a 5xx, the adapter reads the list again and POSTs only if the list or the line is still missing. Changes and removals set absolute values and keep the normal retries.
+Creating the list and adding a line are POSTs, not absolute. They are never retried blindly: after a timeout, a network error, a 429 or a 5xx, the adapter reads the list again, up to 3 times 1 second apart, and POSTs only if the list or the line is still missing. Changes and removals set absolute values and keep the normal retries.
+
+A read that lags can still let a second list or line through. The adapter recovers by itself, so the human never has to clean up:
+
+- Two or more lists named `handle-mcp`: the one with the lowest id is the list. The others are left alone, never deleted, and `get_cart` names them in a warning.
+- A product on two lines of the list: its quantity is the sum. The next write sets the first line and removes the others.
 
 ## The pickup store
 
