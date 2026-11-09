@@ -70,6 +70,9 @@ NUTRIENTS = {"fedt", "protein", "sukker", "kakao", "alkohol", "salt", "frugt", "
 
 QTY_RE = re.compile(r"^\s*(\d+)\s*[x×]\s+(?=\D)", re.IGNORECASE)
 
+# Shop shorthand in names, read as the full word: REMA 1000 writes "HK. OKSEKØD" for hakket.
+ABBREVIATIONS = [(re.compile(r"\bhk\.\s*"), "hakket ")]
+
 OEKO_RE = re.compile(r"\b(?:øko|økologiske?|organic)\b", re.IGNORECASE)  # not "Økonomi"
 
 
@@ -135,6 +138,8 @@ def score(words: list[str], product: Any, asked: set[str] | frozenset[str] = fro
     words = [w.replace("c", "k") for w in words]
     asked = {w.replace("c", "k") for w in asked}
     name = (get(product, "name") or "").replace("C", "K").replace("c", "k").lower()
+    for short, full in ABBREVIATIONS:
+        name = short.sub(full, name)
     brand = (get(product, "brand") or "").replace("C", "K").replace("c", "k").lower()
     head = FLAVOUR_RE.split(name)[0]
     head_words = _words(head)
@@ -225,8 +230,12 @@ def _compound(word: str, token: str) -> bool:
 def mixed(words: list[str], product: Any) -> int:
     """1 for a blend the item does not ask for: 'Hakket oksekød m. 50% grønt'. A share of
     another food ('50% grønt') means a mix. A share of fat or sugar ('m. 0,5% fedt') does not,
-    nor 'Rugbrød m. kerner' or 'Laks m. skind'."""
-    parts = FLAVOUR_RE.split(get(product, "name") or "", maxsplit=1)
+    nor 'Rugbrød m. kerner' or 'Laks m. skind'. REMA 1000 writes a comma: 'HK. OKSEKØD, 35% GRØNT'.
+    Only REMA 1000: elsewhere a comma is no blend ('Skinke, 12% vand')."""
+    name = get(product, "name") or ""
+    parts = FLAVOUR_RE.split(name, maxsplit=1)
+    if len(parts) != 2 and get(product, "store") == "rema1000":
+        parts = name.split(",", 1)
     shares = BLEND_RE.findall(parts[1]) if len(parts) == 2 else []
     if not any(w.lower() not in NUTRIENTS for w in shares):
         return 0

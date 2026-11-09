@@ -194,7 +194,8 @@ async def list_recipes(
 @_tool(READ)
 async def list_offers(stores: list[str] | None = None, limit: int = 25) -> dict:
     """List this week's offers in each store, also items you would not search for: nemlig's
-    Skarp pris, Priskup, Dagstilbud, Undgå madspild and gifts; BilkaToGo's offers. `limit` is
+    Skarp pris, Priskup, Dagstilbud, Undgå madspild and gifts; BilkaToGo's offers; REMA 1000's
+    leaflet (Avisvarer, often with a max per customer in offer_text). `limit` is
     per list; a product on two lists is shown once. A list the store fails to send is left out
     (see the server log). Free gifts come from a separate search and are not cut by `limit`.
     They have price 0 and "max_per_order". Use them when they fit the plan."""

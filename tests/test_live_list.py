@@ -19,7 +19,7 @@ from typing import Any
 import pytest
 
 from handle_mcp.compare import BasketLine, quote
-from handle_mcp.match import get, parse_item
+from handle_mcp.match import ABBREVIATIONS, get, parse_item
 from handle_mcp.models import Product
 from handle_mcp.stores import STORES
 
@@ -35,6 +35,8 @@ def items_for(store: str) -> list[dict[str, Any]]:
 def problems(entry: dict[str, Any], cand: dict[str, Any]) -> list[str]:
     """What is wrong with one candidate for one list entry. Empty when it fits."""
     text = f"{cand['name']} {cand.get('brand') or ''}".lower()
+    for short, full in ABBREVIATIONS:  # REMA 1000's "HK." is hakket
+        text = short.sub(full, text)
     out = [f"mangler '{w}'" for w in entry.get("has", []) if not _any(w, text)]
     out += [f"har '{w}'" for w in entry.get("not", []) if _any(w, text)]
     if "max_kr" in entry and Decimal(str(cand["line_total"])) > Decimal(str(entry["max_kr"])):

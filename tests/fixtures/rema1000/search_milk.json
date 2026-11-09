@@ -1,0 +1,153 @@
+{
+ "data": [
+  {
+   "id": 20302,
+   "name": "SØDMÆLK 3,5%",
+   "underline": "0.5 LTR. / ARLA",
+   "department": {
+    "id": 60,
+    "name": "Mejeri"
+   },
+   "category": {
+    "id": 6050,
+    "name": "Mælk m.v."
+   },
+   "barcodes": [
+    "5700426101026",
+    "5711953146640",
+    "5760466826044",
+    "5760466963831"
+   ],
+   "labels": [
+    {
+     "id": 70,
+     "name": "Dansk"
+    }
+   ],
+   "prices": [
+    {
+     "price": 7.95,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-01-29T00:00:00+00:00",
+     "ending_at": "2099-12-31T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "ltr",
+     "compare_unit_price": 15.9,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": false,
+   "is_weight_item": false
+  },
+  {
+   "id": 70718,
+   "name": "CHOKOLADEKIKS MÆLK",
+   "underline": "125 GR. / REMA 1000",
+   "department": {
+    "id": 80,
+    "name": "Kolonial"
+   },
+   "category": {
+    "id": 8050,
+    "name": "Kiks, kager & knækbrød"
+   },
+   "barcodes": [
+    "5705830006608",
+    "5705830016423"
+   ],
+   "labels": [
+    {
+     "id": 2,
+     "name": "REMA1000"
+    },
+    {
+     "id": 95,
+     "name": "Rainforest Alliance"
+    }
+   ],
+   "prices": [
+    {
+     "price": 18.3,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-01-08T00:00:00+00:00",
+     "ending_at": "2099-12-31T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 146.4,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": true,
+   "is_weight_item": false
+  },
+  {
+   "id": 21513,
+   "name": "SKUMMETMÆLK 0,1%",
+   "underline": "1 LTR. / ARLA, ØKOLOGISK",
+   "department": {
+    "id": 60,
+    "name": "Mejeri"
+   },
+   "category": {
+    "id": 6050,
+    "name": "Mælk m.v."
+   },
+   "barcodes": [
+    "5700426293929",
+    "5709310001602"
+   ],
+   "labels": [
+    {
+     "id": 6,
+     "name": "Økologi"
+    },
+    {
+     "id": 40,
+     "name": "Nøglehul"
+    },
+    {
+     "id": 70,
+     "name": "Dansk"
+    },
+    {
+     "id": 203,
+     "name": "Bedre dyrevelfærd 3"
+    }
+   ],
+   "prices": [
+    {
+     "price": 12.95,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-02-12T00:00:00+00:00",
+     "ending_at": "2099-12-31T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "ltr",
+     "compare_unit_price": 12.95,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": true,
+   "is_weight_item": false
+  }
+ ],
+ "meta": {
+  "pagination": {
+   "current_page": 1,
+   "last_page": 25,
+   "per_page": 3,
+   "total": 74
+  }
+ }
+}

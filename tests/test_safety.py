@@ -30,6 +30,10 @@ FORBIDDEN = [
     r"ClearBasket",  # nemlig: empties the whole cart
     r"CancelOrder",
     r"AddRecipeToBasket",  # nemlig: fills the cart without the human's yes
+    r"v3/cart",  # REMA 1000: the real cart, tied to a store, a pickup time and payment
+    r"v3/jobs",  # REMA 1000: payment jobs
+    r"vendor-baskets",  # REMA 1000: imports a basket into the cart
+    r"checkoutCallback",  # REMA 1000: checkout
 ]
 
 

@@ -195,8 +195,10 @@ def expired(store: str) -> StoreError:
 
 from handle_mcp.stores.bilkatogo import BilkaStore
 from handle_mcp.stores.nemlig import NemligStore
+from handle_mcp.stores.rema1000 import Rema1000Store
 
 STORES: dict[str, type[Store]] = {
     "nemlig": NemligStore,
     "bilkatogo": BilkaStore,
+    "rema1000": Rema1000Store,
 }
