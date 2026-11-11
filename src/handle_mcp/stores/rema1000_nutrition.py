@@ -8,17 +8,15 @@ tells which. Shapes: tests/fixtures/rema1000/README.md.
 
 from __future__ import annotations
 
-import asyncio
 import re
 from typing import Any
 
 from handle_mcp import nutrition
 from handle_mcp.models import ProductNutrition
-from handle_mcp.stores import StoreError
+from handle_mcp.stores import NotFound, StoreError
 from handle_mcp.stores._http import request
 from handle_mcp.stores.rema1000_auth import API, HEADERS, NAME
 
-AT_ONCE = 5  # product calls in flight
 BASIS = {"kg": "100 g", "ltr": "100 ml", "l": "100 ml"}
 NO_LABEL = "REMA 1000 viser ingen næringsdeklaration for varen (ofte frisk kød, frugt og grønt)."
 UNKNOWN = "REMA 1000 kender ikke varen."
@@ -50,20 +48,18 @@ class RemaNutritionMixin:
             raise StoreError(
                 f"Ukendt vare-id hos REMA 1000: {', '.join(bad)}. Brug id'et fra søgningen."
             )
-        gate = asyncio.Semaphore(AT_ONCE)
 
         async def one(pid: str) -> ProductNutrition:
-            async with gate:
-                resp = await request(
-                    self._client,
-                    "GET",
-                    f"{API}/v3/products/{pid}",
-                    NAME,
-                    params={"include": "nutrition_info"},
-                    headers=HEADERS,
-                )
+            resp = await request(
+                self._client,
+                "GET",
+                f"{API}/v3/products/{pid}",
+                NAME,
+                params={"include": "nutrition_info"},
+                headers=HEADERS,
+            )
             if resp.status_code == 404:
-                return ProductNutrition("rema1000", pid, None, None, UNKNOWN)
+                raise NotFound(UNKNOWN)
             if resp.status_code != 200:
                 raise StoreError(f"REMA 1000 svarer {resp.status_code}. Prøv igen senere.")
             try:
@@ -77,15 +73,4 @@ class RemaNutritionMixin:
                     "REMA 1000 har ændret sit svar. handle-mcp skal opdateres."
                 ) from exc
 
-        results = await asyncio.gather(*(one(i) for i in product_ids), return_exceptions=True)
-        for r in results:  # anything but a store error is a bug: let the server log it
-            if isinstance(r, BaseException) and not isinstance(r, StoreError):
-                raise r
-        if all(isinstance(r, StoreError) for r in results):
-            raise results[0]
-        return [
-            ProductNutrition("rema1000", pid, None, None, str(r))
-            if isinstance(r, StoreError)
-            else r
-            for pid, r in zip(product_ids, results, strict=True)
-        ]
+        return await nutrition.each("rema1000", product_ids, one, UNKNOWN)

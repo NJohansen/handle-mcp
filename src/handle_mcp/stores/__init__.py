@@ -40,6 +40,10 @@ class StoreError(Exception):
     """A clear, user-facing failure from one store (login failed, API changed, ...)."""
 
 
+class NotFound(StoreError):
+    """The store does not know this product (HTTP 404)."""
+
+
 class Store(Protocol):
     name: str
     cart_page: str  # the store's cart page, where the human pays: gets UTM tags (links.py)

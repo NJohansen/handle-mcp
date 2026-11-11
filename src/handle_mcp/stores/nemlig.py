@@ -27,7 +27,7 @@ from handle_mcp.models import (
     QuantityResult,
     StoreTerms,
 )
-from handle_mcp.stores import StoreError, expired, has_login, load_login, save_session
+from handle_mcp.stores import NotFound, StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
 from handle_mcp.stores.nemlig_delivery import DK, DeliveryMixin, _money, _time
 from handle_mcp.stores.nemlig_nutrition import NutritionMixin
@@ -152,7 +152,8 @@ class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
             raise _Unauthorized
         if resp.status_code >= 400:  # the URL may hold ids: stderr only, path without query
             log.warning("nemlig.com %s %s -> %s", method, resp.url.path, resp.status_code)
-            raise StoreError(f"nemlig.com afviste kaldet ({resp.status_code}).")
+            error = NotFound if resp.status_code == 404 else StoreError
+            raise error(f"nemlig.com afviste kaldet ({resp.status_code}).")
         try:
             return resp.json() if resp.content else None
         except ValueError as exc:

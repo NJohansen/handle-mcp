@@ -7,10 +7,17 @@ come back as plain decimal strings with a dot, as exact as the label: docs/adr/0
 
 from __future__ import annotations
 
+import asyncio
 import re
+from collections.abc import Awaitable, Callable
 from decimal import Decimal, InvalidOperation
 
-from handle_mcp.models import Nutrition
+from mcp.server.mcpserver.exceptions import ToolError
+
+from handle_mcp.models import Nutrition, ProductNutrition
+from handle_mcp.stores import NotFound, StoreError
+
+AT_ONCE = 5  # product calls in flight per store (nemlig, REMA 1000): kind, quick enough
 
 # Label words → field, checked in order: "mættede fedtsyrer" before "fedt",
 # "sukkerarter" before "kulhydrat" (Bilka writes "- heraf sukkerarter" on its own row).
@@ -75,3 +82,39 @@ def label(rows: list[tuple[str, str]], per: str | None) -> Nutrition | None:
         if key and (v := number(value)) is not None:
             values.setdefault(key, v)
     return Nutrition(per=per, **values) if values else None
+
+
+def product_ids(raw: list[str], limit: int) -> list[str]:
+    """The tool's ids: trimmed, blanks and duplicates removed, order kept."""
+    ids = list(dict.fromkeys(i.strip() for i in raw if i.strip()))
+    if not ids:
+        raise ToolError("Ingen vare-id'er angivet.")
+    if len(ids) > limit:
+        raise ToolError(f"Højst {limit} varer pr. kald.")
+    return ids
+
+
+async def each(
+    store: str, ids: list[str], one: Callable[[str], Awaitable[ProductNutrition]], unknown: str
+) -> list[ProductNutrition]:
+    """`one(id)` for every id, AT_ONCE at a time. One failing product never hides the others:
+    it gets its error as `reason` (NotFound: `unknown`). Every product failing (a queue, a
+    format change) raises the first error, so the tool says why."""
+    gate = asyncio.Semaphore(AT_ONCE)
+
+    async def guarded(pid: str) -> ProductNutrition:
+        async with gate:
+            return await one(pid)
+
+    results = await asyncio.gather(*(guarded(i) for i in ids), return_exceptions=True)
+    for r in results:  # anything but a store error is a bug: let the server log it
+        if isinstance(r, BaseException) and not isinstance(r, StoreError):
+            raise r
+    if all(isinstance(r, StoreError) and not isinstance(r, NotFound) for r in results):
+        raise results[0]
+    return [
+        ProductNutrition(store, pid, None, None, unknown if isinstance(r, NotFound) else str(r))
+        if isinstance(r, StoreError)
+        else r
+        for pid, r in zip(ids, results, strict=True)
+    ]

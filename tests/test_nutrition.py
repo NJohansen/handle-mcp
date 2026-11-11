@@ -9,12 +9,22 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from handle_mcp import nutrition, server
 from handle_mcp.models import Nutrition
-from handle_mcp.stores import StoreError
+from handle_mcp.stores import StoreError, _http
 from handle_mcp.stores.bilkatogo import BilkaStore
 from handle_mcp.stores.nemlig import NemligStore
 from handle_mcp.stores.rema1000 import Rema1000Store
 
 FIXTURES = Path(__file__).parent / "fixtures"
+
+
+@pytest.fixture(autouse=True)
+def no_retry_wait(monkeypatch):
+    """A 500 is retried with a pause (stores/_http.py): no pause in tests."""
+
+    async def no_sleep(_seconds):
+        return None
+
+    monkeypatch.setattr(_http.asyncio, "sleep", no_sleep)
 
 
 def fixture(store: str, name: str) -> dict:
@@ -297,3 +307,28 @@ async def test_rema_rejects_ids_that_are_not_product_numbers():
     with pytest.raises(StoreError, match="Ukendt vare-id"):
         await store.nutrition(["../lists"])
     assert seen == []
+
+
+async def test_rema_one_failure_keeps_the_others():
+    store, _ = _rema({"20385": "product_skyr", "2": 500, "400171": "product_oksekoed"})
+    skyr, broken, mince = await store.nutrition(["20385", "2", "400171"])
+    assert skyr.nutrition is not None and mince.reason
+    assert broken.nutrition is None and broken.reason == "REMA 1000 svarer 500. Prøv igen senere."
+
+
+async def test_nemlig_unknown_and_failing_products_get_their_own_reason(no_nemlig_login):
+    store, _ = _nemlig({"5070417": fixture("nemlig", "product_details_cocio"), "2": 500})
+    cocio, broken, unknown = await store.nutrition(["5070417", "2", "3"])
+    assert cocio.nutrition is not None
+    assert broken.reason == "nemlig.com svarer 500. Prøv igen senere."
+    assert unknown.reason == "nemlig kender ikke varen."
+
+
+async def test_only_unknown_products_is_an_answer_not_an_error(no_nemlig_login):
+    store, _ = _nemlig({})
+    (unknown,) = await store.nutrition(["3"])
+    assert unknown.reason == "nemlig kender ikke varen."
+
+
+def test_product_ids_keep_order_and_drop_duplicates():
+    assert nutrition.product_ids([" 2", "1", "2", ""], 50) == ["2", "1"]
