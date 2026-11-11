@@ -67,6 +67,7 @@ Other stores, Claude Desktop, headless machines and AI agents (`--from-env`): [s
 | `list_recipes` | no | Featured recipes (BilkaToGo: the week's madplan), by tag (nemlig) or by category (BilkaToGo) |
 | `get_recipe` | no | The products to buy for a recipe, for any number of persons |
 | `list_offers` | no | This week's offers and free gifts |
+| `get_nutrition` | no | Nutrition per 100 g/ml from the label |
 | `compare_basket` | no | Prices a list in every store, fees included, cheapest first |
 | `get_cart` | no | Cart lines, fees, total, in one store or every store |
 | `set_cart_quantities` | **yes** | Sets quantities in the cart (REMA 1000: the list "handle-mcp"). Nothing else |

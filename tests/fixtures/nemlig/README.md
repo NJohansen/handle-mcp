@@ -54,3 +54,11 @@ Also seen in the website's code, not used: `meals/filters/{path}` (one tag, all 
 `meals/purchased` ("Mine opskrifter", 401 without login) and
 `POST /webapi/basket/AddRecipeToBasket` (never call it: we fill the cart with
 `set_cart_quantities` after the human says yes).
+
+`product_details_cocio.json` and `product_details_flanksteak.json`:
+`GET https://webapi.prod.knl.nemlig.it/productbff/api/web/productDetails/{id}` for 5070417
+(Cocio kakaomælk) and 5027322 (flanksteak), captured 2026-11-11 with the anonymous token,
+`structuredData` removed. `product.detailDeclaration[]` has `tableHeader`
+("Næringsindhold pr. 100 ml", "") and `tableItems` ([label, value]); "Energi" is
+"329 kJ / 78 Kcal" in one value. The flanksteak has an empty table. No EAN anywhere.
+Public product data, nothing personal.

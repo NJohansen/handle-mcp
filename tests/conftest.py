@@ -15,8 +15,10 @@ from handle_mcp.models import (
     CartLine,
     DeliveryInfo,
     DeliverySlot,
+    Nutrition,
     Order,
     Product,
+    ProductNutrition,
     QuantityResult,
     Recipe,
     RecipeDetails,
@@ -126,6 +128,10 @@ class FakeStore:
     async def terms(self):
         return StoreTerms("fake", True, Decimal(39), minimum_order=Decimal(500))
 
+    async def nutrition(self, product_ids):
+        label = Nutrition("100 g", energy_kcal="55", protein="8.6", salt="0.13")
+        return [self._leak(ProductNutrition("fake", i, "Skyr", label)) for i in product_ids]
+
     async def recipes(self, query, limit=5):
         return [self._leak(Recipe("fake", "r1", f"{query} til 4", "https://example.com/r1"))]
 
@@ -176,6 +182,9 @@ class BrokenStore(FakeStore):
         raise registry.StoreError("API'et svarer 500")
 
     async def orders(self, limit=10):
+        raise NotImplementedError
+
+    async def nutrition(self, product_ids):
         raise NotImplementedError
 
 

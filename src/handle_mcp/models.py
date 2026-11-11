@@ -168,3 +168,29 @@ class Order:
     delivery_start: datetime | None = None
     delivery_end: datetime | None = None
     lines: list[CartLine] = field(default_factory=list)  # empty in order lists
+
+
+@dataclass
+class Nutrition:
+    """Per 100 g or 100 ml, as the label says. Values are strings, not money (docs/adr/0010):
+    "0.13", "1017", "<0.5". None when the label leaves a line out."""
+
+    per: str | None  # "100 g" or "100 ml"; None when the store does not say
+    energy_kj: str | None = None
+    energy_kcal: str | None = None
+    fat: str | None = None
+    saturated_fat: str | None = None
+    carbohydrate: str | None = None
+    sugar: str | None = None
+    protein: str | None = None
+    salt: str | None = None
+    fibre: str | None = None
+
+
+@dataclass
+class ProductNutrition:
+    store: str
+    id: str
+    name: str | None
+    nutrition: Nutrition | None  # None: no declaration (fresh meat, fruit) or unknown product
+    reason: str | None = None  # why nutrition is None, in Danish

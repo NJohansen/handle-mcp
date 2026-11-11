@@ -24,6 +24,7 @@ from handle_mcp.models import (
     DeliverySlot,
     Order,
     Product,
+    ProductNutrition,
     QuantityResult,
     Recipe,
     RecipeDetails,
@@ -39,6 +40,10 @@ class StoreError(Exception):
     """A clear, user-facing failure from one store (login failed, API changed, ...)."""
 
 
+class NotFound(StoreError):
+    """The store does not know this product (HTTP 404)."""
+
+
 class Store(Protocol):
     name: str
     cart_page: str  # the store's cart page, where the human pays: gets UTM tags (links.py)
@@ -51,6 +56,7 @@ class Store(Protocol):
         self, tags: list[str], category: str | None = None, limit: int = 20
     ) -> list[Recipe]: ...
     async def offers(self, limit: int = 25) -> list[Product]: ...
+    async def nutrition(self, product_ids: list[str]) -> list[ProductNutrition]: ...
     async def get_cart(self) -> Cart: ...
     async def set_quantities(self, items: dict[str, int]) -> list[QuantityResult]: ...
     async def delivery_info(self) -> DeliveryInfo: ...

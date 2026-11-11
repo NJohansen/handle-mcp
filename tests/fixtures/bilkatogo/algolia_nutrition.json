@@ -1,0 +1,378 @@
+{
+ "hits": [
+  {
+   "objectID": "19753",
+   "name": "Skyr m. vanilje 0,2% fedt u. tilsat sukker",
+   "infos": [
+    {
+     "code": "description",
+     "title": "Beskrivelse",
+     "items": [
+      {
+       "type": 1,
+       "title": "",
+       "value": "Skyr med vanilje 0,2% fra Cheasy har en skøn smag af vanilje – kombineret med den let syrlige smag, kendt fra skyr, giver det en optimal smagsoplevelse. Skyr med vanilje har en let og lækker yoghurtsmag, som fungerer perfekt, hvad end du nyder produktet som et mellemmåltid eller ved morgenbordet. Brug skyr med vanilje fra Cheasy i en skøn kombination med honning, müsli og frisk frugt, eller brug den sammen med chiafrø i en lækker chiagrød toppet med friske bær.<BR><BR><H2>Om Cheasy</H2><BR>Cheasy blev lanceret i 1991 og er en del af Arla Foods. Cheasy tilbyder et stort udvalg af skyr og yoghurt i forskellige smagsvarianter samt ost, drikkeyoghurt og koldskål"
+      }
+     ]
+    },
+    {
+     "code": "ingredients",
+     "title": "Ingredienser",
+     "items": [
+      {
+       "type": 1,
+       "title": "",
+       "value": "MÆLK, vand (9,3%), modificeret stivelse, vaniljeekstrakt (0,1%), aroma, sødestof (aspartam**), knust vaniljestang, surhedsregulerende middel (citronsyre), YOGHURTKULTUR. **Indeholder en phenylalaninkilde."
+      }
+     ]
+    },
+    {
+     "code": "nutritional_100",
+     "title": "Næringsindhold",
+     "items": [
+      {
+       "type": 2,
+       "title": "Næringsindhold pr.",
+       "value": "100 g"
+      },
+      {
+       "type": 2,
+       "title": "Energi",
+       "value": "233 kJ"
+      },
+      {
+       "type": 2,
+       "title": "Energi",
+       "value": "55 kcal"
+      },
+      {
+       "type": 2,
+       "title": "Fedt",
+       "value": "0,2 g"
+      },
+      {
+       "type": 2,
+       "title": "- heraf mættede fedtsyrer",
+       "value": "0,1 g"
+      },
+      {
+       "type": 2,
+       "title": "Kulhydrater",
+       "value": "4,0 g"
+      },
+      {
+       "type": 2,
+       "title": "- heraf sukkerarter",
+       "value": "3,6 g"
+      },
+      {
+       "type": 2,
+       "title": "Protein",
+       "value": "8,6 g"
+      },
+      {
+       "type": 2,
+       "title": "Salt",
+       "value": "0,13 g"
+      }
+     ]
+    },
+    {
+     "code": "product_details",
+     "title": "Produktdetaljer",
+     "items": [
+      {
+       "type": 2,
+       "title": "Netto mængde",
+       "value": "1 kg"
+      },
+      {
+       "type": 2,
+       "title": "Varebetegnelse",
+       "value": "Syrnet mælk med vanilje 0,2% fedt. Indeholder sødestof"
+      },
+      {
+       "type": 2,
+       "title": "EAN",
+       "value": "5711953011399"
+      },
+      {
+       "type": 2,
+       "title": "Artikel",
+       "value": "17924601"
+      },
+      {
+       "type": 2,
+       "title": "PID",
+       "value": "19753"
+      }
+     ]
+    },
+    {
+     "code": "productspecification",
+     "title": "Specifikationer",
+     "items": [
+      {
+       "type": 2,
+       "title": "Maksimal temperatur opbevaring",
+       "value": "5 c"
+      },
+      {
+       "type": 2,
+       "title": "Minimumstemperatur opbevaring",
+       "value": "2 c"
+      },
+      {
+       "type": 2,
+       "title": "Holdbarhed efter åbning (dage)",
+       "value": "6 dage"
+      },
+      {
+       "type": 2,
+       "title": "Opbevaringsinstruktioner",
+       "value": "Opbevaring: Opbevares ved højst 8°C, anbefales 5°C. Åbnet: 4-6 dage i køleskab (5°C). Ofte god efter."
+      },
+      {
+       "type": 2,
+       "title": "Tilberedning",
+       "value": "Omrøres før brug."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "objectID": "120041",
+   "name": "Hakket oksekød 14-18% fedt",
+   "infos": [
+    {
+     "code": "description",
+     "title": "Beskrivelse",
+     "items": [
+      {
+       "type": 1,
+       "title": "",
+       "value": "Hakket oksekød 14-18% fedt fra Slagteren er velsmagende kød. Den højere fedtprocent på 14-18% gør kødet velegnet til at grille. Form det hakkede oksekød til lækre hakkebøffer, og grill dem en varm sommeraften. Så har du en lækker velsmagende bøf til din burger, som du kan nyde i godt selskab med venner og familie.<BR><BR><H2>Om Slagteren</H2><BR>Slagteren har et stort og bredt udvalg af godt kød til en god pris – både hverdags- og weekendkød. I sortimentet findes mange nemme convenience-løsninger og udskæringer inden for okse og gris."
+      }
+     ]
+    },
+    {
+     "code": "ingredients",
+     "title": "Ingredienser",
+     "items": [
+      {
+       "type": 1,
+       "title": "",
+       "value": "Hakket oksekød"
+      }
+     ]
+    },
+    {
+     "code": "originlist",
+     "title": "Land(e)/Sorter",
+     "items": [
+      {
+       "type": 2,
+       "title": "",
+       "value": "Danmark"
+      }
+     ]
+    },
+    {
+     "code": "product_details",
+     "title": "Produktdetaljer",
+     "items": [
+      {
+       "type": 2,
+       "title": "Netto mængde",
+       "value": "1,2 kg"
+      },
+      {
+       "type": 2,
+       "title": "Varebetegnelse",
+       "value": "Hakket oksekød 14-18% fedt."
+      },
+      {
+       "type": 2,
+       "title": "EAN",
+       "value": "5716045001272"
+      },
+      {
+       "type": 2,
+       "title": "Artikel",
+       "value": "10591129"
+      },
+      {
+       "type": 2,
+       "title": "PID",
+       "value": "120041"
+      }
+     ]
+    },
+    {
+     "code": "productspecification",
+     "title": "Specifikationer",
+     "items": [
+      {
+       "type": 2,
+       "title": "Maksimal temperatur opbevaring",
+       "value": "5 c"
+      },
+      {
+       "type": 2,
+       "title": "Anvendelsesinstruktioner",
+       "value": "Hakket kød og kødfars skal altid gennemsteges"
+      },
+      {
+       "type": 2,
+       "title": "Anbefaling",
+       "value": "Hakket kød og kødfars skal altid gennemsteges."
+      },
+      {
+       "type": 2,
+       "title": "Oprindelse",
+       "value": "Danmark"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "objectID": "20824",
+   "name": "Solsikkerugbrød",
+   "infos": [
+    {
+     "code": "description",
+     "title": "Beskrivelse",
+     "items": [
+      {
+       "type": 1,
+       "title": "",
+       "value": "Solsikkerugbrød fra Kohberg er bagt med dansk mel og surdej og er fyldt med knasende solsikkekerner, der bidrager med en ekstra god smag og en saftig krumme. Det skiveskårede rugbrød er med sin gode og milde smag en sikker vinder på frokostbordet eller i madpakken hos både store og små. Servér eksempelvis rugbrødet sammen med lun leverpostej, æg og rejer eller med rullepølse toppet med sky og rødløg.<BR><BR><H2>Om Kohberg </H2><BR>Kohberg startede i den lille by Bolderslev i Sønderjylland i 1955, hvor bagermester Alfred Kohberg drev sit eget håndværksbageri efter sin far. Det lille bageri fik hurtig succes og flyttede derfor til større lokaler på den passende adresse: Kernesvinget. I dag, på selv samme adresse, består Kohberg af 80 uddannede bagere, som hver dag bager brød til hele Danmark med samme stolte tradition og kærlighed til det gode håndværk."
+      }
+     ]
+    },
+    {
+     "code": "ingredients",
+     "title": "Ingredienser",
+     "items": [
+      {
+       "type": 1,
+       "title": "",
+       "value": "Vand, RUGSIGTEMEL 21%, surdej (vand, RUGMEL^ 9%) 20%, RUGKERNER^ 13%, solsikkekerner 7%, hørfrø, HVEDEMEL 4%, RUGMEL^ 3%, salt tilsat jod, rapsolie, BYGMALTEKSTRAKT, fermenteret HVEDEMEL 1%, fermenteret hestebønnemel (HVEDE, RUG, BYG, HAVRE), sukkersirup, karamelliseret sukkersirup, tørret surdej (RUGMEL^, surdejskultur), gær, salt, HVEDESTIVELSE, melbehandlingsmidler (enzymer (HVEDE)). ^Fuldkorn."
+      }
+     ]
+    },
+    {
+     "code": "nutritional_100",
+     "title": "Næringsindhold",
+     "items": [
+      {
+       "type": 2,
+       "title": "Næringsindhold pr.",
+       "value": "100 g"
+      },
+      {
+       "type": 2,
+       "title": "Energi",
+       "value": "1.017 kJ"
+      },
+      {
+       "type": 2,
+       "title": "Energi",
+       "value": "243 kcal"
+      },
+      {
+       "type": 2,
+       "title": "Fedt",
+       "value": "6,5 g"
+      },
+      {
+       "type": 2,
+       "title": "- heraf mættede fedtsyrer",
+       "value": "0,7 g"
+      },
+      {
+       "type": 2,
+       "title": "Kulhydrater",
+       "value": "35 g"
+      },
+      {
+       "type": 2,
+       "title": "- heraf sukkerarter",
+       "value": "2,4 g"
+      },
+      {
+       "type": 2,
+       "title": "Kostfibre",
+       "value": "7,5 g"
+      },
+      {
+       "type": 2,
+       "title": "Protein",
+       "value": "7,0 g"
+      },
+      {
+       "type": 2,
+       "title": "Salt",
+       "value": "1,2 g"
+      }
+     ]
+    },
+    {
+     "code": "product_details",
+     "title": "Produktdetaljer",
+     "items": [
+      {
+       "type": 2,
+       "title": "Netto mængde",
+       "value": "750 g"
+      },
+      {
+       "type": 2,
+       "title": "Varebetegnelse",
+       "value": "Rugbrød med solsikkekerner"
+      },
+      {
+       "type": 2,
+       "title": "EAN",
+       "value": "5701246102835"
+      },
+      {
+       "type": 2,
+       "title": "Artikel",
+       "value": "82402700140"
+      },
+      {
+       "type": 2,
+       "title": "PID",
+       "value": "20824"
+      }
+     ]
+    },
+    {
+     "code": "productspecification",
+     "title": "Specifikationer",
+     "items": [
+      {
+       "type": 2,
+       "title": "Maksimal temperatur opbevaring",
+       "value": "20 c"
+      },
+      {
+       "type": 2,
+       "title": "Minimumstemperatur opbevaring",
+       "value": "15 c"
+      },
+      {
+       "type": 2,
+       "title": "Opbevaringsinstruktioner",
+       "value": "Opbevaring: Tørt, ved stuetemperatur (ca. 20°C), i tætlukket emballage. Holdbarhed åbnet: 3-4 dage, dog højst til datoen for \"bedst før\"."
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "nbHits": 3
+}

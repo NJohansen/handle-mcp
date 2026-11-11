@@ -1,0 +1,73 @@
+{
+ "data": {
+  "id": 20758,
+  "name": "LETMÆLK",
+  "underline": "250 ML. / ARLA",
+  "prices": [
+   {
+    "price": 3.95,
+    "price_over_max_quantity": null,
+    "max_quantity": null,
+    "is_advertised": false,
+    "is_campaign": false,
+    "starting_at": "2026-01-29T00:00:00+00:00",
+    "ending_at": "2099-12-31T00:00:00+00:00",
+    "deposit": null,
+    "compare_unit": "ltr",
+    "compare_unit_price": 15.8,
+    "consumption_unit": null,
+    "consumption_quantity": null
+   }
+  ],
+  "nutrition_info": [
+   {
+    "name": "Energi",
+    "value": "193 KJ / 46 kcal"
+   },
+   {
+    "name": "Fedt",
+    "value": "1,5"
+   },
+   {
+    "name": "Heraf mættede fedtsyrer",
+    "value": "1,0"
+   },
+   {
+    "name": "Kulhydrat",
+    "value": "4,6"
+   },
+   {
+    "name": "Heraf sukkerarter",
+    "value": "4,6"
+   },
+   {
+    "name": "Kostfibre",
+    "value": "< 0,5"
+   },
+   {
+    "name": "Protein",
+    "value": "3,5"
+   },
+   {
+    "name": "Salt",
+    "value": "0,11"
+   },
+   {
+    "name": "Riboflavin",
+    "value": "0,17 mg"
+   },
+   {
+    "name": "Vitamin B12",
+    "value": "0,49 µg"
+   },
+   {
+    "name": "Calciu",
+    "value": "122 mg"
+   },
+   {
+    "name": "Phosphor",
+    "value": "95 mg"
+   }
+  ]
+ }
+}

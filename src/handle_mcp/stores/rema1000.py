@@ -21,6 +21,7 @@ from handle_mcp.stores import StoreError
 from handle_mcp.stores._http import request
 from handle_mcp.stores.rema1000_auth import API, HEADERS, NAME, SHOP, RemaAuthMixin
 from handle_mcp.stores.rema1000_list import RemaListMixin
+from handle_mcp.stores.rema1000_nutrition import RemaNutritionMixin
 from handle_mcp.stores.rema1000_pickup import NOTE, RemaPickupMixin
 
 log = logging.getLogger(__name__)
@@ -115,7 +116,7 @@ def product(hit: dict, now: datetime | None = None) -> Product | None:
     )
 
 
-class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin):
+class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutritionMixin):
     name = "rema1000"
     cart_page = SHOP  # the list lives in REMA's app and webshop; no page per list is known
 

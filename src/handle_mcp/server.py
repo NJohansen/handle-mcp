@@ -204,6 +204,21 @@ async def list_offers(stores: list[str] | None = None, limit: int = 25) -> dict:
 
 
 @_tool(READ)
+async def get_nutrition(store: str, product_ids: list[str]) -> dict:
+    """Nutrition per 100 g or 100 ml from the store's label: energy_kj, energy_kcal, fat,
+    saturated_fat, carbohydrate, sugar, protein, salt, fibre as strings ("0.13", "<0.5"), null
+    when the label leaves a line out. No label (often fresh meat, fruit): `nutrition` null with a
+    `reason`. Up to 50 ids from search_products, list_offers or compare_basket; duplicates are
+    removed. nemlig, BilkaToGo and REMA 1000; no login needed."""
+    ids = list(dict.fromkeys(i.strip() for i in product_ids if i.strip()))  # order kept
+    if not ids or len(ids) > MAX_ITEMS:
+        raise ToolError(
+            "Ingen vare-id'er angivet." if not ids else f"Højst {MAX_ITEMS} varer pr. kald."
+        )
+    return _out({"products": await _call(store, "nutrition", ids)})
+
+
+@_tool(READ)
 async def compare_basket(items: list[str], stores: list[str] | None = None) -> dict:
     """Price a shopping list in each store, e.g. ["2 x letmælk 1 l", "rugbrød", "æg 10 stk"].
     Write the amount you need ("fior di latte 300 g"), not a pack size. Returns per item a

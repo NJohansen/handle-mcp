@@ -1,0 +1,99 @@
+{
+ "product": {
+  "id": "5027322",
+  "url": null,
+  "title": "Flanksteak",
+  "description": "400-600 g / frost / Irish Nature",
+  "price": 12600,
+  "priceOriginal": null,
+  "pricePerUnit": {
+   "value": 31500,
+   "unitType": "Weight"
+  },
+  "currency": "DKK",
+  "labelMaxQuantity": null,
+  "labelFreshnessDays": 30,
+  "labelHighlighted": {
+   "type": "Premium",
+   "url": "/dagligvarer/nye-varer-inspiration/premium"
+  },
+  "certificates": [
+   {
+    "type": "frozen",
+    "text": "Frost"
+   }
+  ],
+  "externalCertificates": [],
+  "campaignLines": [],
+  "campaignLabel": null,
+  "campaignBadge": null,
+  "quantity": 0,
+  "quantityLimit": null,
+  "isFavorite": false,
+  "isInShoppingList": false,
+  "availability": {
+   "type": "Available",
+   "nextAvailableDate": "0001-01-01T00:00:00Z",
+   "reasonMessage": []
+  },
+  "tracking": {
+   "impression": "",
+   "item_category": "Frost",
+   "item_category2": "Koed",
+   "item_category3": "Oksekoed",
+   "item_name": "Flanksteak",
+   "item_id": "5027322",
+   "price": "126.0",
+   "discount": "0",
+   "item_brand": "Irish Nature",
+   "item_variant": "produkt",
+   "raptor_category_path": ""
+  },
+  "images": [
+   {
+    "source": "https://product-images.nemlig.io/5027322.webp",
+    "accessibilityText": "Billede af Flanksteak"
+   },
+   {
+    "source": "https://product-images.nemlig.io/5027322_2.webp",
+    "accessibilityText": "Billede af Flanksteak"
+   },
+   {
+    "source": "https://product-images.nemlig.io/5027322_3.webp",
+    "accessibilityText": "Billede af Flanksteak"
+   }
+  ],
+  "detailGeneral": "**Type (dyr):** Okse\n\n**Udskæring:** Bryst\n\n**Type:** Oksekød\n\n**Egnet til:** Aftensmad, Bøf, Grill\n\n**Brand:** Irish Nature\n\n**Oprindelsesland:** Irland\n\n**Mærkninger:** Premium, Frost",
+  "detailDeclaration": [
+   {
+    "title": null,
+    "content": "100% okse.",
+    "tableHeader": [],
+    "tableItems": [],
+    "tableFootNotes": [],
+    "externalCertificates": []
+   }
+  ],
+  "detailDescription": "###### Flanksteak  \n  \n  \nDen hurtige steg! også perfekt til grill…  \n  \nSelvom den indeholder ordet steak, så er Flanksteak ikke så meget en steak, som det er en steg. Denne udskæring er placeret i bugen, hvilket med denne Irske krogmodning ”hip-hung” metode, får strukket fibrerne i bagpartiet og gjort dem særdeles møre. Dertil er flanksteaken en af de foretrukne produkter til grillen, der kan pensles med et bred udvalg af marinader og bruges til et væld af tilbehør.  \n  \n**Tilberedning**  \n - Tag stegen ud af køleskabet og ud af vakuummen, gerne en halv time inden tilberedning, så den kan temperere – det vil give et bedre resultat.\n  \n- Stegen placeres varm grill og steges 3-4 minutter på hver side til den har opnået en god stegeskorpe.\n  \n- Dan kan herefter placeres i en indirekte varmezone til den opnår en kernetemperatur på 54 °C. OBS: Flansteaken må endelig ikke få for meget, da den ellers hurtigt kan blive tør.\n  \n- Lad Flansteaken hvile i 10-15 minutter.\n  \n- Skær på tværs af muskelfibrene i 1 cm tykke skiver.\n  \n- Servér Flanksteak marineret med BBQ sammen med fries, dip og coleslaw.Kan også bruges til pastasalat, flødekartofler, nudler som ramen, skåret i strimler til pita, til bagekartofler og meget mere.\n\n  \nVelbekomme!  \n  \n  \n**Tip!** Alternativt kan den pakkes ind i sølvpapir 15 minutter, i stedet for at indgå i den indirekte varme.  \n  \n**Kødet kommer fra Irland**  \nDen grønne ø. Det er ikke uden grund, at det frodige og pragtfulde Irland har fået dette tilnavn. Irland byder på store grønne områder, uspoleret natur, forrevne klipper, søer og floder. Oksekødet af meget høj kvalitet stammer fra dette enestående naturområde med ideelle vækstbetingelser. Dyrene er primært græsfodrede, da de græsser på de frodige, grønne arealer og fodres om vinteren med græsensilage. Derudover suppleres deres kost med en smule korntilskud.  \n  \nDet irske oksekød er kendt for sin helt unikke mørhed. Det skyldes blandt andet, at pistolerne er ”hip hung” -med andre ord; er blevet hofteophængt, straks efter slagtning. På den måde bibeholder musklerne deres naturlige struktur, hvor fibre på lår trækkes, hvilket er med til at gøre kødet mere mørt.",
+  "tags": null,
+  "recommendations": null,
+  "breadcrumbs": [
+   {
+    "title": "Kød",
+    "url": "/kategori/koed"
+   },
+   {
+    "title": "Oksekød",
+    "url": "/kategori/koed/oksekoed"
+   },
+   {
+    "title": "Steaks og bøffer",
+    "url": "/kategori/koed/oksekoed/steaks-og-boeffer"
+   },
+   {
+    "title": "Flanksteak",
+    "url": "/produkt/5027322"
+   }
+  ]
+ }
+}
