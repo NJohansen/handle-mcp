@@ -300,6 +300,13 @@ async def test_the_model_is_told_to_pass_the_notice_on():
     assert "telemetry_notice" in server.mcp.instructions
 
 
+def test_instructions_suggest_a_first_prompt():
+    text = server.mcp.instructions
+    assert "Lav ugens madplan" in text
+    assert "at most 3 short questions" in text
+    assert "this week included, at least 1" in text
+
+
 async def test_a_failing_endpoint_never_breaks_a_tool(sent, monkeypatch):
     def boom(payload):
         raise OSError("network down")

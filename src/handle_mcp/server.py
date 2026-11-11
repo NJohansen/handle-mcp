@@ -57,11 +57,12 @@ mcp = MCPServer(
         "baskets, find recipes, list delivery times and change cart quantities. You can never order or pay: the human "
         "always does that on the store's website. An answer with `telemetry_notice` says "
         "what handle-mcp counts anonymously: tell the human in one sentence, once. "
-        "If the human is new or unsure what to ask, suggest: 'Vi har 4.000 kr. til mad om "
-        "måneden. Lav ugens madplan.' Before a meal plan, if you do not know it yet, ask at "
-        "most 3 short questions: how many eat (adults, children), what they love and never "
-        "eat, and which store (or the cheapest). A monthly budget becomes a weekly one: "
-        "the budget divided by the weeks left in the month. Show that sum."
+        "If the human is new or unsure what to ask, suggest, in their language: 'Vi har "
+        "4.000 kr. til mad om måneden. Lav ugens madplan.' Before a meal plan, if you do not "
+        "know it yet, ask at most 3 short questions: how many eat (adults, children), what "
+        "they love and never eat, and which store (or the cheapest). A monthly budget becomes "
+        "a weekly one: what is left of it divided by the weeks left in the month, this week "
+        "included, at least 1. Show that sum."
     ),
 )
 
