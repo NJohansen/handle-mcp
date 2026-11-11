@@ -175,7 +175,7 @@
  },
  {
   "name": "get_nutrition",
-  "description": "Nutrition per 100 g or 100 ml for products, as on the store's label: energy_kj,\nenergy_kcal, fat, saturated_fat, carbohydrate, sugar, protein, salt, fibre. Values are\nstrings (\"0.13\", \"<0.5\"); a line the label leaves out is null. `nutrition` is null with a\n`reason` when the store shows no label (often fresh meat, fruit and vegetables).\n`product_ids` are ids from search_products, list_offers or compare_basket, at most 50.\nnemlig, BilkaToGo and REMA 1000; no login needed.",
+  "description": "Nutrition per 100 g or 100 ml from the store's label: energy_kj, energy_kcal, fat,\nsaturated_fat, carbohydrate, sugar, protein, salt, fibre as strings (\"0.13\", \"<0.5\"), null\nwhen the label leaves a line out. No label (often fresh meat, fruit): `nutrition` null with a\n`reason`. Up to 50 ids from search_products, list_offers or compare_basket; duplicates are\nremoved. nemlig, BilkaToGo and REMA 1000; no login needed.",
   "inputSchema": {
    "properties": {
     "store": {
