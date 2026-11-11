@@ -2,6 +2,8 @@
 
 Small and boring wins. Read `CLAUDE.md` first: the six rules, the layout and how to add a store.
 
+The tools and the `handle-mcp` CLI are the public interface. The Python modules are internal and may move between releases (e.g. [ADR 0011](docs/adr/0011-a-folder-per-store.md)): a fork with its own changes rebases on `main`.
+
 ## Setup
 
 ```sh
