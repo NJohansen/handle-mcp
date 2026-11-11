@@ -225,9 +225,32 @@ async def test_refused_renewal_means_log_in_again(store, site):
 async def test_renewal_5xx_is_a_store_error_and_not_retried(store, site):
     site.access, site.refresh_status = jwt(NOW - timedelta(minutes=1)), 502
     saved(site, store_ids="263")
-    with pytest.raises(StoreError, match="502 ved fornyelse"):
+    with pytest.raises(StoreError, match="502 ved fornyelse.*handle-mcp login rema1000"):
         await store.delivery_slots(7)
     assert site.calls("/api/auth/refresh") == 1
+
+
+async def test_a_session_another_process_renewed_is_taken_not_renewed_again(site):
+    """Claude Desktop and a test run share the saved session. REMA rotates the refresh token,
+    so the one that renews second must take the saved session, not spend the old token."""
+
+    def make(minutes: int) -> Rema1000Store:
+        s = Rema1000Store(
+            httpx.AsyncClient(transport=httpx.MockTransport(site.api_only)),
+            httpx.AsyncClient(transport=httpx.MockTransport(site.handle)),
+        )
+        s._now = lambda: NOW + timedelta(minutes=minutes)
+        return s
+
+    saved(site, store_ids="263")
+    late = make(0)
+    await late.delivery_slots(7)  # holds r1 in memory
+    late._now = lambda: NOW + timedelta(minutes=70)  # the access token has ended
+    await make(70).delivery_slots(7)  # another process renews first: r2 is saved
+    assert site.calls("/api/auth/refresh") == 1
+    await late.delivery_slots(7)
+    assert site.calls("/api/auth/refresh") == 1  # took r2 from the keychain
+    assert late.session()["refresh_token"] == "r2"
 
 
 async def test_401_renews_once(store, site):

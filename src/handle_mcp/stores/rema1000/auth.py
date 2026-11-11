@@ -151,12 +151,27 @@ class RemaAuthMixin:
                     return self._token
             elif not self._cookies:
                 return await self._login(login["email"], login["password"])
+            elif self._newer(login.get("session")):
+                # Another handle-mcp (Claude Desktop, a test run) renewed and saved first. REMA
+                # rotates the refresh token, so ours is spent: take the saved one.
+                saved = login["session"]
+                self._stores = saved.get("store_ids", "") or self._stores
+                self._set(saved, number(saved.get("access_exp")))
+                if self._token and self._fresh() and self._token != used:
+                    return self._token
             if self._cookies.get("refresh_token") and await self._renew():
                 save_session(self.name, login["email"], self.session() or {})
                 return self._token or ""
             if "password" in login:  # env vars: start over
                 return await self._login(login["email"], login["password"])
             raise expired(self.name)
+
+    def _newer(self, saved: Any) -> bool:
+        """True when the saved session holds another refresh token than the one in memory."""
+        if not isinstance(saved, dict):
+            return False
+        token = saved.get("refresh_token")
+        return bool(token) and token != self._cookies.get("refresh_token")
 
     async def _renew(self) -> bool:
         """POST /api/auth/refresh with the cookies, as the webshop does. False when REMA
@@ -174,7 +189,8 @@ class RemaAuthMixin:
         log.info("REMA 1000 renewal answered %s", resp.status_code)
         if resp.status_code >= 500 and complete:
             raise StoreError(
-                f"REMA 1000 svarer {resp.status_code} ved fornyelse. Prøv igen senere."
+                f"REMA 1000 svarer {resp.status_code} ved fornyelse af login. Prøv igen om lidt. "
+                f"Sker det igen, så log ind på ny: handle-mcp login rema1000"
             )
         if resp.status_code >= 300:
             return False
