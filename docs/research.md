@@ -145,6 +145,14 @@ Kilde: [McAndersDK/handle-mcp-go](https://github.com/McAndersDK/handle-mcp-go) (
 4. **Privacy-filter** skal dække: `InvoiceAddress`, `DeliveryAddress`/`deliveryAddress` (kun ved hjemlevering), navne-, email-, telefon-felter, `DoorCode`, `UnattendedNotes`, `uid`, `tid`, `CustomerName`.
 5. **Forbudte endpoints-test:** grep efter `PlaceOrder`, `Checkout/`, `SetDeliveryAddress`, `EmptyCart` i `src/`.
 
+## Næringsindhold (2026-11-11)
+
+- **BilkaToGo:** Algolia-indekset har `infos` med kode `nutritional_100`: rækker `{type: 2, title, value}`, første række "Næringsindhold pr." = "100 g", "Energi" to gange ("233 kJ", "55 kcal"). Kommer også med i en almindelig søgning, når `infos` er i `attributesToRetrieve`. Opslag på `objectID` virker uden login. `energyInfo` findes, men er tom.
+- **nemlig:** `GET productbff/api/web/productDetails/{id}` med den anonyme token: `product.detailDeclaration[].tableHeader` ("Næringsindhold pr. 100 ml") og `tableItems` ([label, værdi], "329 kJ / 78 Kcal"). Ét kald pr. vare. Ingen EAN, hverken her eller i søgningen.
+- **REMA 1000:** `GET api/v3/products/{id}?include=nutrition_info` uden login, som produktsiden selv spørger: `nutrition_info` = `[{name, value}]` ("Energi" = "318 KJ / 75 kcal", "Fedt" = "< 0,5", ingen enhed). Tabellen siger "Pr. 100 g/ml"; prisens `compare_unit` (kg/ltr) siger hvilken. Søgningen har den ikke (dens `declaration` er ingredienserne). Ukendt id: 404. Siden har også `POST api/v3/batch`, som vi ikke bruger.
+- **Frisk kød** (hakket oksekød, flanksteak) og bananer har ingen deklaration i nogen af butikkerne. REMA har dog tal for hakket hvidkål.
+- **Open Food Facts** har samme tal som Bilka for skyr (EAN 5711953011399), men mangler frisk kød. Ikke brugt: nemlig har ingen EAN, og Bilka har tallene selv.
+
 ## Bekræftet live (2026-11-01, hjemlevering valgt)
 
 - **BilkaToGo `Cart`:** `stat.delivery_price` = 39 kr (levering) + 39 kr (pakkeservice), minimumskøb 500 kr. Hjemlevering ses på `deliveryAddress.dawa_uid` / `recipient_name`.
