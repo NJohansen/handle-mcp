@@ -10,7 +10,7 @@ import os
 
 import pytest
 
-from handle_mcp import compare, recipe_cart
+from handle_mcp import app, compare, recipe_cart
 from handle_mcp.stores import STORES
 from handle_mcp.stores.rema1000.pickup import GateClosed
 
@@ -175,7 +175,7 @@ async def test_compare_week_list(monkeypatch):
     from tests.test_compare import WEEK_LIST
 
     monkeypatch.setattr(registry, "STORES", STORES)  # conftest swaps in fakes
-    monkeypatch.setattr(server, "_instances", {})
+    monkeypatch.setattr(app, "_instances", {})
     result = await server.compare_basket(WEEK_LIST)
     for name, quote in result["stores"].items():
         print(f"\n== {name} ==")

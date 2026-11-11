@@ -8,7 +8,7 @@ import pytest
 from keyring.backend import KeyringBackend
 from keyring.errors import PasswordDeleteError
 
-from handle_mcp import server, telemetry
+from handle_mcp import app, telemetry
 from handle_mcp import stores as registry
 from handle_mcp.models import (
     Cart,
@@ -202,7 +202,7 @@ def no_telemetry(monkeypatch, tmp_path):
 @pytest.fixture(autouse=True)
 def fake_stores(monkeypatch):
     monkeypatch.setattr(registry, "STORES", {"fake": FakeStore, "broken": BrokenStore})
-    monkeypatch.setattr(server, "_instances", {})
+    monkeypatch.setattr(app, "_instances", {})
 
 
 class MemoryKeyring(KeyringBackend):

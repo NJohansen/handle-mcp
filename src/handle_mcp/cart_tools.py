@@ -1,7 +1,6 @@
-"""The tools for the human's cart, delivery times and orders. They register on server.mcp.
-
-Imported at the end of server.py, after the helpers they use. Only set_cart_quantities and
-add_recipe_to_cart write, and only the cart: never an order, a payment or a delivery time.
+"""The tools for the human's cart, delivery times and orders. They register on app.mcp.
+Only set_cart_quantities and add_recipe_to_cart write, and only the cart: never an order,
+a payment or a delivery time.
 """
 
 from __future__ import annotations
@@ -16,7 +15,7 @@ from pydantic import BeforeValidator
 
 from handle_mcp import links, recipe_cart, telemetry
 from handle_mcp import stores as registry
-from handle_mcp.server import (
+from handle_mcp.app import (
     ADD,
     MAX_DAYS,
     MAX_ITEMS,

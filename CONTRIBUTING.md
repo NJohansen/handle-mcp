@@ -21,7 +21,7 @@ Live tests (`HANDLE_LIVE=1 uv run pytest -m live -s`) call the real stores with 
 3. Add one line to `STORES` in `src/handle_mcp/stores/__init__.py`.
 4. Tests: real, redacted answers in `tests/fixtures/<name>/`, HTTP mocked with `httpx.MockTransport`.
 
-No change to `server.py`, `cart_tools.py` or the tools. Store facts: [docs/research.md](docs/research.md).
+No change to `app.py` or the tools. Store facts: [docs/research.md](docs/research.md).
 
 ## Pull requests
 

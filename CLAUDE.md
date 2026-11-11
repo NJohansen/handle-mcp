@@ -5,7 +5,7 @@ A local MCP server (stdio) for Danish grocery stores with home delivery. Goal an
 ## Rules (never break)
 
 1. **The human always pays.** No code may order, pay, read cards, choose a delivery time or change the address. See `docs/adr/0001-the-human-always-pays.md`. `tests/test_safety.py` greps for forbidden endpoints.
-2. **Privacy first.** Every tool answer goes through `privacy.scrub()` in `server._out()`. Never return raw store JSON without it.
+2. **Privacy first.** Every tool answer goes through `privacy.scrub()` in `app._out()`. Never return raw store JSON without it.
 3. **stdout is JSON-RPC.** Never `print()`. Log to stderr with `logging`.
 4. **No secrets in git.** Logins only in env vars, the OS keychain (`handle-mcp login <store>`) or `~/.config/handle-mcp/<store>.json` (chmod 600).
 5. **Small and boring.** < ~550 lines per file in a store folder, < ~300 in every other file. No layer until two real users need it. A store that grows past the limit splits into mixins in its folder, `stores/<store>/<topic>.py`, never into a second layer. A folder per store is grouping, not a layer ([ADR 0011](docs/adr/0011-a-folder-per-store.md)).
@@ -15,8 +15,10 @@ A local MCP server (stdio) for Danish grocery stores with home delivery. Goal an
 
 ```
 src/handle_mcp/
-  server.py        store selection, error handling, the tools that read products, recipes and offers
-  cart_tools.py    the cart, delivery and order tools (registered on server.mcp)
+  server.py        the entry point (`handle-mcp`, `python -m handle_mcp.server`); re-exports the tools
+  app.py           the MCPServer, limits, store selection, error handling, `_out()`
+  read_tools.py    the tools that read products, recipes, offers and nutrition; compare_basket
+  cart_tools.py    the cart, delivery and order tools. Both register on app.mcp; nothing imports server.py
   cli.py           `handle-mcp` entry: stdio server or `login <store>` (logins into the OS keychain)
   compare.py       compare_basket: best product per item, cheapest store
   candidates.py    the products per item the caller picks from, with flags
@@ -62,7 +64,7 @@ docs/tools.md      the tool table users read: stores per tool, what writes
 3. Add one line to `STORES` in `stores/__init__.py`.
 4. Tests: fixtures in `tests/fixtures/<name>/` are real answers with personal data replaced. Mock HTTP with `httpx.MockTransport`.
 
-No change to `server.py`, `cart_tools.py` or the tools is needed.
+No change to `app.py` or the tools is needed.
 
 ## Store API lessons (see docs/research.md)
 

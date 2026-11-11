@@ -8,7 +8,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from handle_mcp import compare, server
+from handle_mcp import app, compare, server
 from handle_mcp import stores as registry
 from handle_mcp.stores import StoreError, _http
 from handle_mcp.stores.nemlig import NemligStore
@@ -434,7 +434,7 @@ async def test_never_calls_order_or_payment_endpoints(store, fake):
 
 async def test_tools_hide_personal_data_from_nemlig(store, monkeypatch):
     monkeypatch.setattr(registry, "STORES", {"nemlig": NemligStore})
-    monkeypatch.setattr(server, "_instances", {"nemlig": store})
+    monkeypatch.setattr(app, "_instances", {"nemlig": store})
     text = json.dumps(
         [
             await server.get_cart("nemlig"),
