@@ -15,7 +15,7 @@ from handle_mcp import nutrition
 from handle_mcp.models import ProductNutrition
 from handle_mcp.stores import NotFound, StoreError
 from handle_mcp.stores._http import per_product, request
-from handle_mcp.stores.rema1000_auth import API, HEADERS, NAME
+from handle_mcp.stores.rema1000.auth import API, HEADERS, NAME
 
 BASIS = {"kg": "100 g", "ltr": "100 ml", "l": "100 ml"}
 NO_LABEL = "REMA 1000 viser ingen næringsdeklaration for varen (ofte frisk kød, frugt og grønt)."

@@ -1,4 +1,4 @@
-"""BilkaToGo's public Algolia index: one home for search (bilkatogo.py) and nutrition.
+"""BilkaToGo's public Algolia index: one home for search (__init__.py) and nutrition.
 
 Public keys from bilkatogo.dk's own JavaScript. Not secrets: every visitor's browser sends them.
 """

@@ -9,7 +9,7 @@ from urllib.parse import parse_qs
 import httpx
 import pytest
 
-from handle_mcp import server
+from handle_mcp import app, server
 from handle_mcp import stores as registry
 from handle_mcp.stores import StoreError, _http
 from handle_mcp.stores import bilkatogo as bilka_module
@@ -332,7 +332,7 @@ async def test_never_calls_forbidden_endpoints(store, fake):
 
 async def test_tools_hide_personal_data_from_bilka(store, monkeypatch):
     monkeypatch.setattr(registry, "STORES", {"bilkatogo": BilkaStore})
-    monkeypatch.setattr(server, "_instances", {"bilkatogo": store})
+    monkeypatch.setattr(app, "_instances", {"bilkatogo": store})
     text = json.dumps(
         [
             await server.get_cart("bilkatogo"),

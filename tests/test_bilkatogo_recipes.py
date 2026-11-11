@@ -7,9 +7,9 @@ import httpx
 import pytest
 
 from handle_mcp.stores import StoreError
-from handle_mcp.stores import bilkatogo_recipes as bilka_recipes
 from handle_mcp.stores.bilkatogo import BilkaStore
-from handle_mcp.stores.bilkatogo_recipes import category_path, js_object, recipe_path
+from handle_mcp.stores.bilkatogo import recipes as bilka_recipes
+from handle_mcp.stores.bilkatogo.recipes import category_path, js_object, recipe_path
 from tests import test_bilkatogo
 
 fake = test_bilkatogo.fake  # Bilka's login, cart and Algolia, fake

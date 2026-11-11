@@ -13,9 +13,8 @@ import pytest
 from handle_mcp import cli
 from handle_mcp import stores as registry
 from handle_mcp.stores import StoreError
-from handle_mcp.stores import rema1000_auth as auth
-from handle_mcp.stores.rema1000 import NOTE, Rema1000Store
-from handle_mcp.stores.rema1000_pickup import GateClosed, parse_ids
+from handle_mcp.stores.rema1000 import NOTE, Rema1000Store, auth
+from handle_mcp.stores.rema1000.pickup import GateClosed, parse_ids
 
 FIXTURES = Path(__file__).parent / "fixtures" / "rema1000"
 NOW = datetime(2026, 11, 10, 9, tzinfo=UTC)

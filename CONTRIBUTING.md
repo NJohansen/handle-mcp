@@ -2,6 +2,8 @@
 
 Small and boring wins. Read `CLAUDE.md` first: the six rules, the layout and how to add a store.
 
+The tools and the `handle-mcp` CLI are the public interface. The Python modules are internal and may move between releases (e.g. [ADR 0011](docs/adr/0011-a-folder-per-store.md)): a fork with its own changes rebases on `main`.
+
 ## Setup
 
 ```sh
@@ -14,12 +16,12 @@ Live tests (`HANDLE_LIVE=1 uv run pytest -m live -s`) call the real stores with 
 
 ## Add a store
 
-1. Create `src/handle_mcp/stores/<name>.py` with a class that has every method in `stores.Store`.
+1. Create `src/handle_mcp/stores/<name>/__init__.py` with a class that has every method in `stores.Store`. Topics that make it long go in mixins next to it, `stores/<name>/<topic>.py`.
 2. Raise `StoreError("clear Danish message")` for expected failures, `NotImplementedError` for what the store cannot do.
 3. Add one line to `STORES` in `src/handle_mcp/stores/__init__.py`.
 4. Tests: real, redacted answers in `tests/fixtures/<name>/`, HTTP mocked with `httpx.MockTransport`.
 
-No change to `server.py` or the tools. Store facts: [docs/research.md](docs/research.md).
+No change to `app.py` or the tools. Store facts: [docs/research.md](docs/research.md).
 
 ## Pull requests
 

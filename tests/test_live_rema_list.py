@@ -12,7 +12,7 @@ import os
 import pytest
 
 from handle_mcp.stores.rema1000 import Rema1000Store
-from handle_mcp.stores.rema1000_list import LIST
+from handle_mcp.stores.rema1000.shopping_list import LIST
 
 pytestmark = [
     pytest.mark.live,

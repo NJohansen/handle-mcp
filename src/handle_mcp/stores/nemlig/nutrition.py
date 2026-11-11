@@ -15,7 +15,7 @@ from handle_mcp import nutrition
 from handle_mcp.models import ProductNutrition
 from handle_mcp.stores import StoreError
 from handle_mcp.stores._http import per_product
-from handle_mcp.stores.nemlig_recipes import BFF
+from handle_mcp.stores.nemlig.recipes import BFF
 
 NO_LABEL = "nemlig viser ingen næringsdeklaration for varen (ofte frisk kød, frugt og grønt)."
 UNKNOWN = "nemlig kender ikke varen."

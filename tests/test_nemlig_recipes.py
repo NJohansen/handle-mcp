@@ -6,7 +6,7 @@ import pytest
 
 from handle_mcp import server
 from handle_mcp.stores import StoreError
-from handle_mcp.stores.nemlig_recipes import category_path, recipe_slug
+from handle_mcp.stores.nemlig.recipes import category_path, recipe_slug
 from tests import test_nemlig
 
 fake, store = test_nemlig.fake, test_nemlig.store  # the fixtures with nemlig's fake HTTP

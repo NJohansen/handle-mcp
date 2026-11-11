@@ -6,7 +6,7 @@ A BilkaToGo cart can be set to pickup in a Bilka store. handle-mcp reads pickup 
 
 `delivery_mode` is `"home"`, `"pickup"` or `null` on `get_cart`, both parts of `get_delivery_info` and each store in `compare_basket`. `pickup_store` is the store's name for pickup, else `null`. nemlig is always `"home"`.
 
-BilkaToGo decides from the cart's `deliveryAddress`, in one place (`_mode()` in `stores/bilkatogo.py`). It fails closed:
+BilkaToGo decides from the cart's `deliveryAddress`, in one place (`_mode()` in `stores/bilkatogo/__init__.py`). It fails closed:
 
 - **home:** `dawa_uid` or `recipient_name` is set.
 - **pickup:** no home marker, a `sid`, and `name` starts with `Bilka`.

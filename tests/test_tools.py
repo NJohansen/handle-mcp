@@ -13,7 +13,7 @@ from handle_mcp import server
 from handle_mcp import stores as registry
 from handle_mcp.models import Product
 from handle_mcp.stores.bilkatogo import BilkaStore
-from handle_mcp.stores.nemlig_offers import offer_product
+from handle_mcp.stores.nemlig.offers import offer_product
 from tests.conftest import BrokenStore
 
 ALLOWED = {

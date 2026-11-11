@@ -9,8 +9,8 @@ import pytest
 
 from handle_mcp import stores as registry
 from handle_mcp import telemetry
-from handle_mcp.stores import rema1000_list
 from handle_mcp.stores.rema1000 import Rema1000Store
+from handle_mcp.stores.rema1000 import shopping_list as rema1000_list
 from tests.test_rema1000_login import STORES, jwt
 
 NOW = datetime(2026, 11, 10, 9, tzinfo=UTC)

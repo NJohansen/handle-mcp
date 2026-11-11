@@ -14,7 +14,7 @@ from typing import Any
 
 from handle_mcp.models import Product
 from handle_mcp.stores import StoreError
-from handle_mcp.stores.nemlig_recipes import BFF
+from handle_mcp.stores.nemlig.recipes import BFF
 
 log = logging.getLogger(__name__)
 

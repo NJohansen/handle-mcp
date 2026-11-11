@@ -16,7 +16,7 @@ from urllib.parse import urlencode
 from handle_mcp import nutrition
 from handle_mcp.models import ProductNutrition
 from handle_mcp.stores import StoreError
-from handle_mcp.stores.bilkatogo_algolia import ALGOLIA, ALGOLIA_HEADERS, ALGOLIA_INDEX
+from handle_mcp.stores.bilkatogo.algolia import ALGOLIA, ALGOLIA_HEADERS, ALGOLIA_INDEX
 
 NUTRITION_CODE = "nutritional_100"
 NO_LABEL = "BilkaToGo viser ingen næringsdeklaration for varen (ofte frisk kød, frugt og grønt)."

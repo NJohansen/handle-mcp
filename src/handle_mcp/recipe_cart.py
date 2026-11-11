@@ -1,6 +1,6 @@
 """add_recipe_to_cart: which products a recipe adds to the cart, and the new absolute counts.
 
-Pure functions: the tool in server.py fetches the recipe and the cart, and writes with the
+Pure functions: the tool in cart_tools.py fetches the recipe and the cart, and writes with the
 store's set_quantities (absolute counts). The store's own "add recipe" call is never used.
 """
 
