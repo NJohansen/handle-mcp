@@ -13,8 +13,8 @@ from typing import Any
 
 from handle_mcp.models import Cart, CartLine, QuantityResult
 from handle_mcp.stores import StoreError
-from handle_mcp.stores.rema1000_auth import Unsure
-from handle_mcp.stores.rema1000_pickup import GateClosed
+from handle_mcp.stores.rema1000.auth import Unsure
+from handle_mcp.stores.rema1000.pickup import GateClosed
 
 LIST = "handle-mcp"
 ATTEMPTS = 3  # a POST is sent again only after a read shows the first one did not land

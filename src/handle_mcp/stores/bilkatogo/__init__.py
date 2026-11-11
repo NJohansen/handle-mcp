@@ -32,9 +32,9 @@ from handle_mcp.models import (
 )
 from handle_mcp.stores import StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
-from handle_mcp.stores.bilkatogo_algolia import ALGOLIA, ALGOLIA_HEADERS, ALGOLIA_INDEX
-from handle_mcp.stores.bilkatogo_nutrition import BilkaNutritionMixin
-from handle_mcp.stores.bilkatogo_recipes import BilkaRecipesMixin
+from handle_mcp.stores.bilkatogo.algolia import ALGOLIA, ALGOLIA_HEADERS, ALGOLIA_INDEX
+from handle_mcp.stores.bilkatogo.nutrition import BilkaNutritionMixin
+from handle_mcp.stores.bilkatogo.recipes import BilkaRecipesMixin
 
 log = logging.getLogger(__name__)
 

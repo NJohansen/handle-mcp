@@ -12,7 +12,7 @@ import pytest
 
 from handle_mcp import compare, recipe_cart
 from handle_mcp.stores import STORES
-from handle_mcp.stores.rema1000_pickup import GateClosed
+from handle_mcp.stores.rema1000.pickup import GateClosed
 
 pytestmark = [
     pytest.mark.live,

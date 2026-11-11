@@ -10,9 +10,11 @@ import pytest
 
 from handle_mcp import compare, server
 from handle_mcp import stores as registry
-from handle_mcp.stores import StoreError, _http, nemlig_delivery, nemlig_offers
+from handle_mcp.stores import StoreError, _http
 from handle_mcp.stores.nemlig import NemligStore
-from handle_mcp.stores.nemlig_offers import offer_product
+from handle_mcp.stores.nemlig import delivery as nemlig_delivery
+from handle_mcp.stores.nemlig import offers as nemlig_offers
+from handle_mcp.stores.nemlig.offers import offer_product
 
 FIXTURES = Path(__file__).parent / "fixtures" / "nemlig"
 

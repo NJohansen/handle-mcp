@@ -1,9 +1,9 @@
 """REMA 1000: the API behind shop.rema1000.dk. See docs/research.md and docs/adr/0007.
 
 Search, the weekly leaflet (Avisvare) and the store list are public: no login. Pickup times
-need one (rema1000_auth.py, rema1000_pickup.py). The webshop is pickup only (Køb & Hent).
+need one (auth.py, pickup.py). The webshop is pickup only (Køb & Hent).
 REMA's own cart, store choice, pickup time and payment are never touched here (docs/adr/0001,
-docs/adr/0007). The cart is the shopping list "handle-mcp" (rema1000_list.py).
+docs/adr/0007). The cart is the shopping list "handle-mcp" (shopping_list.py).
 """
 
 from __future__ import annotations
@@ -19,10 +19,10 @@ import httpx
 from handle_mcp.models import Order, Product, Recipe, RecipeDetails
 from handle_mcp.stores import StoreError
 from handle_mcp.stores._http import request
-from handle_mcp.stores.rema1000_auth import API, HEADERS, NAME, SHOP, RemaAuthMixin
-from handle_mcp.stores.rema1000_list import RemaListMixin
-from handle_mcp.stores.rema1000_nutrition import RemaNutritionMixin
-from handle_mcp.stores.rema1000_pickup import NOTE, RemaPickupMixin
+from handle_mcp.stores.rema1000.auth import API, HEADERS, NAME, SHOP, RemaAuthMixin
+from handle_mcp.stores.rema1000.nutrition import RemaNutritionMixin
+from handle_mcp.stores.rema1000.pickup import NOTE, RemaPickupMixin
+from handle_mcp.stores.rema1000.shopping_list import RemaListMixin
 
 log = logging.getLogger(__name__)
 
@@ -126,14 +126,14 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
         self._client = client or httpx.AsyncClient(timeout=20, follow_redirects=True)
         # The login has its own client, so its cookies never ride along with a search.
         self._auth = auth or httpx.AsyncClient(timeout=20)
-        self._cookies: dict[str, str] = {}  # the site's session (rema1000_auth.py)
+        self._cookies: dict[str, str] = {}  # the site's session (auth.py)
         self._token: str | None = None
         self._until = datetime.min.replace(tzinfo=UTC)
         self._user: int | None = None  # the user id in the token, for the list
-        self._stores = ""  # the chosen store ids, comma-separated (rema1000_pickup.py)
+        self._stores = ""  # the chosen store ids, comma-separated (pickup.py)
         self._gate = None
         self._auth_lock = asyncio.Lock()
-        self._write_lock = asyncio.Lock()  # one list write at a time (rema1000_list.py)
+        self._write_lock = asyncio.Lock()  # one list write at a time (shopping_list.py)
 
     async def _get(self, path: str, params: dict[str, Any]) -> dict:
         resp = await request(

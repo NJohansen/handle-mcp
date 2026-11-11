@@ -29,10 +29,10 @@ from handle_mcp.models import (
 )
 from handle_mcp.stores import NotFound, StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
-from handle_mcp.stores.nemlig_delivery import DK, DeliveryMixin, _money, _time
-from handle_mcp.stores.nemlig_nutrition import NutritionMixin
-from handle_mcp.stores.nemlig_offers import OffersMixin
-from handle_mcp.stores.nemlig_recipes import RecipesMixin
+from handle_mcp.stores.nemlig.delivery import DK, DeliveryMixin, _money, _time
+from handle_mcp.stores.nemlig.nutrition import NutritionMixin
+from handle_mcp.stores.nemlig.offers import OffersMixin
+from handle_mcp.stores.nemlig.recipes import RecipesMixin
 
 log = logging.getLogger(__name__)
 logging.getLogger("httpx").setLevel(logging.WARNING)  # its INFO logs full URLs with tokens
