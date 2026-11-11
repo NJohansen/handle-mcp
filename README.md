@@ -52,7 +52,7 @@ claude mcp add handle -- uvx handle-mcp@latest
 
 Then ask:
 
-- *"Plan 5 dinners for 4 within 900 kr, built on this week's offers. Fill the cheapest cart."*
+- *"We have 4,000 kr a month for food. Plan this week's meals."* It asks who eats, what you like and which store, then plans on this week's offers and fills the cheapest cart after your yes.
 - *"What is on offer this week? Any free gifts?"*
 - *"Which delivery times are cheapest tomorrow?"*
 
