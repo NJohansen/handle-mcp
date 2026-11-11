@@ -8,14 +8,15 @@ A local MCP server (stdio) for Danish grocery stores with home delivery. Goal an
 2. **Privacy first.** Every tool answer goes through `privacy.scrub()` in `server._out()`. Never return raw store JSON without it.
 3. **stdout is JSON-RPC.** Never `print()`. Log to stderr with `logging`.
 4. **No secrets in git.** Logins only in env vars, the OS keychain (`handle-mcp login <store>`) or `~/.config/handle-mcp/<store>.json` (chmod 600).
-5. **Small and boring.** < ~550 lines per store file, < ~300 in every other file. No layer until two real users need it. A store that grows past the limit splits into mixins, `stores/<store>_<topic>.py`, never into a second layer.
+5. **Small and boring.** < ~550 lines per file in a store folder, < ~300 in every other file. No layer until two real users need it. A store that grows past the limit splits into mixins in its folder, `stores/<store>/<topic>.py`, never into a second layer. A folder per store is grouping, not a layer ([ADR 0011](docs/adr/0011-a-folder-per-store.md)).
 6. **No Claude attribution** in commits, PRs or comments.
 
 ## Layout
 
 ```
 src/handle_mcp/
-  server.py        all tools, store selection, error handling
+  server.py        store selection, error handling, the tools that read products, recipes and offers
+  cart_tools.py    the cart, delivery and order tools (registered on server.mcp)
   cli.py           `handle-mcp` entry: stdio server or `login <store>` (logins into the OS keychain)
   compare.py       compare_basket: best product per item, cheapest store
   candidates.py    the products per item the caller picks from, with flags
@@ -29,8 +30,10 @@ src/handle_mcp/
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES
   stores/_http.py     one request with the retries every store needs; per_product() for one call per product
-  stores/<store>.py   one file per store: login, calls and parsing for that store
-  stores/<store>_<topic>.py  mixins when a store outgrows one file (nemlig_offers, nemlig_recipes, nemlig_delivery, nemlig_nutrition, bilkatogo_nutrition, rema1000_nutrition, rema1000_auth, rema1000_pickup, rema1000_list); bilkatogo_algolia holds the Algolia keys both Bilka files use
+  stores/<store>/__init__.py  one folder per store; its class: login, calls and parsing
+  stores/<store>/<topic>.py   the store's mixins: nemlig/{offers,recipes,delivery,nutrition},
+                              bilkatogo/{recipes,nutrition,algolia (the shared Algolia keys)},
+                              rema1000/{auth,pickup,shopping_list,nutrition}
 tests/             no network, no logins
 tests/snapshots/tools.json  every tool as the model sees it (name, description, args)
 docs/adr/          one short file per hard decision
@@ -54,12 +57,12 @@ docs/tools.md      the tool table users read: stores per tool, what writes
 
 ## Add a store
 
-1. Create `src/handle_mcp/stores/<name>.py` with a class that has every method in `stores.Store`.
+1. Create `src/handle_mcp/stores/<name>/__init__.py` with a class that has every method in `stores.Store`. Topics that make it long go in mixins next to it, `stores/<name>/<topic>.py`.
 2. Raise `StoreError("clear Danish message")` for expected failures. Raise `NotImplementedError` if the store cannot do something.
 3. Add one line to `STORES` in `stores/__init__.py`.
 4. Tests: fixtures in `tests/fixtures/<name>/` are real answers with personal data replaced. Mock HTTP with `httpx.MockTransport`.
 
-No change to `server.py` or the tools is needed.
+No change to `server.py`, `cart_tools.py` or the tools is needed.
 
 ## Store API lessons (see docs/research.md)
 
