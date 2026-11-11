@@ -19,3 +19,11 @@ The login and the pickup times (`v3/stores/{id}/time-slots`) need a REMA account
 `tests/test_rema1000_login.py` builds them in code, in the shape the Go port
 [McAndersDK/handle-mcp-go](https://github.com/McAndersDK/handle-mcp-go) verified live on
 2026-11-07: the slots are `data`: day -> list of `{from, to, is_available}` in UTC.
+
+`product_skyr.json`, `product_letmaelk.json`, `product_oksekoed.json`:
+`GET https://api.digital.rema1000.dk/api/v3/products/{id}?include=nutrition_info` for 20385
+(skyr vanilje), 20758 (letmælk) and 400171 (hakket oksekød), captured 2026-11-11 without a
+login, trimmed to `id`, `name`, `underline`, `prices` and `nutrition_info`. The rows are
+`{name, value}`: "Energi" = "318 KJ / 75 kcal", "Fedt" = "< 0,5", values without a unit. The
+oksekød has `nutrition_info: []`. An unknown id answers 404 `{"error_type": "NotFound"}`.
+Public product data, nothing personal.

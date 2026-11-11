@@ -197,3 +197,28 @@ async def test_compare_week_list(monkeypatch):
         )
     print(f"\n{result['summary']}")
     assert result["cheapest"]
+
+
+# Captured 2026-11-11: skyr, rugbrød and hakket oksekød (no label) at BilkaToGo; Cocio
+# kakaomælk and flanksteak (no label) at nemlig; skyr, letmælk and oksekød (no label) at REMA. A product can leave the range: then its
+# reason says "kender ikke varen", and the test says which one.
+NUTRITION = {
+    "bilkatogo": {"19753": True, "20824": True, "120041": False},
+    "nemlig": {"5070417": True, "5027322": False, "5060880": False},
+    "rema1000": {"20385": True, "20758": True, "400171": False},
+}
+
+
+@not_yet_skips
+async def test_nutrition(store):
+    if store.name not in NUTRITION:
+        raise NotImplementedError
+    expected = NUTRITION[store.name]
+    answer = await store.nutrition(list(expected))
+    for p in answer:
+        n = p.nutrition
+        print(f"\n[{store.name}] {p.id} {p.name}: {n or p.reason}")
+        assert "kender ikke varen" not in (p.reason or ""), p.id
+        assert (n is not None) is expected[p.id], p.id
+        if n:
+            assert n.per in ("100 g", "100 ml") and n.energy_kcal and n.protein and n.salt

@@ -1,0 +1,57 @@
+{
+ "data": {
+  "id": 20385,
+  "name": "SKYR VANILJE",
+  "underline": "450 GR. / GRAM SLOT, ØKOLOGISK",
+  "prices": [
+   {
+    "price": 20.1,
+    "price_over_max_quantity": null,
+    "max_quantity": null,
+    "is_advertised": false,
+    "is_campaign": false,
+    "starting_at": "2025-10-02T00:00:00+00:00",
+    "ending_at": "2026-12-05T00:00:00+00:00",
+    "deposit": null,
+    "compare_unit": "kg",
+    "compare_unit_price": 44.67,
+    "consumption_unit": null,
+    "consumption_quantity": null
+   }
+  ],
+  "nutrition_info": [
+   {
+    "name": "Energi",
+    "value": "318 KJ / 75 kcal"
+   },
+   {
+    "name": "Fedt",
+    "value": "< 0,5"
+   },
+   {
+    "name": "Heraf mættede fedtsyrer",
+    "value": "< 0,1"
+   },
+   {
+    "name": "Kulhydrat",
+    "value": "8,6"
+   },
+   {
+    "name": "Heraf sukkerarter",
+    "value": "8,6"
+   },
+   {
+    "name": "Kostfibre",
+    "value": "< 0,5"
+   },
+   {
+    "name": "Protein",
+    "value": "9,6"
+   },
+   {
+    "name": "Salt",
+    "value": "0,14"
+   }
+  ]
+ }
+}

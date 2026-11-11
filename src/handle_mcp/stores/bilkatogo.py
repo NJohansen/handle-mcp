@@ -32,6 +32,7 @@ from handle_mcp.models import (
 )
 from handle_mcp.stores import StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
+from handle_mcp.stores.bilkatogo_nutrition import BilkaNutritionMixin
 from handle_mcp.stores.bilkatogo_recipes import BilkaRecipesMixin
 
 log = logging.getLogger(__name__)
@@ -151,7 +152,7 @@ class _GigyaRefused(StoreError):
     """Gigya answered with an errorCode: bad login or a dead login_token."""
 
 
-class BilkaStore(BilkaRecipesMixin):
+class BilkaStore(BilkaRecipesMixin, BilkaNutritionMixin):
     name = "bilkatogo"
     cart_page = "https://www.bilkatogo.dk/kurv"  # the page the human opens to see the cart and pay
 

@@ -34,3 +34,11 @@ for `""` (opskrifter), `madplaner` (week 46), `aftensmad`, `aftensmad/danske-ret
 No personal data: the pages are public. The only name is the recipes' author.
 In `test_bilkatogo_recipes.py` the Algolia hits for the recipe's products are
 `algolia_products.json` hits with `objectID` changed by hand to karbonader's item numbers.
+
+`algolia_nutrition.json`: one Algolia result (`results[0]`) for
+`filters=objectID:19753 OR objectID:120041 OR objectID:20824` with
+`attributesToRetrieve=["name","infos"]`, captured 2026-11-11 without a login. Skyr (19753)
+and rugbrød (20824) have `infos` code `nutritional_100`; hakket oksekød (120041) has none.
+The rows are `{type: 2, title, value}`: "Næringsindhold pr." = "100 g", two "Energi" rows
+("233 kJ", "55 kcal"), "- heraf mættede fedtsyrer", "1.017 kJ" with a thousands dot. Public
+product data, nothing personal.

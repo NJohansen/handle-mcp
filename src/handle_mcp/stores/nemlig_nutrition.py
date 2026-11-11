@@ -1,0 +1,74 @@
+"""nemlig.com nutrition: the "Næringsindhold" table on the product page, from productbff.
+
+GET productbff/api/web/productDetails/{id}: `product.detailDeclaration[]` has `tableHeader`
+("Næringsindhold pr. 100 ml", "") and `tableItems` ([label, value] rows). Works with the
+anonymous token (seen live 2026-11-11). One call per product, so search does not use it.
+No EAN in it. Shapes: tests/fixtures/nemlig/README.md.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import re
+from typing import Any
+
+from handle_mcp import nutrition
+from handle_mcp.models import ProductNutrition
+from handle_mcp.stores import StoreError
+from handle_mcp.stores.nemlig_recipes import BFF
+
+AT_ONCE = 5  # productDetails calls in flight: kind to nemlig, quick enough for a week's basket
+NO_LABEL = "nemlig viser ingen næringsdeklaration for varen (ofte frisk kød, frugt og grønt)."
+UNKNOWN = "nemlig kender ikke varen."
+
+
+def product_nutrition(product_id: str, data: dict) -> ProductNutrition:
+    p = data["product"]
+    label, per = None, None
+    for block in p.get("detailDeclaration") or []:
+        items = block.get("tableItems") or []
+        rows = [(str(r[0] or ""), str(r[1] or "")) for r in items if len(r) >= 2]
+        per = nutrition.basis(" ".join(str(h or "") for h in block.get("tableHeader") or []))
+        if label := nutrition.label(rows, per):
+            break
+    return ProductNutrition(
+        store="nemlig",
+        id=str(p.get("id") or product_id),
+        name=p.get("title") or None,
+        nutrition=label,
+        reason=None if label else NO_LABEL,
+    )
+
+
+class NutritionMixin:
+    """nutrition() for NemligStore. Uses its `_public` (login optional)."""
+
+    _public: Any
+
+    async def nutrition(self, product_ids: list[str]) -> list[ProductNutrition]:
+        if bad := [i for i in product_ids if not re.fullmatch(r"\d{1,12}", i)]:
+            raise StoreError(
+                f"Ukendt vare-id hos nemlig: {', '.join(bad)}. Brug id'et fra søgningen."
+            )
+        gate = asyncio.Semaphore(AT_ONCE)
+
+        async def one(pid: str) -> ProductNutrition:
+            async with gate:
+                data = await self._public("GET", f"{BFF}/productDetails/{pid}")
+            try:
+                return product_nutrition(pid, data)
+            except (KeyError, TypeError, AttributeError) as exc:
+                raise StoreError("nemligs næringsindhold har ændret format.") from exc
+
+        results = await asyncio.gather(*(one(i) for i in product_ids), return_exceptions=True)
+        for r in results:  # anything but a store error is a bug: let the server log it
+            if isinstance(r, BaseException) and not isinstance(r, StoreError):
+                raise r
+        if all(isinstance(r, StoreError) and "(404)" not in str(r) for r in results):
+            raise results[0]  # a queue, a format change: the whole call failed, say why
+        return [
+            ProductNutrition("nemlig", pid, None, None, UNKNOWN if "(404)" in str(r) else str(r))
+            if isinstance(r, StoreError)
+            else r
+            for pid, r in zip(product_ids, results, strict=True)
+        ]

@@ -1,0 +1,134 @@
+{
+ "product": {
+  "id": "5070417",
+  "url": null,
+  "title": "Cocio kakaomælk (dåse)",
+  "description": "12 x 0,25 l / Classic /",
+  "price": 13625,
+  "priceOriginal": null,
+  "pricePerUnit": {
+   "value": 1135,
+   "unitType": "Pieces"
+  },
+  "currency": "DKK",
+  "labelMaxQuantity": null,
+  "labelFreshnessDays": 30,
+  "labelHighlighted": null,
+  "certificates": [
+   {
+    "type": "dkProduced",
+    "text": "Produceret i Danmark"
+   }
+  ],
+  "externalCertificates": [],
+  "campaignLines": [
+   {
+    "text": "2 stk. 250,-",
+    "accessibilityText": "2 styk 250 kroner",
+    "url": null,
+    "campaignType": null
+   }
+  ],
+  "campaignLabel": {
+   "type": "Period",
+   "campaignPeriod": null
+  },
+  "campaignBadge": {
+   "primaryText": "Køb flere, spar mere",
+   "secondaryText": null,
+   "accessibilityText": "Køb flere, spar mere"
+  },
+  "quantity": 0,
+  "quantityLimit": null,
+  "isFavorite": false,
+  "isInShoppingList": false,
+  "availability": {
+   "type": "Available",
+   "nextAvailableDate": "0001-01-01T00:00:00Z",
+   "reasonMessage": []
+  },
+  "tracking": {
+   "impression": "",
+   "item_category": "Drikkevarer",
+   "item_category2": "Kakao",
+   "item_category3": "Kakaodrikke",
+   "item_name": "Cocio kakaomælk (dåse)",
+   "item_id": "5070417",
+   "price": "136.25",
+   "discount": "0",
+   "item_brand": "Cocio",
+   "item_variant": "produkt",
+   "raptor_category_path": ""
+  },
+  "images": [
+   {
+    "source": "https://product-images.nemlig.io/5070417.webp",
+    "accessibilityText": "Billede af Cocio kakaomælk (dåse)"
+   }
+  ],
+  "detailGeneral": "**Type:** Kakao\n\n**Egnet til:** Morgenmad\n\n**Smag:** Kakao\n\n**Brand:** Cocio\n\n**Emballage:** Multipack\n\n**Mærkninger:** Produceret i Danmark",
+  "detailDeclaration": [
+   {
+    "title": null,
+    "content": "Chokolademælk. Homogeniseret, steriliseret.  \n  \nMÆLK med 2% mælkefedt, sukker, fedtfattig kakao (1,5%).  \n  \n*Rainforest Alliance Certified",
+    "tableHeader": [
+     "Næringsindhold pr. 100 ml",
+     ""
+    ],
+    "tableItems": [
+     [
+      "Energi",
+      "329 kJ / 78 Kcal"
+     ],
+     [
+      "Fedt",
+      "2,1 g"
+     ],
+     [
+      "Heraf mættede fedtsyrer",
+      "1,3 g"
+     ],
+     [
+      "Kulhydrater",
+      "11 g"
+     ],
+     [
+      "Heraf sukkerarter",
+      "11 g"
+     ],
+     [
+      "Protein",
+      "3,6 g"
+     ],
+     [
+      "Salt",
+      "0,11 g"
+     ]
+    ],
+    "tableFootNotes": [],
+    "externalCertificates": []
+   }
+  ],
+  "detailDescription": "###### Cocio Classic  \n  \n  \nCocio Classic er en rigtig klassiker. Udviklet med respekt for den originale opskrift fra 1951. Vores Classic består af tre kvalitets-ingredienser: mælk, kakao og sukker. Der er stadig ikke nogen tilsætningsstoffer, og fedtindholdet er kun 2 %. Så simpel og samtidig helt unik.  \n  \nNyd den cremede og fyldige smag varm eller iskold – afhængigt af dit humør.  \n  \n - Kan nydes på farten\n  \n- Ingen tilsætningsstoffer\n  \n- 2% fedtindhold\n  \n- Nyd den varm eller iskold",
+  "tags": null,
+  "recommendations": null,
+  "breadcrumbs": [
+   {
+    "title": "Drikkevarer",
+    "url": "/kategori/drikkevarer"
+   },
+   {
+    "title": "Kakao",
+    "url": "/kategori/drikkevarer/kakao"
+   },
+   {
+    "title": "Kakaodrikke",
+    "url": "/kategori/drikkevarer/kakao/kakaodrikke"
+   },
+   {
+    "title": "Cocio kakaomælk (dåse)",
+    "url": "/produkt/5070417"
+   }
+  ]
+ }
+}

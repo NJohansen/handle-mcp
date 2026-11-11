@@ -30,6 +30,7 @@ from handle_mcp.models import (
 from handle_mcp.stores import StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
 from handle_mcp.stores.nemlig_delivery import DK, DeliveryMixin, _money, _time
+from handle_mcp.stores.nemlig_nutrition import NutritionMixin
 from handle_mcp.stores.nemlig_offers import OffersMixin
 from handle_mcp.stores.nemlig_recipes import RecipesMixin
 
@@ -107,7 +108,7 @@ def _kr(value: Decimal) -> str:
     return f"{value:.2f}".replace(".", ",").removesuffix(",00")
 
 
-class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin):
+class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
     name = "nemlig"
     cart_page = f"{BASE}/kurv"  # the page the human opens to see the cart and pay
 
