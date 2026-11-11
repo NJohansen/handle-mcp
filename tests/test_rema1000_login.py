@@ -55,6 +55,7 @@ class FakeSite:
         self.login_status = 200
         self.login_next = "http://login.rema1000.dk/authorize?code=1"  # REMA answers http://
         self.refresh_status = 200
+        self.refresh_token = "r1"  # the one REMA takes now
         self.api_401 = 0  # how many API calls answer 401 first
         self.slots: dict = SLOTS
 
@@ -88,7 +89,7 @@ class FakeSite:
             headers += [("Set-Cookie", f"{c}; Domain=rema1000.dk; Path=/") for c in cookies]
             return httpx.Response(302, headers=headers)
         if host == "shop.rema1000.dk" and path == "/api/auth/refresh":
-            assert "refresh_token=r1" in req.headers.get("cookie", "")
+            assert f"refresh_token={self.refresh_token}" in req.headers.get("cookie", "")
             if self.refresh_status != 200:
                 return httpx.Response(self.refresh_status)
             headers = [
@@ -251,6 +252,17 @@ async def test_a_session_another_process_renewed_is_taken_not_renewed_again(site
     await late.delivery_slots(7)
     assert site.calls("/api/auth/refresh") == 1  # took r2 from the keychain
     assert late.session()["refresh_token"] == "r2"
+
+
+async def test_a_saved_session_that_also_ended_is_renewed_with_its_own_token(store, site):
+    saved(site, store_ids="263")
+    await store.delivery_slots(7)  # holds r1 in memory
+    site.access, site.refresh_token = jwt(NOW - timedelta(minutes=1)), "r9"
+    saved(site, refresh_token="r9")  # another process renewed earlier; that token ended too
+    store._now = lambda: NOW + timedelta(minutes=70)
+    await store.delivery_slots(7)
+    assert site.calls("/api/auth/refresh") == 1  # with r9, not the spent r1
+    assert store.session()["refresh_token"] == "r2"
 
 
 async def test_401_renews_once(store, site):
