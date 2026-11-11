@@ -28,9 +28,9 @@ src/handle_mcp/
   models.py        dataclasses; money is Decimal DKK
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES
-  stores/_http.py     one request with the retries every store needs
+  stores/_http.py     one request with the retries every store needs; per_product() for one call per product
   stores/<store>.py   one file per store: login, calls and parsing for that store
-  stores/<store>_<topic>.py  mixins when a store outgrows one file (nemlig_offers, nemlig_recipes, nemlig_delivery, nemlig_nutrition, bilkatogo_nutrition, rema1000_nutrition, rema1000_auth, rema1000_pickup, rema1000_list)
+  stores/<store>_<topic>.py  mixins when a store outgrows one file (nemlig_offers, nemlig_recipes, nemlig_delivery, nemlig_nutrition, bilkatogo_nutrition, rema1000_nutrition, rema1000_auth, rema1000_pickup, rema1000_list); bilkatogo_algolia holds the Algolia keys both Bilka files use
 tests/             no network, no logins
 tests/snapshots/tools.json  every tool as the model sees it (name, description, args)
 docs/adr/          one short file per hard decision

@@ -14,6 +14,7 @@ from typing import Any
 from handle_mcp import nutrition
 from handle_mcp.models import ProductNutrition
 from handle_mcp.stores import StoreError
+from handle_mcp.stores._http import per_product
 from handle_mcp.stores.nemlig_recipes import BFF
 
 NO_LABEL = "nemlig viser ingen næringsdeklaration for varen (ofte frisk kød, frugt og grønt)."
@@ -56,4 +57,4 @@ class NutritionMixin:
             except (KeyError, TypeError, AttributeError) as exc:
                 raise StoreError("nemligs næringsindhold har ændret format.") from exc
 
-        return await nutrition.each("nemlig", product_ids, one, UNKNOWN)
+        return await per_product("nemlig", product_ids, one, UNKNOWN)

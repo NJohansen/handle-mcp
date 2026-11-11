@@ -330,5 +330,6 @@ async def test_only_unknown_products_is_an_answer_not_an_error(no_nemlig_login):
     assert unknown.reason == "nemlig kender ikke varen."
 
 
-def test_product_ids_keep_order_and_drop_duplicates():
-    assert nutrition.product_ids([" 2", "1", "2", ""], 50) == ["2", "1"]
+async def test_tool_keeps_the_order_and_drops_duplicates():
+    answer = await server.get_nutrition("fake", [" 2", "1", "2", ""])
+    assert [p["id"] for p in answer["products"]] == ["2", "1"]

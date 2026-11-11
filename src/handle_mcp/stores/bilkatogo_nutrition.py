@@ -16,6 +16,7 @@ from urllib.parse import urlencode
 from handle_mcp import nutrition
 from handle_mcp.models import ProductNutrition
 from handle_mcp.stores import StoreError
+from handle_mcp.stores.bilkatogo_algolia import ALGOLIA, ALGOLIA_HEADERS, ALGOLIA_INDEX
 
 NUTRITION_CODE = "nutritional_100"
 NO_LABEL = "BilkaToGo viser ingen næringsdeklaration for varen (ofte frisk kød, frugt og grønt)."
@@ -43,8 +44,6 @@ class BilkaNutritionMixin:
     _json: Any
 
     async def nutrition(self, product_ids: list[str]) -> list[ProductNutrition]:
-        from handle_mcp.stores.bilkatogo import ALGOLIA, ALGOLIA_HEADERS, ALGOLIA_INDEX
-
         if bad := [i for i in product_ids if not re.fullmatch(r"\d{1,12}", i)]:
             raise StoreError(
                 f"Ukendt vare-id hos BilkaToGo: {', '.join(bad)}. Brug id'et fra søgningen."

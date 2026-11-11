@@ -14,7 +14,7 @@ from typing import Any
 from handle_mcp import nutrition
 from handle_mcp.models import ProductNutrition
 from handle_mcp.stores import NotFound, StoreError
-from handle_mcp.stores._http import request
+from handle_mcp.stores._http import per_product, request
 from handle_mcp.stores.rema1000_auth import API, HEADERS, NAME
 
 BASIS = {"kg": "100 g", "ltr": "100 ml", "l": "100 ml"}
@@ -73,4 +73,4 @@ class RemaNutritionMixin:
                     "REMA 1000 har ændret sit svar. handle-mcp skal opdateres."
                 ) from exc
 
-        return await nutrition.each("rema1000", product_ids, one, UNKNOWN)
+        return await per_product("rema1000", product_ids, one, UNKNOWN)

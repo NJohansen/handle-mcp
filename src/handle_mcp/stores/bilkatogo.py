@@ -32,6 +32,7 @@ from handle_mcp.models import (
 )
 from handle_mcp.stores import StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
+from handle_mcp.stores.bilkatogo_algolia import ALGOLIA, ALGOLIA_HEADERS, ALGOLIA_INDEX
 from handle_mcp.stores.bilkatogo_nutrition import BilkaNutritionMixin
 from handle_mcp.stores.bilkatogo_recipes import BilkaRecipesMixin
 
@@ -43,12 +44,6 @@ GIGYA_API_KEY = "3_tA6BbV434FQqN73HnUG1KA3qFv8KiG4OqLu9eWPh7sKRqRizH5Vfv5Larmgrb
 GIGYA_BAD_LOGIN = 403042
 GIGYA_RATE_LIMIT = 403048  # with 5xxxxx (Gigya's server errors): try later, the login is fine
 API = "https://api.bilkatogo.dk/api"
-ALGOLIA = "https://f9vbjlr1bk-dsn.algolia.net/1/indexes/*/queries"
-ALGOLIA_HEADERS = {
-    "x-algolia-application-id": "F9VBJLR1BK",
-    "x-algolia-api-key": "1deaf41c87e729779f7695c00f190cc9",  # public search-only key
-}
-ALGOLIA_INDEX = "prod_BILKATOGO_PRODUCTS"
 JWT_SECONDS = 86400
 FEE_GROUPS = {"Emballage", "Services"}  # cart groups that are fees, not products
 TZ = ZoneInfo("Europe/Copenhagen")

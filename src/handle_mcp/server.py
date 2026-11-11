@@ -18,7 +18,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydantic import BeforeValidator
 
-from handle_mcp import cli, compare, links, nutrition, recipe_cart, telemetry
+from handle_mcp import cli, compare, links, recipe_cart, telemetry
 from handle_mcp import stores as registry
 from handle_mcp.privacy import jsonable, scrub, scrub_text
 
@@ -210,7 +210,11 @@ async def get_nutrition(store: str, product_ids: list[str]) -> dict:
     when the label leaves a line out. No label (often fresh meat, fruit): `nutrition` null with a
     `reason`. Up to 50 ids from search_products, list_offers or compare_basket; duplicates are
     removed. nemlig, BilkaToGo and REMA 1000; no login needed."""
-    ids = nutrition.product_ids(product_ids, MAX_ITEMS)
+    ids = list(dict.fromkeys(i.strip() for i in product_ids if i.strip()))  # order kept
+    if not ids or len(ids) > MAX_ITEMS:
+        raise ToolError(
+            "Ingen vare-id'er angivet." if not ids else f"Højst {MAX_ITEMS} varer pr. kald."
+        )
     return _out({"products": await _call(store, "nutrition", ids)})
 
 
