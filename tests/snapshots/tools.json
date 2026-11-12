@@ -134,7 +134,7 @@
  },
  {
   "name": "get_cart",
-  "description": "Show the cart as it is now: lines, fees, total, whether the minimum order is met and `url`, the\n    store's cart page where the human checks the cart and pays: give it to the human. With `store`\n    that store's cart; without, every store's cart keyed by store name, a failing store\n    (e.g. no login) as {\"error\": ...} next to the others. REMA 1000: the cart is the shopping\n    list \"handle-mcp\" in REMA's app, where the human orders. Use it before set_cart_quantities to\nsee what is there; for past orders use get_orders.",
+  "description": "Show the cart as it is now: lines, fees, total, whether the minimum order is met and `url`, the\nstore's cart page where the human checks the cart and pays: give it to the human. With `store`\nthat store's cart; without, every store's cart keyed by store name, a failing store\n(e.g. no login) as {\"error\": ...} next to the others. REMA 1000: the cart is the shopping\nlist \"handle-mcp\" in REMA's app, where the human orders. Use it before set_cart_quantities to\nsee what is there; for past orders use get_orders.",
   "inputSchema": {
    "properties": {
     "store": {
@@ -457,7 +457,7 @@
  },
  {
   "name": "search_products",
-  "description": "Search products in one or more stores. Returns price, price per kg/l, offers and EAN when\n    known. Stores rank by relevance and put cheap products far down: when the human asks for the\n    cheapest, use sort=\"unit_price\" (per kg/l/stk) or \"price\". For a whole shopping list, use\ncompare_basket.",
+  "description": "Search products in one or more stores. Returns price, price per kg/l, offers and EAN when\nknown. Stores rank by relevance and put cheap products far down: when the human asks for the\ncheapest, use sort=\"unit_price\" (per kg/l/stk) or \"price\". For a whole shopping list, use\ncompare_basket.",
   "inputSchema": {
    "properties": {
     "query": {
@@ -513,7 +513,7 @@
  },
  {
   "name": "search_recipes",
-  "description": "Find the stores' own recipes, e.g. \"kylling karry\". Returns name and link.\n    Use it when the human names a dish; to browse by tag or category, use list_recipes.\nUse get_recipe for time, persons and the products to buy.\n    nemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there.",
+  "description": "Find the stores' own recipes, e.g. \"kylling karry\". Returns name and link.\nUse it when the human names a dish; to browse by tag or category, use list_recipes.\nUse get_recipe for time, persons and the products to buy.\nnemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there.",
   "inputSchema": {
    "properties": {
     "query": {

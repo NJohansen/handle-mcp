@@ -58,10 +58,10 @@ async def get_cart(
     ] = None,
 ) -> dict:
     """Show the cart as it is now: lines, fees, total, whether the minimum order is met and `url`, the
-        store's cart page where the human checks the cart and pays: give it to the human. With `store`
-        that store's cart; without, every store's cart keyed by store name, a failing store
-        (e.g. no login) as {"error": ...} next to the others. REMA 1000: the cart is the shopping
-        list "handle-mcp" in REMA's app, where the human orders. Use it before set_cart_quantities to
+    store's cart page where the human checks the cart and pays: give it to the human. With `store`
+    that store's cart; without, every store's cart keyed by store name, a failing store
+    (e.g. no login) as {"error": ...} next to the others. REMA 1000: the cart is the shopping
+    list "handle-mcp" in REMA's app, where the human orders. Use it before set_cart_quantities to
     see what is there; for past orders use get_orders."""
     if store is not None:
         return _out(await _call(store, "cart"))

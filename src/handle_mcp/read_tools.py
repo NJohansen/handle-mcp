@@ -36,8 +36,8 @@ async def search_products(
     ] = "relevance",
 ) -> dict:
     """Search products in one or more stores. Returns price, price per kg/l, offers and EAN when
-        known. Stores rank by relevance and put cheap products far down: when the human asks for the
-        cheapest, use sort="unit_price" (per kg/l/stk) or "price". For a whole shopping list, use
+    known. Stores rank by relevance and put cheap products far down: when the human asks for the
+    cheapest, use sort="unit_price" (per kg/l/stk) or "price". For a whole shopping list, use
     compare_basket."""
     limit = max(1, min(limit, MAX_RESULTS))
     return _out(await _each(_names(stores), lambda s: compare.search(s, query, limit, sort)))
@@ -50,9 +50,9 @@ async def search_recipes(
     limit: Annotated[int, Field(description="Recipes per store, 1-25.")] = 5,
 ) -> dict:
     """Find the stores' own recipes, e.g. "kylling karry". Returns name and link.
-        Use it when the human names a dish; to browse by tag or category, use list_recipes.
+    Use it when the human names a dish; to browse by tag or category, use list_recipes.
     Use get_recipe for time, persons and the products to buy.
-        nemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there."""
+    nemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there."""
     limit = max(1, min(limit, MAX_RESULTS))
     return _out(await _each(_names(stores), lambda s: s.recipes(query, limit)))
 
