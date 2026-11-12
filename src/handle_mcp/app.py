@@ -10,11 +10,12 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
-from typing import Any
+from typing import Annotated, Any
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
+from pydantic import Field
 
 from handle_mcp import links, telemetry
 from handle_mcp import stores as registry
@@ -27,6 +28,13 @@ MAX_QUANTITY = 50  # per product
 MAX_RESULTS = 25
 MAX_DAYS = 14
 MIN_PERSONS, MAX_PERSONS = 2, 12  # nemlig: 2-12
+
+# Arguments many tools share. The description is what the model reads about the argument.
+StoreName = Annotated[str, Field(description='One store: "nemlig", "bilkatogo" or "rema1000".')]
+StoreNames = Annotated[
+    list[str] | None,
+    Field(description='Stores to ask, e.g. ["nemlig", "rema1000"]. Leave out to ask every store.'),
+]
 
 
 READ = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=True)
