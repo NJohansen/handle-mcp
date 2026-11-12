@@ -114,6 +114,31 @@ def test_a_renewed_session_that_cannot_be_saved_does_not_stop_the_tool(
     assert registry.keychain_get("fake") == {"email": "a@example.com", "session": SHORT}
 
 
+@pytest.mark.parametrize("parts", [0, -1, True, 10**9, "2"])
+def test_an_entry_with_a_bad_count_is_a_broken_login_not_a_missing_one(memory_keychain, parts):
+    memory_keychain.secrets[(SERVICE, "fake")] = json.dumps({"parts": parts, "id": "ab12"})
+    with pytest.raises(registry.StoreError, match="Ugyldigt login"):
+        registry.keychain_get("fake")
+
+
+def refuse_to_read(service, username):
+    raise CredWriteError(5, "CredRead", "Access is denied")
+
+
+def test_a_keychain_that_cannot_be_read_gives_a_clear_error(memory_keychain, monkeypatch):
+    monkeypatch.setattr(memory_keychain, "get_password", refuse_to_read)
+    with pytest.raises(registry.StoreError, match="Nøgleringen kunne ikke læses"):
+        registry.load_login("fake")
+    assert registry.has_login("fake") is False
+    registry.save_session("fake", "a@example.com", SHORT)  # raises nothing
+
+
+def test_logout_says_so_when_the_keychain_refuses(memory_keychain, monkeypatch, capsys):
+    monkeypatch.setattr(memory_keychain, "get_password", refuse_to_read)
+    assert cli.run(["logout", "fake"]) == 1
+    assert "Kunne ikke slette fra nøgleringen" in capsys.readouterr().err
+
+
 @pytest.mark.real_keychain
 @pytest.mark.skipif(
     sys.platform != "win32" or not os.environ.get("CI"),

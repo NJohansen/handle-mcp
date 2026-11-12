@@ -15,6 +15,7 @@ import secrets
 import keyring
 
 PIECE = 1000  # characters per entry: under the Windows limit, with room to spare
+MOST = 50  # pieces in one login: a count outside 1..MOST is not ours, and is never followed
 
 
 def _index(secret: str | None) -> tuple[str, int] | None:
@@ -25,8 +26,9 @@ def _index(secret: str | None) -> tuple[str, int] | None:
         return None
     if not isinstance(data, dict) or set(data) != {"parts", "id"}:
         return None
-    if isinstance(data["id"], str) and isinstance(data["parts"], int):
-        return data["id"], data["parts"]
+    key, parts = data["id"], data["parts"]
+    if isinstance(key, str) and type(parts) is int and 1 <= parts <= MOST:
+        return key, parts
     return None
 
 

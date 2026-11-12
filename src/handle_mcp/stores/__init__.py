@@ -91,6 +91,10 @@ def keychain_get(store: str) -> dict | None:
         return None
     except ValueError:  # not JSON, or pieces of a long login are missing
         login = None
+    except Exception as exc:  # noqa: BLE001  a backend's own error type (Windows): see keychain_set
+        raise StoreError(
+            f"Nøgleringen kunne ikke læses ({type(exc).__name__}). Kør: handle-mcp login {store}"
+        ) from None
     if login is None:
         raise StoreError(f"Ugyldigt login i nøgleringen. Kør: handle-mcp login {store}")
     return login

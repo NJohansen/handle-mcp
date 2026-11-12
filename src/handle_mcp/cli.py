@@ -104,6 +104,9 @@ def _logout(store: str) -> int:
         if not removed:
             _say(f"Ingen nøglering på denne maskine: {exc}")
             return 1
+    except Exception as exc:  # noqa: BLE001  the Windows backend raises its own type
+        _say(f"Kunne ikke slette fra nøgleringen ({type(exc).__name__}).")
+        return 1
     _say(f"Login slettet fra {' og '.join(removed)}." if removed else "Der var intet gemt login.")
     return 0
 
