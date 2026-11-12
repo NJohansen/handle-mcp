@@ -4,15 +4,18 @@ They register on app.mcp. Nothing here writes.
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver.exceptions import ToolError
+from pydantic import Field
 
 from handle_mcp import compare
 from handle_mcp.app import (
     MAX_ITEMS,
     MAX_RESULTS,
     READ,
+    StoreName,
+    StoreNames,
     _call,
     _each,
     _names,
@@ -24,21 +27,30 @@ from handle_mcp.app import (
 
 @_tool(READ)
 async def search_products(
-    query: str,
-    stores: list[str] | None = None,
-    limit: int = 10,
-    sort: Literal["relevance", "price", "unit_price"] = "relevance",
+    query: Annotated[str, Field(description='What to find, in Danish, e.g. "letmælk".')],
+    stores: StoreNames = None,
+    limit: Annotated[int, Field(description="Products per store, 1-25.")] = 10,
+    sort: Annotated[
+        Literal["relevance", "price", "unit_price"],
+        Field(description='"unit_price" is per kg/l/stk.'),
+    ] = "relevance",
 ) -> dict:
     """Search products in one or more stores. Returns price, price per kg/l, offers and EAN when
     known. Stores rank by relevance and put cheap products far down: when the human asks for the
-    cheapest, use sort="unit_price" (per kg/l/stk) or "price"."""
+    cheapest, use sort="unit_price" (per kg/l/stk) or "price". For a whole shopping list, use
+    compare_basket."""
     limit = max(1, min(limit, MAX_RESULTS))
     return _out(await _each(_names(stores), lambda s: compare.search(s, query, limit, sort)))
 
 
 @_tool(READ)
-async def search_recipes(query: str, stores: list[str] | None = None, limit: int = 5) -> dict:
+async def search_recipes(
+    query: Annotated[str, Field(description='Words to search for, e.g. "kylling karry".')],
+    stores: StoreNames = None,
+    limit: Annotated[int, Field(description="Recipes per store, 1-25.")] = 5,
+) -> dict:
     """Find the stores' own recipes, e.g. "kylling karry". Returns name and link.
+    Use it when the human names a dish; to browse by tag or category, use list_recipes.
     Use get_recipe for time, persons and the products to buy.
     nemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there."""
     limit = max(1, min(limit, MAX_RESULTS))
@@ -46,7 +58,15 @@ async def search_recipes(query: str, stores: list[str] | None = None, limit: int
 
 
 @_tool(READ)
-async def get_recipe(store: str, recipe: str, persons: int | None = None) -> dict:
+async def get_recipe(
+    store: StoreName,
+    recipe: Annotated[
+        str, Field(description="The recipe's link or id from search_recipes or list_recipes.")
+    ],
+    persons: Annotated[
+        int | None, Field(description="People to cook for, 2-12. Leave out for the recipe's own.")
+    ] = None,
+) -> dict:
     """The products to buy for one of the store's recipes, as on its "Se varer og læg i kurv":
     per ingredient the store's product, packs for `persons` and alternatives. `have_at_home`
     items (salt, oil) are what the store assumes you have: left out of `total`, ask first.
@@ -60,12 +80,17 @@ async def get_recipe(store: str, recipe: str, persons: int | None = None) -> dic
 
 @_tool(READ)
 async def list_recipes(
-    stores: list[str] | None = None,
-    tags: list[str] | None = None,
-    category: str | None = None,
-    limit: int = 20,
+    stores: StoreNames = None,
+    tags: Annotated[
+        list[str] | None, Field(description='Every tag must match, e.g. ["Familievenlig"].')
+    ] = None,
+    category: Annotated[
+        str | None, Field(description='e.g. "aftensmad", "frokost". Leave out for the default.')
+    ] = None,
+    limit: Annotated[int, Field(description="Recipes per store, 1-25.")] = 20,
 ) -> dict:
-    """Browse the store's recipes, with link. No tags or category: this week's featured
+    """Browse the store's recipes, with link, when the human has no dish in mind (for a dish by
+    name, use search_recipes). No tags or category: this week's featured
     recipes (nemlig: "Ugens udvalgte"). With `tags`: recipes that have every tag, e.g.
     ["Familievenlig", "Budgetvenlig"] or ["Under 30 min", "Kylling"]. nemlig's tags include
     Under 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,
@@ -82,7 +107,10 @@ async def list_recipes(
 
 
 @_tool(READ)
-async def list_offers(stores: list[str] | None = None, limit: int = 25) -> dict:
+async def list_offers(
+    stores: StoreNames = None,
+    limit: Annotated[int, Field(description="Products per offer list, 1-25.")] = 25,
+) -> dict:
     """List this week's offers in each store, also items you would not search for: nemlig's
     Skarp pris, Priskup, Dagstilbud, Undgå madspild and gifts; BilkaToGo's offers; REMA 1000's
     leaflet (Avisvarer, often with a max per customer in offer_text). `limit` is
@@ -94,7 +122,12 @@ async def list_offers(stores: list[str] | None = None, limit: int = 25) -> dict:
 
 
 @_tool(READ)
-async def get_nutrition(store: str, product_ids: list[str]) -> dict:
+async def get_nutrition(
+    store: StoreName,
+    product_ids: Annotated[
+        list[str], Field(description="Product ids from the same store, up to 50.")
+    ],
+) -> dict:
     """Nutrition per 100 g or 100 ml from the store's label: energy_kj, energy_kcal, fat,
     saturated_fat, carbohydrate, sugar, protein, salt, fibre as strings ("0.13", "<0.5"), null
     when the label leaves a line out. No label (often fresh meat, fruit): `nutrition` null with a
@@ -109,7 +142,12 @@ async def get_nutrition(store: str, product_ids: list[str]) -> dict:
 
 
 @_tool(READ)
-async def compare_basket(items: list[str], stores: list[str] | None = None) -> dict:
+async def compare_basket(
+    items: Annotated[
+        list[str], Field(description='One line per item with the amount, e.g. "rugbrød 1 kg".')
+    ],
+    stores: StoreNames = None,
+) -> dict:
     """Price a shopping list in each store, e.g. ["2 x letmælk 1 l", "rugbrød", "æg 10 stk"].
     Write the amount you need ("fior di latte 300 g"), not a pack size. Returns per item a
     suggested product and up to 5 "candidates" (the suggestion first, one øko when found) with
