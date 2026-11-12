@@ -32,6 +32,7 @@ src/handle_mcp/
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES
   stores/_http.py     one request with the retries every store needs; per_product() for one call per product
+  stores/_keychain.py the OS keychain for a login of any length: a long one is split (ADR 0012)
   stores/<store>/__init__.py  one folder per store; its class: login, calls and parsing
   stores/<store>/<topic>.py   the store's mixins: nemlig/{offers,recipes,delivery,nutrition},
                               bilkatogo/{recipes,nutrition,algolia (the shared Algolia keys)},

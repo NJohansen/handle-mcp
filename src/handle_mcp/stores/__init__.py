@@ -15,7 +15,7 @@ import stat
 from pathlib import Path
 from typing import Protocol
 
-import keyring
+import keyring  # noqa: F401  (tests reach the keychain through this module)
 from keyring.errors import KeyringError, PasswordDeleteError
 
 from handle_mcp.models import (
@@ -30,6 +30,7 @@ from handle_mcp.models import (
     RecipeDetails,
     StoreTerms,
 )
+from handle_mcp.stores import _keychain
 
 log = logging.getLogger(__name__)
 CONFIG_DIR = Path(os.environ.get("HANDLE_CONFIG_DIR", "~/.config/handle-mcp")).expanduser()
@@ -82,29 +83,33 @@ def _parse(data: object) -> dict | None:
 def keychain_get(store: str) -> dict | None:
     """The login saved by `handle-mcp login <store>` in the OS keychain, if any."""
     try:
-        secret = keyring.get_password(KEYCHAIN_SERVICE, store)
+        secret = _keychain.read(KEYCHAIN_SERVICE, store)
+        if not secret:
+            return None
+        login = _parse(json.loads(secret))
     except KeyringError:  # no keychain on this machine (e.g. a headless Linux box)
         return None
-    if not secret:
-        return None
-    try:
-        login = _parse(json.loads(secret))
-    except ValueError:
+    except ValueError:  # not JSON, or pieces of a long login are missing
         login = None
+    except Exception as exc:  # noqa: BLE001  a backend's own error type (Windows): see keychain_set
+        raise StoreError(
+            f"Nøgleringen kunne ikke læses ({type(exc).__name__}). Kør: handle-mcp login {store}"
+        ) from None
     if login is None:
         raise StoreError(f"Ugyldigt login i nøgleringen. Kør: handle-mcp login {store}")
     return login
 
 
 def keychain_set(store: str, email: str, session: dict[str, str]) -> None:
-    """Save the store's session, never the password (docs/adr/0003)."""
-    keyring.set_password(KEYCHAIN_SERVICE, store, json.dumps({"email": email, "session": session}))
+    """Save the store's session, never the password (docs/adr/0003). A keychain backend may
+    raise its own error types (Windows: pywintypes.error), so callers catch Exception."""
+    _keychain.write(KEYCHAIN_SERVICE, store, json.dumps({"email": email, "session": session}))
 
 
 def keychain_delete(store: str) -> bool:
     """True if a login was removed, False if none was saved. Raises KeyringError with no keychain."""
     try:
-        keyring.delete_password(KEYCHAIN_SERVICE, store)
+        _keychain.delete(KEYCHAIN_SERVICE, store)
     except PasswordDeleteError:
         return False
     return True
@@ -191,7 +196,7 @@ def save_session(store: str, email: str, session: dict[str, str]) -> None:
             keychain_set(store, email, session)
         elif (CONFIG_DIR / f"{store}.json").exists():
             config_set(store, email, session)
-    except (KeyringError, OSError, StoreError) as exc:  # the login works; only the save failed
+    except Exception as exc:  # noqa: BLE001  the login works; only the save failed
         log.warning("could not save the %s session: %s", store, type(exc).__name__)
 
 
