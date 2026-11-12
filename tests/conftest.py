@@ -205,6 +205,13 @@ def fake_stores(monkeypatch):
     monkeypatch.setattr(app, "_instances", {})
 
 
+WINDOWS_LIMIT = 2560
+
+
+class CredWriteError(Exception):
+    """Stands in for pywintypes.error: the Windows backend's own type, not a KeyringError."""
+
+
 class MemoryKeyring(KeyringBackend):
     """A keychain in memory, so tests never read or write the real one."""
 
@@ -218,6 +225,10 @@ class MemoryKeyring(KeyringBackend):
         return self.secrets.get((service, username))
 
     def set_password(self, service, username, password):
+        # Windows Credential Manager: 2560 bytes per entry, written as UTF-16. Every OS in CI
+        # gets the limit, so a login that outgrows one entry fails here first (#151).
+        if len(password.encode("utf-16-le")) > WINDOWS_LIMIT:
+            raise CredWriteError(1783, "CredWrite", "The stub received bad data")
         self.secrets[(service, username)] = password
 
     def delete_password(self, service, username):
@@ -227,7 +238,8 @@ class MemoryKeyring(KeyringBackend):
 
 @pytest.fixture(autouse=True)
 def memory_keychain(request):
-    if request.node.get_closest_marker("live"):  # live tests use the real keychain
+    if request.node.get_closest_marker("live") or request.node.get_closest_marker("real_keychain"):
+        # live tests use the real keychain; so does the Windows Credential Manager test
         yield None
         return
     real = keyring.get_keyring()

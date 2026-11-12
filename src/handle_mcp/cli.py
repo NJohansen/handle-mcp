@@ -84,8 +84,12 @@ def run(args: list[str]) -> int:
         return 1
     try:
         registry.keychain_set(store, email, session)
-    except KeyringError as exc:
-        _say(f"Kunne ikke gemme i nøgleringen: {exc}")
+    except Exception as exc:  # noqa: BLE001  the Windows backend raises its own type
+        _say(
+            f"Kunne ikke gemme i nøgleringen ({type(exc).__name__}). Intet er gemt.\n"
+            f"Uden nøglering: sæt HANDLE_{store.upper()}_EMAIL og _PASSWORD, "
+            f"og kør: handle-mcp login {store} --from-env"
+        )
         return 1
     _say(f"Logget ind på {store}. Sessionen er gemt i nøgleringen. Kodeordet er ikke gemt.")
     return 0
