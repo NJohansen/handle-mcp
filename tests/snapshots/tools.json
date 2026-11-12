@@ -5,10 +5,12 @@
   "inputSchema": {
    "properties": {
     "store": {
+     "description": "One store: \"nemlig\", \"bilkatogo\" or \"rema1000\".",
      "title": "Store",
      "type": "string"
     },
     "recipe": {
+     "description": "The recipe's link or id, as given to get_recipe.",
      "title": "Recipe",
      "type": "string"
     },
@@ -22,6 +24,7 @@
       }
      ],
      "default": null,
+     "description": "People to cook for, 2-12. Leave out for the recipe's own.",
      "title": "Persons"
     },
     "skip": {
@@ -37,6 +40,7 @@
       }
      ],
      "default": null,
+     "description": "Ingredient names or product ids to leave out.",
      "title": "Skip"
     },
     "swap": {
@@ -52,6 +56,7 @@
       }
      ],
      "default": null,
+     "description": "Ingredient name or product id → the alternative's product id.",
      "title": "Swap"
     },
     "include": {
@@ -67,6 +72,7 @@
       }
      ],
      "default": null,
+     "description": "`have_at_home` items to buy anyway, e.g. [\"olie\"].",
      "title": "Include"
     }
    },
@@ -90,6 +96,7 @@
   "inputSchema": {
    "properties": {
     "items": {
+     "description": "One line per item with the amount, e.g. \"rugbrød 1 kg\".",
      "items": {
       "type": "string"
      },
@@ -109,6 +116,7 @@
       }
      ],
      "default": null,
+     "description": "Stores to ask, e.g. [\"nemlig\", \"rema1000\"]. Leave out to ask every store.",
      "title": "Stores"
     }
    },
@@ -126,7 +134,7 @@
  },
  {
   "name": "get_cart",
-  "description": "Show the cart: lines, fees, total, whether the minimum order is met and `url`, the\nstore's cart page where the human checks the cart and pays: give it to the human. With `store`\nthat store's cart; without, every store's cart keyed by store name, a failing store\n(e.g. no login) as {\"error\": ...} next to the others. REMA 1000: the cart is the shopping\nlist \"handle-mcp\" in REMA's app, where the human orders.",
+  "description": "Show the cart as it is now: lines, fees, total, whether the minimum order is met and `url`, the\nstore's cart page where the human checks the cart and pays: give it to the human. With `store`\nthat store's cart; without, every store's cart keyed by store name, a failing store\n(e.g. no login) as {\"error\": ...} next to the others. REMA 1000: the cart is the shopping\nlist \"handle-mcp\" in REMA's app, where the human orders. Use it before set_cart_quantities to\nsee what is there; for past orders use get_orders.",
   "inputSchema": {
    "properties": {
     "store": {
@@ -139,6 +147,7 @@
       }
      ],
      "default": null,
+     "description": "One store: \"nemlig\", \"bilkatogo\" or \"rema1000\". Leave out for all.",
      "title": "Store"
     }
    },
@@ -153,10 +162,11 @@
  },
  {
   "name": "get_delivery_info",
-  "description": "Show the chosen delivery time, edit deadline and next free day, plus fees and minimum order.\n`delivery_mode` is \"home\", \"pickup\" (BilkaToGo, REMA 1000, with `pickup_store`) or null when\nunknown.",
+  "description": "Show the delivery the human has already chosen in one store: time, edit deadline and next\nfree day, plus fees and minimum order. `delivery_mode` is \"home\", \"pickup\" (BilkaToGo,\nREMA 1000, with `pickup_store`) or null when unknown; the time is null when none is chosen.\nTo see free times to choose from, use list_delivery_slots. Only reads.",
   "inputSchema": {
    "properties": {
     "store": {
+     "description": "One store: \"nemlig\", \"bilkatogo\" or \"rema1000\".",
      "title": "Store",
      "type": "string"
     }
@@ -179,10 +189,12 @@
   "inputSchema": {
    "properties": {
     "store": {
+     "description": "One store: \"nemlig\", \"bilkatogo\" or \"rema1000\".",
      "title": "Store",
      "type": "string"
     },
     "product_ids": {
+     "description": "Product ids from the same store, up to 50.",
      "items": {
       "type": "string"
      },
@@ -205,14 +217,16 @@
  },
  {
   "name": "get_order",
-  "description": "Show one order with what was bought.",
+  "description": "Show one past order with every product bought: name, product id, count and price. Get the\nid from get_orders first. The product ids work in set_cart_quantities to buy the same again.\nnemlig and BilkaToGo; needs a login. Only reads.",
   "inputSchema": {
    "properties": {
     "store": {
+     "description": "One store: \"nemlig\", \"bilkatogo\" or \"rema1000\".",
      "title": "Store",
      "type": "string"
     },
     "order_id": {
+     "description": "The order's `id` from get_orders.",
      "title": "Order Id",
      "type": "string"
     }
@@ -232,15 +246,17 @@
  },
  {
   "name": "get_orders",
-  "description": "List recent orders in one store (newest first). Use get_order for the lines.",
+  "description": "List the human's past orders in one store, newest first: id, status, date and total. Use it for\n\"what do we usually buy\"; then get_order with an id for the products. nemlig and BilkaToGo;\nneeds a login. Only reads.",
   "inputSchema": {
    "properties": {
     "store": {
+     "description": "One store: \"nemlig\", \"bilkatogo\" or \"rema1000\".",
      "title": "Store",
      "type": "string"
     },
     "limit": {
      "default": 10,
+     "description": "Orders to return, 1-25.",
      "title": "Limit",
      "type": "integer"
     }
@@ -263,10 +279,12 @@
   "inputSchema": {
    "properties": {
     "store": {
+     "description": "One store: \"nemlig\", \"bilkatogo\" or \"rema1000\".",
      "title": "Store",
      "type": "string"
     },
     "recipe": {
+     "description": "The recipe's link or id from search_recipes or list_recipes.",
      "title": "Recipe",
      "type": "string"
     },
@@ -280,6 +298,7 @@
       }
      ],
      "default": null,
+     "description": "People to cook for, 2-12. Leave out for the recipe's own.",
      "title": "Persons"
     }
    },
@@ -298,7 +317,7 @@
  },
  {
   "name": "list_delivery_slots",
-  "description": "List free delivery times for the next `days` days with the delivery fee per slot, in time\norder, plus the 3 cheapest per store. nemlig: \"Personlig\" (you are home) or \"Fleksibel\"\n(left at the door). BilkaToGo: one flat fee, night delivery, or pickup times (\"Afhentning\")\nwhen the cart is set to pickup. REMA 1000: Køb & Hent times in the store chosen at login, no\nfee. Only reads: it never chooses a time, store or mode. The human chooses on the store's\nwebsite.",
+  "description": "List free delivery times for the next `days` days with the delivery fee per slot, in time\norder, plus the 3 cheapest per store. nemlig: \"Personlig\" (you are home) or \"Fleksibel\"\n(left at the door). BilkaToGo: one flat fee, night delivery, or pickup times (\"Afhentning\")\nwhen the cart is set to pickup. REMA 1000: Køb & Hent times in the store chosen at login, no\nfee. Only reads: it never chooses a time, store or mode. The human chooses on the store's\nwebsite. For the time already chosen, use get_delivery_info.",
   "inputSchema": {
    "properties": {
     "stores": {
@@ -314,10 +333,12 @@
       }
      ],
      "default": null,
+     "description": "Stores to ask, e.g. [\"nemlig\", \"rema1000\"]. Leave out to ask every store.",
      "title": "Stores"
     },
     "days": {
      "default": 7,
+     "description": "Days ahead to look, 1-14.",
      "title": "Days",
      "type": "integer"
     }
@@ -349,10 +370,12 @@
       }
      ],
      "default": null,
+     "description": "Stores to ask, e.g. [\"nemlig\", \"rema1000\"]. Leave out to ask every store.",
      "title": "Stores"
     },
     "limit": {
      "default": 25,
+     "description": "Products per offer list, 1-25.",
      "title": "Limit",
      "type": "integer"
     }
@@ -368,7 +391,7 @@
  },
  {
   "name": "list_recipes",
-  "description": "Browse the store's recipes, with link. No tags or category: this week's featured\nrecipes (nemlig: \"Ugens udvalgte\"). With `tags`: recipes that have every tag, e.g.\n[\"Familievenlig\", \"Budgetvenlig\"] or [\"Under 30 min\", \"Kylling\"]. nemlig's tags include\nUnder 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,\nKylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.\n`category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...).\nBilkaToGo: no tags; no category is this week's \"Madplan\" (7 dinners); `category` is a path\nlike aftensmad or aftensmad/pastaretter, an unknown one answers with the list. Use get_recipe.",
+  "description": "Browse the store's recipes, with link, when the human has no dish in mind (for a dish by\nname, use search_recipes). No tags or category: this week's featured\nrecipes (nemlig: \"Ugens udvalgte\"). With `tags`: recipes that have every tag, e.g.\n[\"Familievenlig\", \"Budgetvenlig\"] or [\"Under 30 min\", \"Kylling\"]. nemlig's tags include\nUnder 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,\nKylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.\n`category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...).\nBilkaToGo: no tags; no category is this week's \"Madplan\" (7 dinners); `category` is a path\nlike aftensmad or aftensmad/pastaretter, an unknown one answers with the list. Use get_recipe.",
   "inputSchema": {
    "properties": {
     "stores": {
@@ -384,6 +407,7 @@
       }
      ],
      "default": null,
+     "description": "Stores to ask, e.g. [\"nemlig\", \"rema1000\"]. Leave out to ask every store.",
      "title": "Stores"
     },
     "tags": {
@@ -399,6 +423,7 @@
       }
      ],
      "default": null,
+     "description": "Every tag must match, e.g. [\"Familievenlig\"].",
      "title": "Tags"
     },
     "category": {
@@ -411,10 +436,12 @@
       }
      ],
      "default": null,
+     "description": "e.g. \"aftensmad\", \"frokost\". Leave out for the default.",
      "title": "Category"
     },
     "limit": {
      "default": 20,
+     "description": "Recipes per store, 1-25.",
      "title": "Limit",
      "type": "integer"
     }
@@ -430,10 +457,11 @@
  },
  {
   "name": "search_products",
-  "description": "Search products in one or more stores. Returns price, price per kg/l, offers and EAN when\nknown. Stores rank by relevance and put cheap products far down: when the human asks for the\ncheapest, use sort=\"unit_price\" (per kg/l/stk) or \"price\".",
+  "description": "Search products in one or more stores. Returns price, price per kg/l, offers and EAN when\nknown. Stores rank by relevance and put cheap products far down: when the human asks for the\ncheapest, use sort=\"unit_price\" (per kg/l/stk) or \"price\". For a whole shopping list, use\ncompare_basket.",
   "inputSchema": {
    "properties": {
     "query": {
+     "description": "What to find, in Danish, e.g. \"letmælk\".",
      "title": "Query",
      "type": "string"
     },
@@ -450,15 +478,18 @@
       }
      ],
      "default": null,
+     "description": "Stores to ask, e.g. [\"nemlig\", \"rema1000\"]. Leave out to ask every store.",
      "title": "Stores"
     },
     "limit": {
      "default": 10,
+     "description": "Products per store, 1-25.",
      "title": "Limit",
      "type": "integer"
     },
     "sort": {
      "default": "relevance",
+     "description": "\"unit_price\" is per kg/l/stk.",
      "enum": [
       "relevance",
       "price",
@@ -482,10 +513,11 @@
  },
  {
   "name": "search_recipes",
-  "description": "Find the stores' own recipes, e.g. \"kylling karry\". Returns name and link.\nUse get_recipe for time, persons and the products to buy.\nnemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there.",
+  "description": "Find the stores' own recipes, e.g. \"kylling karry\". Returns name and link.\nUse it when the human names a dish; to browse by tag or category, use list_recipes.\nUse get_recipe for time, persons and the products to buy.\nnemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there.",
   "inputSchema": {
    "properties": {
     "query": {
+     "description": "Words to search for, e.g. \"kylling karry\".",
      "title": "Query",
      "type": "string"
     },
@@ -502,10 +534,12 @@
       }
      ],
      "default": null,
+     "description": "Stores to ask, e.g. [\"nemlig\", \"rema1000\"]. Leave out to ask every store.",
      "title": "Stores"
     },
     "limit": {
      "default": 5,
+     "description": "Recipes per store, 1-25.",
      "title": "Limit",
      "type": "integer"
     }
@@ -524,10 +558,11 @@
  },
  {
   "name": "set_cart_quantities",
-  "description": "Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart with its `url`: give the human that link to check and pay. REMA 1000: sets the shopping list \"handle-mcp\", never another list.",
+  "description": "Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Product ids come from search_products, compare_basket or list_offers. Returns a result per product and the new cart with its `url`: give the human that link to check and pay. REMA 1000: sets the shopping list \"handle-mcp\", never another list.",
   "inputSchema": {
    "properties": {
     "store": {
+     "description": "One store: \"nemlig\", \"bilkatogo\" or \"rema1000\".",
      "title": "Store",
      "type": "string"
     },
@@ -535,6 +570,7 @@
      "additionalProperties": {
       "type": "integer"
      },
+     "description": "Product id → absolute count, e.g. {\"5012345\": 2, \"5098765\": 0}.",
      "title": "Items",
      "type": "object"
     }

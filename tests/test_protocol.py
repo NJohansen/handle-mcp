@@ -41,6 +41,15 @@ async def test_tool_surface_matches_the_snapshot():
     )
 
 
+async def test_every_argument_has_a_description():
+    """The model fills arguments from the schema: an argument without a description is a guess."""
+    for tool in await _client_tools():
+        description = inspect.cleandoc(tool["description"])
+        assert not any(line.startswith(" ") for line in description.splitlines()), tool["name"]
+        for arg, schema in tool["inputSchema"]["properties"].items():
+            assert schema.get("description"), f"{tool['name']}({arg}) has no description"
+
+
 async def test_write_tools_are_marked_and_never_order_or_pay():
     writes = {}
     for tool in await _client_tools():

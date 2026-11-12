@@ -11,7 +11,7 @@ import re
 from typing import Annotated, Any
 
 from mcp.server.mcpserver.exceptions import ToolError
-from pydantic import BeforeValidator
+from pydantic import BeforeValidator, Field
 
 from handle_mcp import links, recipe_cart, telemetry
 from handle_mcp import stores as registry
@@ -23,6 +23,8 @@ from handle_mcp.app import (
     MAX_RESULTS,
     READ,
     WRITE,
+    StoreName,
+    StoreNames,
     _call,
     _each,
     _names,
@@ -42,23 +44,33 @@ def _whole(value: Any) -> Any:
 
 
 Count = Annotated[int, BeforeValidator(_whole)]
+Quantities = Annotated[
+    dict[str, Count],
+    Field(description='Product id → absolute count, e.g. {"5012345": 2, "5098765": 0}.'),
+]
 
 
 @_tool(READ)
-async def get_cart(store: str | None = None) -> dict:
-    """Show the cart: lines, fees, total, whether the minimum order is met and `url`, the
+async def get_cart(
+    store: Annotated[
+        str | None,
+        Field(description='One store: "nemlig", "bilkatogo" or "rema1000". Leave out for all.'),
+    ] = None,
+) -> dict:
+    """Show the cart as it is now: lines, fees, total, whether the minimum order is met and `url`, the
     store's cart page where the human checks the cart and pays: give it to the human. With `store`
     that store's cart; without, every store's cart keyed by store name, a failing store
     (e.g. no login) as {"error": ...} next to the others. REMA 1000: the cart is the shopping
-    list "handle-mcp" in REMA's app, where the human orders."""
+    list "handle-mcp" in REMA's app, where the human orders. Use it before set_cart_quantities to
+    see what is there; for past orders use get_orders."""
     if store is not None:
         return _out(await _call(store, "cart"))
     return _out(await _each(_names(None), links.cart))
 
 
 @_tool(WRITE)
-async def set_cart_quantities(store: str, items: dict[str, Count]) -> dict:
-    """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Returns a result per product and the new cart with its `url`: give the human that link to check and pay. REMA 1000: sets the shopping list "handle-mcp", never another list."""
+async def set_cart_quantities(store: StoreName, items: Quantities) -> dict:
+    """Set ABSOLUTE quantities in one store's cart (0 removes the product). Never orders or pays. Product ids come from search_products, compare_basket or list_offers. Returns a result per product and the new cart with its `url`: give the human that link to check and pay. REMA 1000: sets the shopping list "handle-mcp", never another list."""
     if not items:
         raise ToolError("Ingen varer angivet.")
     if len(items) > MAX_ITEMS:
@@ -77,12 +89,21 @@ async def set_cart_quantities(store: str, items: dict[str, Count]) -> dict:
 
 @_tool(ADD)
 async def add_recipe_to_cart(
-    store: str,
-    recipe: str,
-    persons: int | None = None,
-    skip: list[str] | None = None,
-    swap: dict[str, str] | None = None,
-    include: list[str] | None = None,
+    store: StoreName,
+    recipe: Annotated[str, Field(description="The recipe's link or id, as given to get_recipe.")],
+    persons: Annotated[
+        int | None, Field(description="People to cook for, 2-12. Leave out for the recipe's own.")
+    ] = None,
+    skip: Annotated[
+        list[str] | None, Field(description="Ingredient names or product ids to leave out.")
+    ] = None,
+    swap: Annotated[
+        dict[str, str] | None,
+        Field(description="Ingredient name or product id → the alternative's product id."),
+    ] = None,
+    include: Annotated[
+        list[str] | None, Field(description='`have_at_home` items to buy anyway, e.g. ["olie"].')
+    ] = None,
 ) -> dict:
     """Put a recipe's products in one store's cart, as get_recipe shows them.
     ASK THE HUMAN FIRST: show the list from get_recipe and get a yes. Never orders or pays.
@@ -113,22 +134,26 @@ async def add_recipe_to_cart(
 
 
 @_tool(READ)
-async def get_delivery_info(store: str) -> dict:
-    """Show the chosen delivery time, edit deadline and next free day, plus fees and minimum order.
-    `delivery_mode` is "home", "pickup" (BilkaToGo, REMA 1000, with `pickup_store`) or null when
-    unknown."""
+async def get_delivery_info(store: StoreName) -> dict:
+    """Show the delivery the human has already chosen in one store: time, edit deadline and next
+    free day, plus fees and minimum order. `delivery_mode` is "home", "pickup" (BilkaToGo,
+    REMA 1000, with `pickup_store`) or null when unknown; the time is null when none is chosen.
+    To see free times to choose from, use list_delivery_slots. Only reads."""
     info, terms = await asyncio.gather(_call(store, "delivery_info"), _call(store, "terms"))
     return _out({"delivery": info, "terms": terms})
 
 
 @_tool(READ)
-async def list_delivery_slots(stores: list[str] | None = None, days: int = 7) -> dict:
+async def list_delivery_slots(
+    stores: StoreNames = None,
+    days: Annotated[int, Field(description="Days ahead to look, 1-14.")] = 7,
+) -> dict:
     """List free delivery times for the next `days` days with the delivery fee per slot, in time
     order, plus the 3 cheapest per store. nemlig: "Personlig" (you are home) or "Fleksibel"
     (left at the door). BilkaToGo: one flat fee, night delivery, or pickup times ("Afhentning")
     when the cart is set to pickup. REMA 1000: Køb & Hent times in the store chosen at login, no
     fee. Only reads: it never chooses a time, store or mode. The human chooses on the store's
-    website."""
+    website. For the time already chosen, use get_delivery_info."""
     days = max(1, min(days, MAX_DAYS))
     return _out(await _each(_names(stores), lambda s: _slots(s, days)))
 
@@ -142,13 +167,23 @@ async def _slots(store: registry.Store, days: int) -> dict:
 
 
 @_tool(READ)
-async def get_orders(store: str, limit: int = 10) -> dict:
-    """List recent orders in one store (newest first). Use get_order for the lines."""
+async def get_orders(
+    store: StoreName,
+    limit: Annotated[int, Field(description="Orders to return, 1-25.")] = 10,
+) -> dict:
+    """List the human's past orders in one store, newest first: id, status, date and total. Use it for
+    "what do we usually buy"; then get_order with an id for the products. nemlig and BilkaToGo;
+    needs a login. Only reads."""
     limit = max(1, min(limit, MAX_RESULTS))
     return _out({"orders": await _call(store, "orders", limit)})
 
 
 @_tool(READ)
-async def get_order(store: str, order_id: str) -> dict:
-    """Show one order with what was bought."""
+async def get_order(
+    store: StoreName,
+    order_id: Annotated[str, Field(description="The order's `id` from get_orders.")],
+) -> dict:
+    """Show one past order with every product bought: name, product id, count and price. Get the
+    id from get_orders first. The product ids work in set_cart_quantities to buy the same again.
+    nemlig and BilkaToGo; needs a login. Only reads."""
     return _out(await _call(store, "order", order_id))
