@@ -4,7 +4,7 @@ A saved login longer than 1000 characters is split over several keychain entries
 
 ## Why
 
-Windows Credential Manager holds 2560 bytes per entry, and keyring writes UTF-16: about 1280 characters. A REMA 1000 session (two tokens and three cookies) is longer, so `handle-mcp login rema1000` could not save on Windows (#151). The Windows backend also raises its own error type, not a `KeyringError`, so the human saw a traceback.
+Windows Credential Manager holds 2560 bytes per entry, and keyring writes UTF-16: about 1280 characters. A REMA 1000 session (two tokens and three cookies) is about 2500 characters as saved, so `handle-mcp login rema1000` could not save on Windows (#151). The Windows backend also raises its own error type, not a `KeyringError`, so the human saw a traceback.
 
 The other choices were worse:
 

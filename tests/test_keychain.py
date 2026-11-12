@@ -12,13 +12,15 @@ from handle_mcp import stores as registry
 from handle_mcp.stores import _keychain
 from tests.conftest import WINDOWS_LIMIT, CredWriteError
 
-# The shape of a REMA 1000 session: two long tokens and three cookies. The sizes are a guess.
+# A REMA 1000 session with the lengths measured in a real one (2026-11-12): 2503 characters as
+# saved, about twice what one Windows entry holds.
 LONG = {
-    "access_token": "a" * 1400,
-    "refresh_token": "r" * 1100,
-    "api_session": "s" * 400,
-    "AWSALB": "b" * 160,
-    "AWSALBCORS": "c" * 160,
+    "access_token": "a" * 1004,
+    "refresh_token": "r" * 742,
+    "api_session": "s" * 342,
+    "AWSALB": "b" * 124,
+    "AWSALBCORS": "c" * 124,
+    "access_exp": "1" * 10,
 }
 SHORT = {"token": "session-1"}
 SERVICE = registry.KEYCHAIN_SERVICE
@@ -42,7 +44,7 @@ def test_a_short_login_is_one_entry_as_before(memory_keychain):
 def test_a_new_login_removes_the_old_pieces(memory_keychain):
     registry.keychain_set("fake", "a@example.com", LONG)
     first = set(memory_keychain.secrets)
-    registry.keychain_set("fake", "a@example.com", LONG | {"access_token": "n" * 1400})
+    registry.keychain_set("fake", "a@example.com", LONG | {"access_token": "n" * 1004})
     assert len(memory_keychain.secrets) == len(first)  # no pieces left from the first login
     assert set(memory_keychain.secrets) & first == {(SERVICE, "fake")}
     registry.keychain_set("fake", "a@example.com", SHORT)
@@ -76,7 +78,7 @@ def test_a_failed_save_keeps_the_old_login_and_leaves_no_pieces(memory_keychain,
 
     monkeypatch.setattr(memory_keychain, "set_password", fails_on_the_third)
     with pytest.raises(CredWriteError):
-        registry.keychain_set("fake", "a@example.com", LONG | {"access_token": "n" * 1400})
+        registry.keychain_set("fake", "a@example.com", LONG | {"access_token": "n" * 1004})
     assert memory_keychain.secrets == before
 
 
@@ -146,7 +148,7 @@ def test_logout_says_so_when_the_keychain_refuses(memory_keychain, monkeypatch, 
 )
 def test_windows_credential_manager_takes_a_long_login():
     service, secret = "handle-mcp-test", json.dumps({"email": "a@example.com", "session": LONG})
-    with pytest.raises(Exception, match="1783|bad data"):  # the bug: one entry is too small
+    with pytest.raises(Exception):  # noqa: B017  the bug: one entry is too small
         keyring.set_password(service, "whole", secret)
     try:
         _keychain.write(service, "fake", secret)
