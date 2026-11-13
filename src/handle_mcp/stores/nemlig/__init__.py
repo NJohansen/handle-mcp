@@ -303,15 +303,17 @@ class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
     def _product(self, hit: dict) -> Product:
         avail = hit.get("Availability") or {}
         campaign = hit.get("Campaign") or None
-        price = _money(hit.get("Price")) or Decimal(0)
-        now = _discount_price(campaign)
-        if now is not None and now >= price:  # seen live: a "Dagstilbud" above the normal price
-            now = None
-        offer = _offer(campaign) if now is not None or not _discount_price(campaign) else None
-        if (campaign or {}).get("Type") == FREE and now is not None:
+        normal = _money(hit.get("Price")) or Decimal(0)
+        # CampaignPrice is what the basket charges, also when it is ABOVE Price (seen live
+        # 2026-11-13, #155: Price 82, CampaignPrice 99, a "God pris" label). Then it is the
+        # price, and not an offer.
+        pay = _discount_price(campaign)
+        cheaper = pay is not None and pay < normal
+        offer = _offer(campaign) if cheaper or pay is None else None
+        if (campaign or {}).get("Type") == FREE and pay is not None:
             offer = "Gratis"
-        elif offer == "Tilbud" and now is not None:
-            offer = f"Tilbud, før {_kr(price)} kr"
+        elif offer == "Tilbud" and cheaper:
+            offer = f"Tilbud, før {_kr(normal)} kr"
         limit = (campaign or {}).get("MaxQuantity") or None
         if offer and limit:
             offer += f" (max {limit} stk.)"
@@ -319,18 +321,18 @@ class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
             store=self.name,
             id=str(hit["Id"]),
             name=hit.get("Name", ""),
-            price=price if now is None else now,
+            price=normal if pay is None else pay,
             brand=hit.get("Brand") or None,
             size=hit.get("Description") or None,
             unit_price=_money(campaign.get("CampaignUnitPrice"))
-            if now is not None
+            if pay is not None
             else _money(hit.get("UnitPriceCalc")),
             unit=_unit(hit.get("UnitPriceLabel")),
             ean=None,  # not in nemlig's search answers (docs/research.md)
             on_offer=bool(offer),
             offer_text=offer,
-            before_price=price if now is not None else None,
-            offer_until=_until(campaign),
+            before_price=normal if cheaper else None,
+            offer_until=_until(campaign) if offer else None,
             available=avail.get("IsDeliveryAvailable", True)
             and avail.get("IsAvailableInStock", True),
             category=hit.get("Category") or None,
