@@ -30,6 +30,9 @@ def compare(lines, found) -> tuple[list[str], list[str], int]:
             unchecked.append(f"{line.name}: ikke fundet i søgningen")
         elif MULTI_BUY.search(product.offer_text or ""):
             unchecked.append(f"{line.name}: flerkøb ({product.offer_text})")
+        elif product.max_per_order and line.quantity > product.max_per_order:
+            # Over the offer limit the rest is at the normal price: the average says nothing.
+            unchecked.append(f"{line.name}: over tilbuddets grænse ({product.max_per_order})")
         elif line.quantity < 1:
             unchecked.append(f"{line.name}: antal {line.quantity}")
         else:
@@ -45,24 +48,28 @@ def compare(lines, found) -> tuple[list[str], list[str], int]:
 def test_compare_finds_the_line_the_cart_charges_more_for():
     """No network: the case from #155, next to lines the check must leave alone."""
 
-    def product(pid, price, offer_text=None):
-        return Product("nemlig", pid, "vare", Decimal(price), offer_text=offer_text)
+    def product(pid, price, offer_text=None, most=None):
+        return Product(
+            "nemlig", pid, "vare", Decimal(price), offer_text=offer_text, max_per_order=most
+        )
 
     lines = [
         CartLine("1", "Pepsi Max", 2, Decimal("198.00")),
         CartLine("2", "Mælk", 3, Decimal("38.85")),
         CartLine("3", "Cola", 2, Decimal("80.00")),
         CartLine("4", "Udgået", 1, Decimal("10.00")),
+        CartLine("5", "Smør", 3, Decimal("51.90")),
     ]
     found = {
         "1": product("1", "82.00"),
         "2": product("2", "12.95"),
         "3": product("3", "41.25", "2 for 80 kr"),
+        "5": product("5", "12.00", "Tilbud, før 19,95 kr", most=1),
     }
     wrong, unchecked, checked = compare(lines, found)
     assert checked == 2
     assert wrong == ["Pepsi Max (1): søgning 82.00 kr, kurv 99.00 kr"]
-    assert [text.split(":")[0] for text in unchecked] == ["Cola", "Udgået"]
+    assert [text.split(":")[0] for text in unchecked] == ["Cola", "Udgået", "Smør"]
 
 
 @live
