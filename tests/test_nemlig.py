@@ -511,6 +511,39 @@ def test_discount_campaign_pays_the_campaign_price(store):
     assert p.offer_until == date(2026, 11, 4)  # 22:59:59 UTC is the last minute of the day in DK
 
 
+def test_campaign_price_above_the_normal_price_is_the_price(store):
+    """#155, the hit as nemlig sent it 2026-11-13. The basket charged 99, not 82."""
+    hit = {
+        "Id": "5016248",
+        "Name": "Pepsi Max (dåse)",
+        "Description": "24 x 0,33 l / ex. pant / indh. sødestoffer / Pepsi",
+        "Price": 82.0,
+        "UnitPriceCalc": 3.42,
+        "UnitPriceLabel": "kr/stk",
+        "Campaign": {
+            "DiscountSavings": -17.0,
+            "MaxQuantity": 0,
+            "CampaignPrice": 99.0,
+            "CampaignUnitPrice": 4.13,
+            "Type": "ProductCampaignDiscount",
+            "Code": "K",
+            "IntervalStart": "2026-11-08T23:00:00Z",
+            "IntervalEnd": "2026-11-15T22:59:59Z",
+            "ShowCampaignInterval": True,
+        },
+        "DiscountItem": False,
+    }
+    p = store._product(hit)
+    assert (p.price, p.unit_price) == (Decimal("99.0"), Decimal("4.13"))
+    assert (p.on_offer, p.offer_text, p.before_price, p.offer_until) == (False, None, None, None)
+
+
+def test_campaign_price_equal_to_the_normal_price_is_not_an_offer(store):
+    campaign = {"Type": "ProductCampaignDiscount", "CampaignPrice": 20, "CampaignUnitPrice": 40}
+    p = store._product({"Id": 8, "Name": "Is", "Price": 20, "Campaign": campaign})
+    assert (p.price, p.on_offer, p.before_price) == (Decimal(20), False, None)
+
+
 def test_discount_label_alone_is_not_an_offer(store):
     hit = {"Id": 2, "Name": "Letmælk 1,5%", "Price": 10.95, "Campaign": None, "DiscountItem": True}
     p = store._product(hit)

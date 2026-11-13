@@ -44,6 +44,7 @@ Krævede headers: `Platform: web`, `Device-Size: desktop`, `Version: <app-versio
 **Tilbud (set live 2026-11-01):**
 - `DiscountItem: true` uden `Campaign` er nemligs faste "Discount"-mærke (står også i `Labels`). Det er ikke et tilbud.
 - `ProductCampaignDiscountPercent` og `ProductCampaignDiscount`: `Price` er prisen FØR tilbud. Du betaler `CampaignPrice`, og enhedsprisen er `CampaignUnitPrice`.
+- `CampaignPrice` kan være HØJERE end `Price` (set live 2026-11-13, #155: `Price` 82, `CampaignPrice` 99, `DiscountSavings` -17, `Code` "K", mærket "God pris" på siden). Kurven tager `CampaignPrice`. Så er det prisen, og ikke et tilbud.
 - `ProductCampaignMixOffer` og `ProductCampaignBuyXForY`: `Price` er stykprisen. Tilbuddet er `MinQuantity` for `TotalPrice`.
 - Kampagner vises allerede aftenen før `IntervalStart`.
 
