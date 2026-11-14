@@ -1,0 +1,172 @@
+{
+ "data": [
+  {
+   "id": 60033,
+   "name": "SOLSIKKERUGBRØD",
+   "underline": "750 GR. / KOHBERG",
+   "department": {
+    "id": 10,
+    "name": "Brød & Bavinchi"
+   },
+   "category": {
+    "id": 1040,
+    "name": "Rugbrød"
+   },
+   "barcodes": [
+    "5701246102835"
+   ],
+   "labels": [
+    {
+     "id": 9001,
+     "name": "Avisvare"
+    },
+    {
+     "id": 40,
+     "name": "Nøglehul"
+    }
+   ],
+   "prices": [
+    {
+     "price": 10,
+     "price_over_max_quantity": 22.5,
+     "max_quantity": 6,
+     "is_advertised": true,
+     "is_campaign": true,
+     "starting_at": "2026-11-08T00:00:00+00:00",
+     "ending_at": "2026-11-14T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 13.33,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    },
+    {
+     "price": 22.5,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-11-15T00:00:00+00:00",
+     "ending_at": "2026-12-05T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 30,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": true,
+   "is_weight_item": false
+  },
+  {
+   "id": 60106,
+   "name": "SOLSKINSBOLLER",
+   "underline": "390 GR. / KOHBERG",
+   "department": {
+    "id": 10,
+    "name": "Brød & Bavinchi"
+   },
+   "category": {
+    "id": 1020,
+    "name": "Boller"
+   },
+   "barcodes": [
+    "5701246006195"
+   ],
+   "labels": [
+    {
+     "id": 9001,
+     "name": "Avisvare"
+    }
+   ],
+   "prices": [
+    {
+     "price": 10,
+     "price_over_max_quantity": 23.5,
+     "max_quantity": 6,
+     "is_advertised": true,
+     "is_campaign": true,
+     "starting_at": "2026-11-08T00:00:00+00:00",
+     "ending_at": "2026-11-14T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 25.64,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    },
+    {
+     "price": 23.5,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": false,
+     "is_campaign": false,
+     "starting_at": "2026-11-15T00:00:00+00:00",
+     "ending_at": "2026-12-05T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 60.26,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": true,
+   "is_weight_item": false
+  },
+  {
+   "id": 66038,
+   "name": "FULDK. BURGER",
+   "underline": "300 GR. / HATTING TASTY",
+   "department": {
+    "id": 10,
+    "name": "Brød & Bavinchi"
+   },
+   "category": {
+    "id": 1060,
+    "name": "Fast food brød"
+   },
+   "barcodes": [
+    "5701205009908"
+   ],
+   "labels": [
+    {
+     "id": 9001,
+     "name": "Avisvare"
+    },
+    {
+     "id": 40,
+     "name": "Nøglehul"
+    },
+    {
+     "id": 43,
+     "name": "Fuldkorn"
+    }
+   ],
+   "prices": [
+    {
+     "price": 15,
+     "price_over_max_quantity": null,
+     "max_quantity": null,
+     "is_advertised": true,
+     "is_campaign": false,
+     "starting_at": "2026-11-08T00:00:00+00:00",
+     "ending_at": "2027-02-06T00:00:00+00:00",
+     "deposit": null,
+     "compare_unit": "kg",
+     "compare_unit_price": 50,
+     "consumption_unit": null,
+     "consumption_quantity": null
+    }
+   ],
+   "is_available_in_all_stores": true,
+   "is_weight_item": false
+  }
+ ],
+ "meta": {
+  "pagination": {
+   "current_page": 1,
+   "last_page": 1,
+   "per_page": 100,
+   "total": 12
+  }
+ }
+}

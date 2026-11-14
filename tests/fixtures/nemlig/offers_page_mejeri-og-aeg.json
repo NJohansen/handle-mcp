@@ -1,0 +1,571 @@
+{
+ "structuredData": {
+  "@context": "https://schema.org",
+  "@graph": [
+   {
+    "@type": "BreadcrumbList",
+    "@id": "https://www.nemlig.com/tilbud/mejeri-og-aeg#breadcrumb",
+    "itemListElement": [
+     {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hjem",
+      "item": "https://www.nemlig.com/"
+     },
+     {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tilbud",
+      "item": "https://www.nemlig.com/tilbud"
+     },
+     {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Mejeri og æg",
+      "item": "https://www.nemlig.com/tilbud/mejeri-og-aeg"
+     }
+    ]
+   },
+   {
+    "@type": "WebSite",
+    "@id": "https://www.nemlig.com/#website",
+    "publisher": {
+     "@id": "https://www.nemlig.com/#organization"
+    },
+    "url": "https://www.nemlig.com/",
+    "name": "www.nemlig.com",
+    "potentialAction": {
+     "@type": "SearchAction",
+     "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://www.nemlig.com/soeg?query={search_term_string}"
+     },
+     "query-input": "required name=search_term_string"
+    }
+   }
+  ]
+ },
+ "id": "a6f2cc10-cb47-4105-8678-02932e3f4058",
+ "pageType": "themePage",
+ "title": "Mejeri og æg på tilbud",
+ "description": null,
+ "seo": {
+  "title": "Mejeri og æg på tilbud | Levering fra 0 kr.",
+  "description": "Se udvalget af mejeri og æg på tilbud og +9.000 andre dagligvarer. Danmarks bedste friskhedsgaranti. 1.500 Prismatchede varer. Levering fra 0 kr.",
+  "content": "<h2 dir=\"ltr\">Mejeri og æg på tilbud</h2>\n<p dir=\"ltr\">Her finder du ugens tilbud på mejeriprodukter og æg, fra mælk, yoghurt og skyr til ost, smør, fløde og æg. Tilbuddene gælder fra mandag til søndag, så længe lager haves.</p>\n<p dir=\"ltr\">Mejeriprodukter bruges hver dag, så tilbuddene gør en forskel på ugens budget, især på ost og smør, der holder sig længe.</p>\n<h2 dir=\"ltr\">Sådan får du mest ud af tilbuddene</h2>\n<ul>\n<li>Køb smør og ost i større mængder, de kan fryses</li>\n<li>Vælg yoghurt og skyr med lang holdbarhed, når de er på tilbud</li>\n<li>Brug æggene til både morgenmad, bagning og aftensmad</li>\n</ul>\n<h2 dir=\"ltr\">FAQ - Mejeri og æg på tilbud</h2>\n<h3 dir=\"ltr\">Kan man fryse ost og smør?</h3>\n<p dir=\"ltr\">Ja. Smør kan fryses i op til seks måneder, og revet ost og faste oste i op til tre måneder.</p>\n<h3 dir=\"ltr\">Hvor længe holder æg?</h3>\n<p dir=\"ltr\">Æg holder typisk tre til fire uger fra pakkedatoen, når de opbevares i køleskabet.</p>\n<h3 dir=\"ltr\">Hvor længe gælder tilbuddene?</h3>\n<p dir=\"ltr\">Tilbuddene gælder fra mandag til søndag, så længe lager haves.</p>",
+  "noIndex": false
+ },
+ "pageContent": [
+  {
+   "contentType": "ProductList",
+   "anchorId": "0-b55ef9de-ae07-469b-9e6c-ae1ee766549c",
+   "layout": "Onerow",
+   "header": {
+    "title": "Lurpak kun 12 kr. ",
+    "subtitle": null,
+    "image": null,
+    "button": null
+   },
+   "products": [
+    {
+     "id": "5038613",
+     "url": "5038613",
+     "title": "Smør (saltet)",
+     "description": "200 g / Lurpak",
+     "price": 1200,
+     "priceOriginal": 1995,
+     "priceDiscount": 795,
+     "pricePerUnit": {
+      "value": 6000,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 14,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "7,95",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 7,95 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5038613.webp",
+      "accessibilityText": "Billede af Smør (saltet)"
+     }
+    },
+    {
+     "id": "104373",
+     "url": "104373",
+     "title": "Smørbar (saltet)",
+     "description": "200 g / Lurpak",
+     "price": 1200,
+     "priceOriginal": 1995,
+     "priceDiscount": 795,
+     "pricePerUnit": {
+      "value": 6000,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 14,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "7,95",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 7,95 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/104373.webp",
+      "accessibilityText": "Billede af Smørbar (saltet)"
+     }
+    }
+   ]
+  },
+  {
+   "contentType": "ProductList",
+   "anchorId": "1-36975e21-9e89-44f3-b397-acbf1163ca62",
+   "layout": "Showall",
+   "header": {
+    "title": "Mejeri og æg",
+    "subtitle": null,
+    "image": null,
+    "button": null
+   },
+   "products": [
+    {
+     "id": "5038613",
+     "url": "5038613",
+     "title": "Smør (saltet)",
+     "description": "200 g / Lurpak",
+     "price": 1200,
+     "priceOriginal": 1995,
+     "priceDiscount": 795,
+     "pricePerUnit": {
+      "value": 6000,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 14,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "7,95",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 7,95 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5038613.webp",
+      "accessibilityText": "Billede af Smør (saltet)"
+     }
+    },
+    {
+     "id": "5040184",
+     "url": "5040184",
+     "title": "Mandelsmør øko.",
+     "description": "150 g / vegansk / Urtekram",
+     "price": 4753,
+     "priceOriginal": 7921,
+     "priceDiscount": 3168,
+     "pricePerUnit": {
+      "value": 31684,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 90,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      },
+      {
+       "type": "vegan",
+       "text": "Vegansk"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "40%",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 40 procent"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5040184.webp",
+      "accessibilityText": "Billede af Mandelsmør øko."
+     }
+    },
+    {
+     "id": "923214",
+     "url": "923214",
+     "title": "Yoghurt m. jordbær 0,4% øko.",
+     "description": "1 kg / Arla ØKO",
+     "price": 1600,
+     "priceOriginal": 2295,
+     "priceDiscount": 695,
+     "pricePerUnit": {
+      "value": 1600,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 8,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      },
+      {
+       "type": "animalWelfareHearts3",
+       "text": "Bedre dyrevelfærd (3 hjerter)"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "6,95",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 6,95 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/923214.webp",
+      "accessibilityText": "Billede af Yoghurt m. jordbær 0,4% øko."
+     }
+    },
+    {
+     "id": "706008",
+     "url": "706008",
+     "title": "Ost i skiver mild 45+",
+     "description": "240 g / Danbo / Arla Klovborg",
+     "price": 2000,
+     "priceOriginal": 5001,
+     "priceDiscount": 3001,
+     "pricePerUnit": {
+      "value": 8333,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 14,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Priskup",
+       "accessibilityText": "Priskup",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "30,01",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 30,01 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/706008.webp",
+      "accessibilityText": "Billede af Ost i skiver mild 45+"
+     }
+    },
+    {
+     "id": "5605447",
+     "url": "5605447",
+     "title": "Æg str. M/L øko.",
+     "description": "6 stk. / Niels & Grete",
+     "price": 2500,
+     "priceOriginal": 3150,
+     "priceDiscount": 650,
+     "pricePerUnit": {
+      "value": 417,
+      "unitType": "Pieces"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 8,
+     "labelHighlighted": null,
+     "certificates": [],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "6,50",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 6,50 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Stk.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5605447.webp",
+      "accessibilityText": "Billede af Æg str. M/L øko."
+     }
+    },
+    {
+     "id": "5071597",
+     "url": "5071597",
+     "title": "Drikkeyoghurt m. blåbær",
+     "description": "0,30 l / Activia",
+     "price": 1000,
+     "priceOriginal": 1675,
+     "priceDiscount": 675,
+     "pricePerUnit": {
+      "value": 3333,
+      "unitType": "Volume"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 8,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "6,75",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 6,75 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Ltr.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5071597.webp",
+      "accessibilityText": "Billede af Drikkeyoghurt m. blåbær"
+     }
+    },
+    {
+     "id": "5062129",
+     "url": "5062129",
+     "title": "Guld skiveost",
+     "description": "140 g / Mammen",
+     "price": 1700,
+     "priceOriginal": 2095,
+     "priceDiscount": 395,
+     "pricePerUnit": {
+      "value": 12143,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 14,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "3,95",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 3,95 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5062129.webp",
+      "accessibilityText": "Billede af Guld skiveost"
+     }
+    }
+   ]
+  }
+ ],
+ "topBanner": null,
+ "breadcrumbs": [
+  {
+   "title": "Tilbud",
+   "url": "/tilbud"
+  },
+  {
+   "title": "Mejeri og æg",
+   "url": "/tilbud/mejeri-og-aeg"
+  }
+ ],
+ "navigationItems": []
+}

@@ -9,17 +9,58 @@ with "X", and the order number is a test value. Product lines, amounts and dates
 `search.json` `Recipes`: the fields documented in `nemlig_api.md` (`Id`, `Name`, `Url`,
 `TotalTime`, `NumberOfPersons`). Not a live capture yet.
 
-## Offers (live capture, 2026-11-03, logged in, read-only GET)
+## Offers (live captures, 2026-11-03 and 2026-11-14, logged in, read-only GET)
 
 `offers_page.json`: `GET https://webapi.prod.knl.nemlig.it/productbff/api/web/page?path=/tilbud`,
 the data behind nemlig.com/tilbud. `pageContent[]` has `ProductList` blocks with `header.title`
 and `products[]` inline (same product shape as the recipe files; `price` and `priceOriginal`
 in øre). The offer lists are "Skarp pris", "Ugens priskup", "En gave til dig", "Dagstilbud" and
-"Undgå madspild"; the rest ("Frugt og grønt", "Kød", ...) are categories. Trimmed to 5 products
-per offer list and 2 of "Frugt og grønt"; one "Mix 2 stk." Priskup product added from the same
-capture. `tracking`/`dataLayerTracking` removed, `isFavorite`/`isInShoppingList` false. No user
-id needed, unlike the old `/tilbud?GetAsJson=1` + `GetByProductGroupId` (the page URL is queued
-by queue-it in busy hours).
+"Undgå madspild"; the rest ("Frugt og grønt", "Kød", ...) are categories. No user id needed,
+unlike the old `/tilbud?GetAsJson=1` + `GetByProductGroupId` (the page URL is queued by queue-it
+in busy hours).
+
+The file is two captures put together:
+
+- The banner and the five offer lists are the 2026-11-03 capture, unchanged (5 products per
+  list, one "Mix 2 stk." Priskup product added from the same capture). On 2026-11-14 the page
+  had no "En gave til dig" list.
+- The page fields (`structuredData`, `seo`, `topBanner`, `breadcrumbs`) and four category blocks
+  are the 2026-11-14 capture. `navigationItems` is cut to the lists in the file ("Favoritter",
+  a logged-in list, is left out with its block "Favoritter på tilbud").
+- The category blocks are in another order than on the page: "Frugt og grønt" comes first on
+  nemlig.com, but is last here, because tests read `pageContent[-1]`. Its second product
+  (5024698, "2 stk. 15,-") is from 2026-11-03.
+
+What the category blocks cover (2026-11-14 unless noted):
+
+| Block | `header.button.url` | Products |
+|---|---|---|
+| Mejeri og æg | `/tilbud/mejeri-og-aeg` | 5038613 and 5040184 "Skarp pris"; 923214 cheaper than `priceOriginal`, no `campaignLines`; 706008 "Priskup" |
+| Drikkevarer | `/tilbud/drikkevarer` | 106517 "Mix 2 stk. 25,-" + "Priskup"; 5604110 badge "God pris", `priceOriginal` null, no `campaignLines` (not an offer); 5070387 "Mix 2 stk. 45,-"; 5605401 cheaper; 5602213 "6 stk. 69,-" |
+| Brød, kiks og kager | `/tilbud/broed-kiks-og-kager` | 5606369 a gift: `price` 0, "En gave til dig", `labelMaxQuantity` 1, sold out; 5055078 cheaper; 5062435 "God pris", `priceOriginal` null; 5047400 "Mix 2 stk. 50,-" |
+| Frugt og grønt | `/tilbud/frugt-og-groent` | 5058121, 5001423 and 5049872 at 15 kr., cheaper than `priceOriginal`, no `campaignLines` and no campaign name anywhere; 5603155 "Skarp pris", sold out |
+
+A product on offer in a category block has no campaign name and no end date: only `price` below
+`priceOriginal` (and `priceDiscount`, `campaignBadge` "Spar 3,-"). The blocks on /tilbud are not
+always complete: on 2026-11-14 "Mejeri og æg" had 36 products here and 61 on its sub-page,
+"Drikkevarer" 200 here and 213 there.
+
+`offers_page_frugt-og-groent.json` and `offers_page_mejeri-og-aeg.json`: the same call with
+`path=/tilbud/frugt-og-groent` and `path=/tilbud/mejeri-og-aeg` (the "Se alle" links),
+2026-11-14. Same shape as /tilbud, `navigationItems` empty, `breadcrumbs` Tilbud > the page.
+
+- Frugt og grønt: one block, "Friske favoritter til kurven", 35 products on the page (the same
+  35 as the block on /tilbud), cut to 6.
+- Mejeri og æg: two blocks. "Lurpak kun 12 kr. " (`layout` "Onerow") is a campaign block: the
+  block title is the only place the campaign name is. Both its products are kept. "Mejeri og æg"
+  is cut to 7: the 4 from `offers_page.json` and 3 that are not in the Mejeri block on /tilbud
+  (5605447 and 5071597 are in no block on /tilbud; 5062129 is only in another block there).
+
+In all three files `tracking`/`dataLayerTracking` are removed, and `isFavorite`,
+`isInShoppingList` and `quantity` are false, false and 0.
+
+The home page (`path=/`) answers a `testPage` with an empty `pageContent`, logged in or not
+(2026-11-14), so the gifts on the front page are not in this call. No fixture for it.
 
 ## `search_gift.json`
 
