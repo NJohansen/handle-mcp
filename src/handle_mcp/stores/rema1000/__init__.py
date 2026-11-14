@@ -211,8 +211,14 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
             *(
                 self._products(params | {"filter[departments]": dept}, limit, offers_only=True)
                 for dept in DEPARTMENTS[category]
-            )
+            ),
+            return_exceptions=True,
         )
+        if failed := [f for f in found if isinstance(f, BaseException)]:
+            if len(failed) == len(found):  # one department failing must not hide the others
+                raise failed[0]
+            log.warning("REMA 1000: %d afdelinger fejlede: %r", len(failed), failed[0])
+        found = [f for f in found if not isinstance(f, BaseException)]
         unique = {p.id: p for products in found for p in products}
         return list(unique.values())[:limit]
 

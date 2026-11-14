@@ -128,6 +128,18 @@ async def test_offers_in_a_category_ask_per_department(store, fake):
     assert not milk.on_offer
 
 
+async def test_one_failing_department_does_not_hide_the_others(fake):
+    def handle(request):
+        if request.url.params.get("filter[departments]") in ("60", "50"):
+            return httpx.Response(404)  # no retry
+        return fake.handle(request)
+
+    store = Rema1000Store(httpx.AsyncClient(transport=httpx.MockTransport(handle)))
+    assert len(await store.offers(25, "mejeri og æg")) == 3  # Ost m.v. still answers
+    with pytest.raises(StoreError):
+        await store.offers(25, "frost")  # its only department fails
+
+
 def test_an_advertised_leaflet_product_is_an_offer_without_a_price_before():
     hit = fixture("offers_department")["data"][2]  # is_campaign false
     assert product(hit, NOW).on_offer is False  # in a search: a normal price
