@@ -124,15 +124,17 @@ async def list_offers(
         Field(description="One category: " + ", ".join(f'"{c}"' for c in OFFER_CATEGORIES) + "."),
     ] = None,
 ) -> dict:
-    """List this week's offers in each store, also items you would not search for.
-    Without `category`, a first look: nemlig's Skarp pris, Priskup, Dagstilbud, Undgå madspild
-    and gifts; the first of BilkaToGo's offers; REMA 1000's leaflet (Avisvarer, often with a max
-    per customer in offer_text). That is a small part of the offers. For a meal plan or a
-    shopping list, call once per `category` you buy from: every offer in it, in each store,
-    e.g. nemlig's fruit at one price. `campaign` is the store's name for the offer when it has
-    one. A product on two lists is shown once. A list the store fails to send is left out (see
-    the server log). Free gifts have price 0, "max_per_order" and their own product id, and
-    are not cut by `limit`. Use them when they fit the plan."""
+    """List this week's offers in each store, also items you would not search for. For one
+    named product, use search_products.
+    Without `category`, a first look only: nemlig's Skarp pris, Priskup, Dagstilbud, Undgå
+    madspild and gifts; the first of BilkaToGo's offers; REMA 1000's leaflet (Avisvarer). For a
+    meal plan or a shopping list, call once per `category` you buy from: every offer in it, in
+    each store.
+    Each product has price, before_price and offer_until (null when the store does not say),
+    offer_text (multi-buy, max per customer) and campaign (the store's name for the offer). A
+    product on two lists is shown once. A list the store fails to send is left out (see the
+    server log). Free gifts have price 0, max_per_order and their own product id, and are not
+    cut by `limit`."""
     if category is not None:
         category = category.strip().lower()
         if category not in OFFER_CATEGORIES:
