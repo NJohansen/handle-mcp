@@ -10,6 +10,7 @@ import pytest
 
 from handle_mcp import compare
 from handle_mcp.stores import STORES, StoreError  # the real dict: conftest swaps in fakes later
+from handle_mcp.stores import rema1000 as rema_module
 from handle_mcp.stores.rema1000 import NOTE, Rema1000Store, product
 
 FIXTURES = Path(__file__).parent / "fixtures" / "rema1000"
@@ -34,6 +35,18 @@ class FakeRema:
         if key in self.answers:
             return self.answers[key]
         return httpx.Response(200, json=fixture("search_milk"))
+
+
+class _Clock(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return NOW
+
+
+@pytest.fixture(autouse=True)
+def _in_the_offer_week(monkeypatch):
+    """The store reads the clock. Without this, the tests fail when the fixture's week ends."""
+    monkeypatch.setattr(rema_module, "datetime", _Clock)
 
 
 @pytest.fixture
