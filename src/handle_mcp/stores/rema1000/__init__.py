@@ -142,6 +142,10 @@ def product(hit: dict, now: datetime | None = None, advertised: bool = False) ->
     )
 
 
+def _campaigns_first(products: list[Product]) -> list[Product]:
+    return sorted(products, key=lambda p: p.offer_text == FIXED)  # stable: the store's order
+
+
 class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutritionMixin):
     name = "rema1000"
     cart_page = SHOP  # the list lives in REMA's app and webshop; no page per list is known
@@ -179,10 +183,12 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
         self, params: dict[str, Any], limit: int, offers_only: bool = False
     ) -> list[Product]:
         """Page until `limit` products. `offers_only` skips a leaflet product whose offer has
-        ended, before counting, so the limit is still filled."""
+        ended, before counting, so the limit is still filled. A fixed leaflet price does not
+        count either: the paging goes on until `limit` campaigns are found, and they come first,
+        so a fixed price never pushes a price cut out."""
         found: list[Product] = []
         page = 1
-        while len(found) < limit:
+        while sum(not offers_only or p.offer_text != FIXED for p in found) < limit:
             data = await self._get("search/products", params | {"per_page": PER_PAGE, "page": page})
             hits = [
                 product(hit, advertised=offers_only)
@@ -194,9 +200,7 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
             if page >= last or not data["data"]:
                 break
             page += 1
-        if offers_only:  # campaigns first: a fixed price must not push a price cut out
-            found.sort(key=lambda p: p.offer_text == FIXED)
-        return found[:limit]
+        return _campaigns_first(found)[:limit] if offers_only else found[:limit]
 
     async def search(self, query: str, limit: int = 10) -> list[Product]:
         return await self._products({"query": query}, limit)
@@ -220,7 +224,7 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
             log.warning("REMA 1000: %d afdelinger fejlede: %r", len(failed), failed[0])
         found = [f for f in found if not isinstance(f, BaseException)]
         unique = {p.id: p for products in found for p in products}
-        return list(unique.values())[:limit]
+        return _campaigns_first(list(unique.values()))[:limit]
 
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
         raise NotImplementedError

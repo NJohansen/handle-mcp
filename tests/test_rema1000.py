@@ -140,6 +140,24 @@ async def test_one_failing_department_does_not_hide_the_others(fake):
         await store.offers(25, "frost")  # its only department fails
 
 
+async def test_a_campaign_on_a_later_page_comes_before_a_fixed_price(fake):
+    bread, _, burger = fixture("offers_department")["data"]
+    page = fixture("offers_department")["meta"]["pagination"]
+    pages = {
+        "1": {"data": [burger], "meta": {"pagination": page | {"last_page": 2}}},
+        "2": {"data": [bread], "meta": {"pagination": page | {"current_page": 2, "last_page": 2}}},
+    }
+
+    def handle(request):
+        fake.requests.append(request)
+        return httpx.Response(200, json=pages[request.url.params["page"]])
+
+    store = Rema1000Store(httpx.AsyncClient(transport=httpx.MockTransport(handle)))
+    assert [p.id for p in await store.offers(1)] == ["60033"]  # the campaign, from page 2
+    assert [p.id for p in await store.offers(2)] == ["60033", "66038"]
+    assert [p.id for p in await store.offers(1, "brød og kager")] == ["60033"]
+
+
 def test_an_advertised_leaflet_product_is_an_offer_without_a_price_before():
     hit = fixture("offers_department")["data"][2]  # is_campaign false
     assert product(hit, NOW).on_offer is False  # in a search: a normal price
