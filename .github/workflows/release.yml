@@ -1,4 +1,6 @@
 name: release
+# The run list shows "Release 1.8.0", not "release".
+run-name: Release ${{ inputs.version }}
 # One button: Actions > release > Run workflow, with the version from the
 # merged release PR. Tests and builds main, waits for the maintainer to
 # approve the `pypi` environment, publishes to PyPI, then tags main and
