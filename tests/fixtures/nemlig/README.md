@@ -59,6 +59,12 @@ always complete: on 2026-11-14 "Mejeri og æg" had 36 products here and 61 on it
 In all three files `tracking`/`dataLayerTracking` are removed, and `isFavorite`,
 `isInShoppingList` and `quantity` are false, false and 0.
 
+`gift_page.json`: the same call with `path=/fordele/det-nye-nemlig`, 2026-11-14, no login (the
+answer is the same logged in). Trimmed to the last two `ProductList` blocks: "Skarp pris" cut from
+189 products to 2, and the gift block (no `header.title`) with its one product, 5064572: `price`
+0, "En gave til dig", `labelMaxQuantity` 1. A gift has its own id; the same cola for sale is
+106517. `tracking`/`dataLayerTracking` removed, the six text and banner blocks left out.
+
 The home page (`path=/`) answers a `testPage` with an empty `pageContent`, logged in or not
 (2026-11-14), so the gifts on the front page are not in this call. No fixture for it.
 

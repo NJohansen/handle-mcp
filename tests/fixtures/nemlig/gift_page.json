@@ -1,0 +1,244 @@
+{
+ "structuredData": {
+  "@context": "https://schema.org",
+  "@graph": [
+   {
+    "@type": "BreadcrumbList",
+    "@id": "https://www.nemlig.com/fordele/det-nye-nemlig#breadcrumb",
+    "itemListElement": [
+     {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hjem",
+      "item": "https://www.nemlig.com/"
+     },
+     {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Det nye nemlig",
+      "item": "https://www.nemlig.com/fordele/det-nye-nemlig"
+     }
+    ]
+   },
+   {
+    "@type": "WebSite",
+    "@id": "https://www.nemlig.com/#website",
+    "publisher": {
+     "@id": "https://www.nemlig.com/#organization"
+    },
+    "url": "https://www.nemlig.com/",
+    "name": "www.nemlig.com",
+    "potentialAction": {
+     "@type": "SearchAction",
+     "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://www.nemlig.com/soeg?query={search_term_string}"
+     },
+     "query-input": "required name=search_term_string"
+    }
+   }
+  ]
+ },
+ "id": "a0c82963-9fdf-4191-b5b7-a303bf1e5eb2",
+ "pageType": "themePage",
+ "title": "Det nye nemlig",
+ "description": null,
+ "seo": {
+  "title": "Det nye nemlig | Læs om nyheder og fordele",
+  "description": "Læs om det nye nemlig, og få et overblik over nyheder og fordele. Se, hvad ændringerne betyder for dig, når du handler hos os.",
+  "content": "",
+  "noIndex": false
+ },
+ "pageContent": [
+  {
+   "contentType": "ProductList",
+   "anchorId": "6-88b4e263-59f7-44ee-96b9-290fe463646b",
+   "products": [
+    {
+     "id": "5603156",
+     "url": "5603156",
+     "title": "Svesker øko.",
+     "description": "150 g / Urtekram",
+     "price": 2277,
+     "priceOriginal": 3795,
+     "priceDiscount": 1518,
+     "pricePerUnit": {
+      "value": 15180,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 90,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "40%",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 40 procent"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5603156.webp",
+      "accessibilityText": "Billede af Svesker øko."
+     }
+    },
+    {
+     "id": "5603153",
+     "url": "5603153",
+     "title": "Tranebær øko.",
+     "description": "120 g / Urtekram",
+     "price": 1575,
+     "priceOriginal": 2625,
+     "priceDiscount": 1050,
+     "pricePerUnit": {
+      "value": 13125,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 90,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "40%",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 40 procent"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5603153.webp",
+      "accessibilityText": "Billede af Tranebær øko."
+     }
+    }
+   ],
+   "layout": "Onerow",
+   "header": {
+    "title": "Klar til at prøve det nye nemlig?",
+    "subtitle": "Start indkøbet med din gave og vores skarpeste tilbud",
+    "image": {
+     "source": "https://media.umbraco.io/nemlig3/foef0pls/graftis-gave.svg?mode=crop&anchor=center&width=64&height=64",
+     "accessibilityText": "1-1_illustration_gratis-gave"
+    },
+    "button": null
+   }
+  },
+  {
+   "contentType": "ProductList",
+   "anchorId": "7-80ddbe26-18bd-4cfc-9001-c3210122f40b",
+   "products": [
+    {
+     "id": "5064572",
+     "url": "5064572",
+     "title": "Coca-Cola Zero",
+     "description": "1,50 l / indh. sødestoffer / Coca-Cola",
+     "price": 0,
+     "priceOriginal": 1800,
+     "priceDiscount": 1800,
+     "pricePerUnit": {
+      "value": 0,
+      "unitType": "Volume"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": 1,
+     "labelFreshnessDays": 30,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "sugarFree",
+       "text": "Sukkerfri"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "En gave til dig",
+       "accessibilityText": "En gave til dig",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "Gratis",
+      "secondaryText": null,
+      "accessibilityText": "Gratis"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Ltr.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5064572.webp",
+      "accessibilityText": "Billede af Coca-Cola Zero"
+     }
+    }
+   ],
+   "layout": "Onerow",
+   "header": null
+  }
+ ],
+ "topBanner": null,
+ "breadcrumbs": [
+  {
+   "title": "Det nye nemlig",
+   "url": "/fordele/det-nye-nemlig"
+  }
+ ],
+ "navigationItems": []
+}
