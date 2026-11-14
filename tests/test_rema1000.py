@@ -121,11 +121,17 @@ async def test_offers_in_a_category_ask_per_department(store, fake):
     assert asked == ["60", "70"]  # Mejeri and Ost m.v., at once
     assert all(r.url.params["filter[labels]"] == "9001" for r in fake.requests)
     assert set(offers) == {"60033", "60106", "66038"}  # the same product twice is shown once
-    assert len(await store.offers(2, "frugt og grønt")) == 2
+    two = await store.offers(2, "frugt og grønt")
+    assert [p.id for p in two] == ["60033", "60106"]  # campaigns before a fixed price
+    assert list(offers)[-1] == "66038"
+    milk = (await store.search("mælk", 1))[0]
+    assert not milk.on_offer
 
 
 def test_an_advertised_leaflet_product_is_an_offer_without_a_price_before():
-    burger = product(fixture("offers_department")["data"][2], NOW)  # is_campaign false
+    hit = fixture("offers_department")["data"][2]  # is_campaign false
+    assert product(hit, NOW).on_offer is False  # in a search: a normal price
+    burger = product(hit, NOW, advertised=True)  # in the offer list
     assert (burger.on_offer, burger.campaign, burger.before_price) == (True, "Avisvare", None)
     assert (burger.offer_text, burger.max_per_order) == ("Avisvare, fast pris", None)
     assert burger.offer_until == date(2027, 2, 6)

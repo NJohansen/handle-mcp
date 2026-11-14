@@ -29,7 +29,8 @@ model to read well.
   the same list there.
 - An unknown name is an error that lists the known names. A guess would drop offers in silence.
 - A product at its normal price in a category list is no offer and is left out.
-- A leaflet product at a fixed price is an offer with no price before.
+- A leaflet product at a fixed price is an offer with no price before, in `list_offers` only.
+  Campaigns come first, so a fixed price never pushes a price cut out of the answer.
 
 ## Consequences
 

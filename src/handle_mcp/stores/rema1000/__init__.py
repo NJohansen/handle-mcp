@@ -27,6 +27,7 @@ from handle_mcp.stores.rema1000.shopping_list import RemaListMixin
 log = logging.getLogger(__name__)
 
 LEAFLET = 9001  # the label "Avisvare": this week's leaflet
+FIXED = "Avisvare, fast pris"
 # A shared category (stores.OFFER_CATEGORIES) is one or more departments: `filter[departments]`
 # takes a department id. No call lists them (live 2026-11-14: tests/fixtures/rema1000/README.md).
 DEPARTMENTS = {
@@ -86,15 +87,16 @@ def _kr(value: Decimal) -> str:
 def _offer_text(period: dict, leaflet: bool) -> str:
     text = "Avisvare" if leaflet else "Tilbud"
     if not period.get("is_campaign"):  # in the leaflet at a fixed price, for months
-        return "Avisvare, fast pris"
+        return FIXED
     most, over = period.get("max_quantity"), _money(period.get("price_over_max_quantity"))
     if isinstance(most, int) and most > 0 and over is not None:
         text += f", maks {most} stk. (derefter {_kr(over)} kr)"
     return text
 
 
-def product(hit: dict, now: datetime | None = None) -> Product | None:
-    """One product from search/products. None when it has no price."""
+def product(hit: dict, now: datetime | None = None, advertised: bool = False) -> Product | None:
+    """One product from search/products. None when it has no price. `advertised` (the offer
+    list): a leaflet product at a fixed price is an offer too."""
     prices = [p for p in hit.get("prices") or [] if isinstance(p, dict)]
     at = _current(prices, now or datetime.now(UTC))
     price = _money(prices[at].get("price")) if at is not None else None
@@ -104,9 +106,10 @@ def product(hit: dict, now: datetime | None = None) -> Product | None:
     size, _, brand = str(hit.get("underline") or "").partition(" / ")
     labels = {lbl.get("id") for lbl in hit.get("labels") or [] if isinstance(lbl, dict)}
     # A leaflet product can be advertised at a fixed price and be no campaign (live 2026-11-14:
-    # 191 of the leaflet's 416). The store shows it as an offer, so it is one; no price before.
+    # 191 of the leaflet's 416). The leaflet shows it, so the offer list does; no price before.
+    # In a search it stays a normal price: nothing is cheaper than before.
     on_offer = bool(period.get("is_campaign")) or (
-        LEAFLET in labels and bool(period.get("is_advertised"))
+        advertised and LEAFLET in labels and bool(period.get("is_advertised"))
     )
     before = None
     if on_offer:  # the next period that is no offer: what it costs after the offer
@@ -181,12 +184,18 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
         page = 1
         while len(found) < limit:
             data = await self._get("search/products", params | {"per_page": PER_PAGE, "page": page})
-            hits = [product(hit) for hit in data["data"] if isinstance(hit, dict)]
+            hits = [
+                product(hit, advertised=offers_only)
+                for hit in data["data"]
+                if isinstance(hit, dict)
+            ]
             found += [p for p in hits if p and (p.on_offer or not offers_only)]
             last = ((data.get("meta") or {}).get("pagination") or {}).get("last_page") or 1
             if page >= last or not data["data"]:
                 break
             page += 1
+        if offers_only:  # campaigns first: a fixed price must not push a price cut out
+            found.sort(key=lambda p: p.offer_text == FIXED)
         return found[:limit]
 
     async def search(self, query: str, limit: int = 10) -> list[Product]:
