@@ -154,6 +154,13 @@ Kilde: [McAndersDK/handle-mcp-go](https://github.com/McAndersDK/handle-mcp-go) (
 - **Frisk kød** (hakket oksekød, flanksteak) og bananer har ingen deklaration i nogen af butikkerne. REMA har dog tal for hakket hvidkål.
 - **Open Food Facts** har samme tal som Bilka for skyr (EAN 5711953011399), men mangler frisk kød. Ikke brugt: nemlig har ingen EAN, og Bilka har tallene selv.
 
+## Tilbud pr. kategori (2026-11-14, kun GET)
+
+- **nemlig:** `/tilbud` har de fem faste lister og en blok pr. kategori. Blokkens `header.button.url` ("Se alle") peger på undersiden, fx `/tilbud/frugt-og-groent`. Undersiden er hele listen; blokken på `/tilbud` kan mangle varer. En kampagneblok har `layout: "Onerow"`, og dens `header.title` er kampagnens navn ("Lurpak kun 12 kr."). En vare uden `priceOriginal` og uden kampagnelinje er ikke et tilbud ("God pris"). Sidesvaret har ingen slutdato; den står kun i søgningen (`Campaign.IntervalEnd`). `/tilbud` fylder ca. 2,9 MB, en underside 50-300 KB.
+- **nemlig-gaver:** en gave har sit eget varenummer, pris 0, `campaignLines` "En gave til dig" og `labelMaxQuantity` 1. Den kan stå i en kategoriblok eller på en side uden for `/tilbud` (`/fordele/det-nye-nemlig`). `page?path=/` giver en tom `testPage`.
+- **BilkaToGo:** `isInOffer` giver ca. 14.600 varer. `consumerFacingHierarchy.lvl0` er træet bag `deepestCategoryPath` og kan bruges i `filters`. `leafletTitle` og `isInCurrentLeaflet` siger, hvad avisen kalder tilbuddet. `storeData.<butik>.offerUntil` er udfyldt på 1-3 %.
+- **REMA 1000:** `filter[departments]=<id>` filtrerer på afdeling. Ingen kald lister afdelingerne. 191 af avisens 416 varer har `is_advertised: true` og `is_campaign: false`: annonceret fast pris. `filter[is_campaign]` svarer 400.
+
 ## Bekræftet live (2026-11-01, hjemlevering valgt)
 
 - **BilkaToGo `Cart`:** `stat.delivery_price` = 39 kr (levering) + 39 kr (pakkeservice), minimumskøb 500 kr. Hjemlevering ses på `deliveryAddress.dawa_uid` / `recipient_name`.

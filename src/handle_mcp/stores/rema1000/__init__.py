@@ -27,6 +27,24 @@ from handle_mcp.stores.rema1000.shopping_list import RemaListMixin
 log = logging.getLogger(__name__)
 
 LEAFLET = 9001  # the label "Avisvare": this week's leaflet
+FIXED = "Avisvare, fast pris"
+# A shared category (stores.OFFER_CATEGORIES) is one or more departments: `filter[departments]`
+# takes a department id. No call lists them (live 2026-11-14: tests/fixtures/rema1000/README.md).
+DEPARTMENTS = {
+    "frugt og grønt": (20,),
+    "kød og fisk": (30,),
+    "mejeri og æg": (60, 70),  # Mejeri, Ost m.v.
+    "pålæg": (40,),  # Køl
+    "brød og kager": (10,),
+    "kolonial": (80, 160),  # Kolonial, Nemt & hurtigt
+    "frost": (50,),
+    "drikkevarer": (90,),
+    "slik og snacks": (130,),
+    "husholdning": (100,),
+    "pleje": (120,),
+    "baby": (110,),
+}
+
 PER_PAGE = 100  # the most one page gives
 UNITS = {"kg": "kg", "ltr": "l", "l": "l", "stk": "stk"}
 __all__ = ["NOTE", "Rema1000Store", "product"]
@@ -68,14 +86,17 @@ def _kr(value: Decimal) -> str:
 
 def _offer_text(period: dict, leaflet: bool) -> str:
     text = "Avisvare" if leaflet else "Tilbud"
+    if not period.get("is_campaign"):  # in the leaflet at a fixed price, for months
+        return FIXED
     most, over = period.get("max_quantity"), _money(period.get("price_over_max_quantity"))
     if isinstance(most, int) and most > 0 and over is not None:
         text += f", maks {most} stk. (derefter {_kr(over)} kr)"
     return text
 
 
-def product(hit: dict, now: datetime | None = None) -> Product | None:
-    """One product from search/products. None when it has no price."""
+def product(hit: dict, now: datetime | None = None, advertised: bool = False) -> Product | None:
+    """One product from search/products. None when it has no price. `advertised` (the offer
+    list): a leaflet product at a fixed price is an offer too."""
     prices = [p for p in hit.get("prices") or [] if isinstance(p, dict)]
     at = _current(prices, now or datetime.now(UTC))
     price = _money(prices[at].get("price")) if at is not None else None
@@ -84,7 +105,12 @@ def product(hit: dict, now: datetime | None = None) -> Product | None:
     period = prices[at]
     size, _, brand = str(hit.get("underline") or "").partition(" / ")
     labels = {lbl.get("id") for lbl in hit.get("labels") or [] if isinstance(lbl, dict)}
-    on_offer = bool(period.get("is_campaign"))
+    # A leaflet product can be advertised at a fixed price and be no campaign (live 2026-11-14:
+    # 191 of the leaflet's 416). The leaflet shows it, so the offer list does; no price before.
+    # In a search it stays a normal price: nothing is cheaper than before.
+    on_offer = bool(period.get("is_campaign")) or (
+        advertised and LEAFLET in labels and bool(period.get("is_advertised"))
+    )
     before = None
     if on_offer:  # the next period that is no offer: what it costs after the offer
         later = [p for p in prices[at + 1 :] if not p.get("is_campaign")]
@@ -114,6 +140,10 @@ def product(hit: dict, now: datetime | None = None) -> Product | None:
         campaign="Avisvare" if on_offer and LEAFLET in labels else None,
         max_per_order=most if on_offer and isinstance(most, int) and most > 0 else None,
     )
+
+
+def _campaigns_first(products: list[Product]) -> list[Product]:
+    return sorted(products, key=lambda p: p.offer_text == FIXED)  # stable: the store's order
 
 
 class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutritionMixin):
@@ -153,25 +183,48 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
         self, params: dict[str, Any], limit: int, offers_only: bool = False
     ) -> list[Product]:
         """Page until `limit` products. `offers_only` skips a leaflet product whose offer has
-        ended, before counting, so the limit is still filled."""
+        ended, before counting, so the limit is still filled. A fixed leaflet price does not
+        count either: the paging goes on until `limit` campaigns are found, and they come first,
+        so a fixed price never pushes a price cut out."""
         found: list[Product] = []
         page = 1
-        while len(found) < limit:
+        while sum(not offers_only or p.offer_text != FIXED for p in found) < limit:
             data = await self._get("search/products", params | {"per_page": PER_PAGE, "page": page})
-            hits = [product(hit) for hit in data["data"] if isinstance(hit, dict)]
+            hits = [
+                product(hit, advertised=offers_only)
+                for hit in data["data"]
+                if isinstance(hit, dict)
+            ]
             found += [p for p in hits if p and (p.on_offer or not offers_only)]
             last = ((data.get("meta") or {}).get("pagination") or {}).get("last_page") or 1
             if page >= last or not data["data"]:
                 break
             page += 1
-        return found[:limit]
+        return _campaigns_first(found)[:limit] if offers_only else found[:limit]
 
     async def search(self, query: str, limit: int = 10) -> list[Product]:
         return await self._products({"query": query}, limit)
 
-    async def offers(self, limit: int = 25) -> list[Product]:
+    async def offers(self, limit: int = 25, category: str | None = None) -> list[Product]:
+        """The leaflet (Avisvarer). With `category`: the leaflet in its departments, one call
+        per department at once."""
         params = {"filter[labels]": LEAFLET, "sort": "department"}
-        return await self._products(params, limit, offers_only=True)
+        if not category:
+            return await self._products(params, limit, offers_only=True)
+        found = await asyncio.gather(
+            *(
+                self._products(params | {"filter[departments]": dept}, limit, offers_only=True)
+                for dept in DEPARTMENTS[category]
+            ),
+            return_exceptions=True,
+        )
+        if failed := [f for f in found if isinstance(f, BaseException)]:
+            if len(failed) == len(found):  # one department failing must not hide the others
+                raise failed[0]
+            log.warning("REMA 1000: %d afdelinger fejlede: %r", len(failed), failed[0])
+        found = [f for f in found if not isinstance(f, BaseException)]
+        unique = {p.id: p for products in found for p in products}
+        return _campaigns_first(list(unique.values()))[:limit]
 
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
         raise NotImplementedError

@@ -1,0 +1,53 @@
+{
+ "hits": [],
+ "nbHits": 14644,
+ "page": 0,
+ "nbPages": 0,
+ "hitsPerPage": 0,
+ "facets": {
+  "categories.lvl0": {
+   "Non-food": 5273,
+   "Tøj": 2856,
+   "Kolonial": 1258,
+   "Drikke": 1213,
+   "Pleje": 1207,
+   "Kiosk": 711,
+   "Husholdning": 592,
+   "Køl": 471,
+   "Frost": 290,
+   "Brød og kager": 263,
+   "Mejeri": 240,
+   "Kød og fisk": 201,
+   "Frugt og grønt": 69
+  },
+  "consumerFacingHierarchy.lvl0": {
+   "Tøj & sko": 3168,
+   "Leg": 2473,
+   "Personlig pleje": 1506,
+   "Drikkevarer": 1225,
+   "Kolonial": 1105,
+   "Mejeri & køl": 802,
+   "Slik & snacks": 722,
+   "Fritid & sport": 643,
+   "Bolig & køkken": 560,
+   "Elektronik": 310,
+   "Byggemarked": 288,
+   "Frost": 287,
+   "Husholdning": 286,
+   "Brød & kager": 263,
+   "Dyremad": 242,
+   "Baby & børn": 209,
+   "Have": 161,
+   "Kød & fisk": 145,
+   "Mad fra hele verden": 109,
+   "Biludstyr": 96,
+   "Frugt & grønt": 24,
+   "Not Categorized": 20
+  }
+ },
+ "exhaustiveFacetsCount": true,
+ "exhaustiveTypo": true,
+ "query": "",
+ "params": "query=&hitsPerPage=0&filters=isInOffer%3A1653+AND+isInAssortmentIn%3A1653+AND+nonsearchable%3Afalse&facets=%5B%22categories.lvl0%22%2C+%22categories.lvl1%22%2C+%22consumerFacingHierarchy.lvl0%22%2C+%22consumerFacingHierarchy.lvl1%22%2C+%22searchHierachy%22%5D&maxValuesPerFacet=200",
+ "index": "prod_BILKATOGO_PRODUCTS"
+}

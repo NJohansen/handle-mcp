@@ -32,7 +32,12 @@ from handle_mcp.models import (
 )
 from handle_mcp.stores import StoreError, expired, has_login, load_login, save_session
 from handle_mcp.stores._http import request
-from handle_mcp.stores.bilkatogo.algolia import ALGOLIA, ALGOLIA_HEADERS, ALGOLIA_INDEX
+from handle_mcp.stores.bilkatogo.algolia import (
+    ALGOLIA,
+    ALGOLIA_HEADERS,
+    ALGOLIA_INDEX,
+    category_filter,
+)
 from handle_mcp.stores.bilkatogo.nutrition import BilkaNutritionMixin
 from handle_mcp.stores.bilkatogo.recipes import BilkaRecipesMixin
 
@@ -254,12 +259,18 @@ class BilkaStore(BilkaRecipesMixin, BilkaNutritionMixin):
     async def search(self, query: str, limit: int = 10) -> list[Product]:
         return await self._algolia(query, limit)
 
-    async def offers(self, limit: int = 25) -> list[Product]:
-        """Products on offer in our store: Skarp pris, leaflet offers and mix offers."""
-        return await self._algolia("", limit, offers=True)
+    async def offers(self, limit: int = 25, category: str | None = None) -> list[Product]:
+        """Products on offer in our store: Skarp pris, leaflet offers and mix offers. Without
+        `category` the first `limit` of every offer in the store, clothes and toys too."""
+        return await self._algolia("", limit, offers=True, category=category)
 
     async def _algolia(
-        self, query: str, limit: int, offers: bool = False, ids: list[str] | None = None
+        self,
+        query: str,
+        limit: int,
+        offers: bool = False,
+        ids: list[str] | None = None,
+        category: str | None = None,
     ) -> list[Product]:
         """Search, offers, or `ids`: the products with those Bilka item numbers (recipes)."""
         if not has_login(self.name):  # the assortment, prices and offers follow the address
@@ -276,6 +287,8 @@ class BilkaStore(BilkaRecipesMixin, BilkaNutritionMixin):
         filters = f"isInAssortmentIn:{sid} AND nonsearchable:false"
         if offers:  # isInOffer is a list of store ids, not true/false
             filters = f"isInOffer:{sid} AND {filters}"
+        if category:
+            filters = f"{category_filter(category)} AND {filters}"
         if ids:  # a recipe's products may be hidden from search: no nonsearchable filter
             filters = f"({' OR '.join(f'objectID:{i}' for i in ids)}) AND isInAssortmentIn:{sid}"
         params = urlencode(
@@ -296,6 +309,8 @@ class BilkaStore(BilkaRecipesMixin, BilkaNutritionMixin):
                         "deepestCategoryPath",
                         "price",  # the price without the offer
                         f"storeData.{sid}",
+                        "isInCurrentLeaflet",
+                        "leafletTitle",  # the leaflet's name for the offer
                     ]
                 ),
             }
@@ -321,6 +336,10 @@ class BilkaStore(BilkaRecipesMixin, BilkaNutritionMixin):
         offer = store.get("offerDescription") or None
         if offer in GENERIC_OFFERS:  # a leaflet offer with no text of its own
             offer = f"Tilbud, før {before:.2f} kr".replace(".", ",") if before else "Tilbud"
+        leaflet = str(hit.get("leafletTitle") or "").strip() if offer else ""
+        text = (
+            f"{offer} (avisen: {leaflet})" if hit.get("isInCurrentLeaflet") and leaflet else offer
+        )
         shown = store.get(
             "unitsOfMeasureShowPrice"
         )  # with the offer; unitsOfMeasurePrice is without
@@ -335,7 +354,7 @@ class BilkaStore(BilkaRecipesMixin, BilkaNutritionMixin):
             unit=UNITS.get(unit, unit or None),
             ean=hit.get("gtin") or None,
             on_offer=bool(offer),
-            offer_text=offer,
+            offer_text=text,
             before_price=before if offer else None,
             campaign=_campaign(offer),
             max_per_order=(int(store.get("offerMax") or 0) or None) if offer else None,

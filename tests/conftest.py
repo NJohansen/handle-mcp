@@ -83,7 +83,8 @@ class FakeStore:
             )
         ]
 
-    async def offers(self, limit=25):
+    async def offers(self, limit=25, category=None):
+        self.offer_calls = [*getattr(self, "offer_calls", []), (limit, category)]
         return await self.search("Tilbud", limit)
 
     async def get_cart(self):

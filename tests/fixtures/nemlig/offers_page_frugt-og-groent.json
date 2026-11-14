@@ -1,0 +1,348 @@
+{
+ "structuredData": {
+  "@context": "https://schema.org",
+  "@graph": [
+   {
+    "@type": "BreadcrumbList",
+    "@id": "https://www.nemlig.com/tilbud/frugt-og-groent#breadcrumb",
+    "itemListElement": [
+     {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hjem",
+      "item": "https://www.nemlig.com/"
+     },
+     {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tilbud",
+      "item": "https://www.nemlig.com/tilbud"
+     },
+     {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Frugt og grønt på tilbud",
+      "item": "https://www.nemlig.com/tilbud/frugt-og-groent"
+     }
+    ]
+   },
+   {
+    "@type": "WebSite",
+    "@id": "https://www.nemlig.com/#website",
+    "publisher": {
+     "@id": "https://www.nemlig.com/#organization"
+    },
+    "url": "https://www.nemlig.com/",
+    "name": "www.nemlig.com",
+    "potentialAction": {
+     "@type": "SearchAction",
+     "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://www.nemlig.com/soeg?query={search_term_string}"
+     },
+     "query-input": "required name=search_term_string"
+    }
+   }
+  ]
+ },
+ "id": "1f89fddb-6089-4bdf-bedb-9c84b6ee15c0",
+ "pageType": "themePage",
+ "title": "Frugt og grønt på tilbud",
+ "description": null,
+ "seo": {
+  "title": "Frugt og grønt på tilbud | Levering fra 0 kr.",
+  "description": "Se udvalget af frugt og grønt på tilbud og +9.000 andre dagligvarer. Danmarks bedste friskhedsgaranti. 1.500 Prismatchede varer. Levering fra 0 kr.",
+  "content": "<h2 dir=\"ltr\">Frugt og grønt på tilbud</h2>\n<p dir=\"ltr\">Her finder du ugens tilbud på frugt og grønt, fra bananer, æbler og bær til salat, kartofler og grøntsager til aftensmaden. Tilbuddene gælder fra mandag til søndag, så længe lager haves.</p>\n<p dir=\"ltr\">Med alle tilbuddene på frugt og grønt samlet ét sted kan du hurtigt se, hvad der er billigt i denne uge, og planlægge måltiderne ud fra det.</p>\n<h2 dir=\"ltr\">Sådan får du mest ud af tilbuddene</h2>\n<ul>\n<li>Planlæg ugens aftensmad ud fra de grøntsager, der er på tilbud</li>\n<li>Køb frugt og grønt i sæson, hvor priserne ofte er lavest</li>\n<li>Frys bær, bananer og hakkede grøntsager, hvis du køber mere, end du når at spise</li>\n</ul>\n<h2 dir=\"ltr\">FAQ - Frugt og grønt på tilbud</h2>\n<h3 dir=\"ltr\">Hvor længe gælder tilbuddene?</h3>\n<p dir=\"ltr\">Tilbuddene gælder fra mandag til søndag, så længe lager haves.</p>\n<h3 dir=\"ltr\">Kan man fryse frugt og grønt?</h3>\n<p dir=\"ltr\">Ja. Bær, bananer, spinat, ærter og hakkede grøntsager som løg, peberfrugt og gulerødder kan fryses i op til 12 måneder.</p>\n<h3 dir=\"ltr\">Hvordan holder frugt og grønt sig længst?</h3>\n<p dir=\"ltr\">Opbevar grøntsager som salat, gulerødder og broccoli i køleskabets grøntsagsskuffe, og hold æbler og bananer adskilt fra anden frugt.</p>",
+  "noIndex": false
+ },
+ "pageContent": [
+  {
+   "contentType": "ProductList",
+   "anchorId": "0-49c65160-bf50-435b-97cf-097ebb4b70fc",
+   "layout": "Showall",
+   "header": {
+    "title": "Friske favoritter til kurven",
+    "subtitle": null,
+    "image": null,
+    "button": null
+   },
+   "products": [
+    {
+     "id": "5058121",
+     "url": "5058121",
+     "title": "Æbler Granny Smith",
+     "description": "4 stk. /  ca. 500g",
+     "price": 1500,
+     "priceOriginal": 1800,
+     "priceDiscount": 300,
+     "pricePerUnit": {
+      "value": 375,
+      "unitType": "Pieces"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": null,
+     "labelHighlighted": null,
+     "certificates": [],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "3,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 3 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Stk.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5058121.webp",
+      "accessibilityText": "Billede af Æbler Granny Smith"
+     }
+    },
+    {
+     "id": "5001423",
+     "url": "5001423",
+     "title": "Pærer Conference",
+     "description": "1 kg",
+     "price": 1500,
+     "priceOriginal": 2300,
+     "priceDiscount": 800,
+     "pricePerUnit": {
+      "value": 1500,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": null,
+     "labelHighlighted": null,
+     "certificates": [],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "8,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 8 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5001423.webp",
+      "accessibilityText": "Billede af Pærer Conference"
+     }
+    },
+    {
+     "id": "5603155",
+     "url": "5603155",
+     "title": "Abrikoser øko.",
+     "description": "120 g / Urtekram",
+     "price": 2205,
+     "priceOriginal": 3675,
+     "priceDiscount": 1470,
+     "pricePerUnit": {
+      "value": 18375,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 90,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "40%",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 40 procent"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "SoldOut",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5603155.webp",
+      "accessibilityText": "Billede af Abrikoser øko."
+     }
+    },
+    {
+     "id": "5049872",
+     "url": "5049872",
+     "title": "Blåbær",
+     "description": "125 g",
+     "price": 1500,
+     "priceOriginal": 1800,
+     "priceDiscount": 300,
+     "pricePerUnit": {
+      "value": 12000,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": null,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "3,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 3 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5049872.webp",
+      "accessibilityText": "Billede af Blåbær"
+     }
+    },
+    {
+     "id": "5011243",
+     "url": "5011243",
+     "title": "Citroner øko.",
+     "description": "500 g",
+     "price": 1500,
+     "priceOriginal": 1800,
+     "priceDiscount": 300,
+     "pricePerUnit": {
+      "value": 3000,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": null,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "3,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 3 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5011243.webp",
+      "accessibilityText": "Billede af Citroner øko."
+     }
+    },
+    {
+     "id": "5006090",
+     "url": "5006090",
+     "title": "Kartofler",
+     "description": "2 kg",
+     "price": 1500,
+     "priceOriginal": 1800,
+     "priceDiscount": 300,
+     "pricePerUnit": {
+      "value": 750,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": null,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "3,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 3 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5006090.webp",
+      "accessibilityText": "Billede af Kartofler"
+     }
+    }
+   ]
+  }
+ ],
+ "topBanner": null,
+ "breadcrumbs": [
+  {
+   "title": "Tilbud",
+   "url": "/tilbud"
+  },
+  {
+   "title": "Frugt og grønt på tilbud",
+   "url": "/tilbud/frugt-og-groent"
+  }
+ ],
+ "navigationItems": []
+}

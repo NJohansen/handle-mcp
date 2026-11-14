@@ -37,6 +37,23 @@ CONFIG_DIR = Path(os.environ.get("HANDLE_CONFIG_DIR", "~/.config/handle-mcp")).e
 KEYCHAIN_SERVICE = "handle-mcp"  # one entry per store; the secret is {"email", "session"} as JSON
 
 
+# The categories list_offers takes. Each store maps a name to its own categories.
+OFFER_CATEGORIES = (
+    "frugt og grønt",
+    "kød og fisk",
+    "mejeri og æg",
+    "pålæg",
+    "brød og kager",
+    "kolonial",
+    "frost",
+    "drikkevarer",
+    "slik og snacks",
+    "husholdning",
+    "pleje",
+    "baby",
+)
+
+
 class StoreError(Exception):
     """A clear, user-facing failure from one store (login failed, API changed, ...)."""
 
@@ -56,7 +73,7 @@ class Store(Protocol):
     async def recipes_by_tag(
         self, tags: list[str], category: str | None = None, limit: int = 20
     ) -> list[Recipe]: ...
-    async def offers(self, limit: int = 25) -> list[Product]: ...
+    async def offers(self, limit: int = 25, category: str | None = None) -> list[Product]: ...
     async def nutrition(self, product_ids: list[str]) -> list[ProductNutrition]: ...
     async def get_cart(self) -> Cart: ...
     async def set_quantities(self, items: dict[str, int]) -> list[QuantityResult]: ...

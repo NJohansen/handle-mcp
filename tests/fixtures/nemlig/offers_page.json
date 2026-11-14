@@ -1,12 +1,52 @@
 {
+ "structuredData": {
+  "@context": "https://schema.org",
+  "@graph": [
+   {
+    "@type": "BreadcrumbList",
+    "@id": "https://www.nemlig.com/tilbud#breadcrumb",
+    "itemListElement": [
+     {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hjem",
+      "item": "https://www.nemlig.com/"
+     },
+     {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tilbud",
+      "item": "https://www.nemlig.com/tilbud"
+     }
+    ]
+   },
+   {
+    "@type": "WebSite",
+    "@id": "https://www.nemlig.com/#website",
+    "publisher": {
+     "@id": "https://www.nemlig.com/#organization"
+    },
+    "url": "https://www.nemlig.com/",
+    "name": "www.nemlig.com",
+    "potentialAction": {
+     "@type": "SearchAction",
+     "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://www.nemlig.com/soeg?query={search_term_string}"
+     },
+     "query-input": "required name=search_term_string"
+    }
+   }
+  ]
+ },
  "id": "566a9d12-f1a0-404d-a55f-a87afb16d26f",
  "pageType": "themePage",
  "title": "Tilbud",
  "description": null,
  "seo": {
-  "title": "",
-  "description": "",
-  "content": "",
+  "title": "Tilbud på dagligvarer | Find dine favoritter hos nemlig",
+  "description": "Se tilbud på dagligvarer hos nemlig, og find favoritter til dine måltider | Køb ind til hverdag og weekend, og læg tilbuddene i kurven.",
+  "content": "<h2 dir=\"ltr\">Tilbud på dagligvarer</h2>\n<p dir=\"ltr\">Gode tilbud skal ikke kræve, at du løber mellem fem butikker med tilbudsavisen under armen. Her har vi samlet ugens tilbud hos nemlig ét sted, så du kan fylde kurven til en god pris og få det hele leveret hjem.</p>\n<p dir=\"ltr\">Tilbuddene følger din leveringsdag og gælder fra mandag til søndag, så længe lager haves. Vælg din leveringsdag, så kan du se de tilbud, der gælder for dig.</p>\n<h2 dir=\"ltr\">Dagstilbud og datovarer</h2>\n<p dir=\"ltr\">Ud over ugens tilbud har vi også dagstilbud, som skifter fra dag til dag, og datovarer. Datovarer er varer, der ikke længere lever op til vores friskhedsgaranti, men som altid holder mindst en dag efter leveringsdagen. Du får en god pris, og vi undgår madspild. Det er en ret god handel for begge parter.</p>\n<h2 dir=\"ltr\">Skarp pris, priskup og køb flere, spar mere</h2>\n<p dir=\"ltr\">Vi har flere slags tilbud. Varer med “Skarp pris” er udvalgte varer til en særlig god pris i en periode, og ugens priskup er værd at holde øje med hver uge. Vi prismatcher også udvalgte varer, så du ikke behøver at tjekke prisen andre steder.</p>\n<p dir=\"ltr\">Skal du købe stort ind, så kig forbi <a href=\"https://www.nemlig.com/dagligvarer/koeb-flere-spar-mere\">køb flere, spar mere</a>. Her kan du mixe og matche mellem udvalgte varer og spare mere, jo flere du tager.</p>\n<h2 dir=\"ltr\">Gå ikke glip af næste uges tilbud</h2>\n<p dir=\"ltr\">Tilbuddene skifter hver uge. Vil du have dem direkte i indbakken, kan du <a href=\"https://www.nemlig.com/om-nemlig/varer-fordele/tilmeld-nyhedsbrev\">tilmelde dig vores nyhedsbrev</a>.</p>\n<h2 dir=\"ltr\">Vi leverer dine tilbud til døren</h2>\n<p dir=\"ltr\">Når du har fundet dine tilbud, bestiller du resten af dagligvarerne i samme omgang, og så kører vi det hele hjem til din dør. Du slipper for køen, slæbet og jagten på parkeringspladser og kan bruge tiden på noget, der er sjovere.</p>",
   "noIndex": false
  },
  "pageContent": [
@@ -1354,25 +1394,346 @@
   },
   {
    "contentType": "ProductList",
-   "anchorId": "10-49c65160-bf50-435b-97cf-097ebb4b70fc",
+   "anchorId": "15-7bc1c888-2abb-49ea-a57d-64bccff83933",
+   "layout": "Showall",
+   "header": {
+    "title": "Mejeri og æg",
+    "subtitle": null,
+    "image": null,
+    "button": {
+     "label": "Se alle",
+     "url": "/tilbud/mejeri-og-aeg"
+    }
+   },
    "products": [
     {
-     "id": "5066321",
-     "url": "5066321",
-     "title": "Æbler Kanzi",
-     "description": "8 stk. / ca. 1000g",
+     "id": "5038613",
+     "url": "5038613",
+     "title": "Smør (saltet)",
+     "description": "200 g / Lurpak",
+     "price": 1200,
+     "priceOriginal": 1995,
+     "priceDiscount": 795,
+     "pricePerUnit": {
+      "value": 6000,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 14,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "7,95",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 7,95 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5038613.webp",
+      "accessibilityText": "Billede af Smør (saltet)"
+     }
+    },
+    {
+     "id": "5040184",
+     "url": "5040184",
+     "title": "Mandelsmør øko.",
+     "description": "150 g / vegansk / Urtekram",
+     "price": 4753,
+     "priceOriginal": 7921,
+     "priceDiscount": 3168,
+     "pricePerUnit": {
+      "value": 31684,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 90,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      },
+      {
+       "type": "vegan",
+       "text": "Vegansk"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "40%",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 40 procent"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5040184.webp",
+      "accessibilityText": "Billede af Mandelsmør øko."
+     }
+    },
+    {
+     "id": "923214",
+     "url": "923214",
+     "title": "Yoghurt m. jordbær 0,4% øko.",
+     "description": "1 kg / Arla ØKO",
+     "price": 1600,
+     "priceOriginal": 2295,
+     "priceDiscount": 695,
+     "pricePerUnit": {
+      "value": 1600,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 8,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      },
+      {
+       "type": "animalWelfareHearts3",
+       "text": "Bedre dyrevelfærd (3 hjerter)"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "6,95",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 6,95 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/923214.webp",
+      "accessibilityText": "Billede af Yoghurt m. jordbær 0,4% øko."
+     }
+    },
+    {
+     "id": "706008",
+     "url": "706008",
+     "title": "Ost i skiver mild 45+",
+     "description": "240 g / Danbo / Arla Klovborg",
      "price": 2000,
+     "priceOriginal": 5001,
+     "priceDiscount": 3001,
+     "pricePerUnit": {
+      "value": 8333,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 14,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "refrigerated",
+       "text": "Køl"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Priskup",
+       "accessibilityText": "Priskup",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "30,01",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 30,01 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/706008.webp",
+      "accessibilityText": "Billede af Ost i skiver mild 45+"
+     }
+    }
+   ]
+  },
+  {
+   "contentType": "ProductList",
+   "anchorId": "19-2bdd7c29-fcbe-48cd-a08f-94d871e84ecb",
+   "layout": "Showall",
+   "header": {
+    "title": "Drikkevarer",
+    "subtitle": null,
+    "image": null,
+    "button": {
+     "label": "Se alle",
+     "url": "/tilbud/drikkevarer"
+    }
+   },
+   "products": [
+    {
+     "id": "106517",
+     "url": "106517",
+     "title": "Coca-Cola Zero",
+     "description": "1,50 l / ex. pant / indh. sødestoffer / Coca-Cola",
+     "price": 1800,
      "priceOriginal": null,
      "priceDiscount": null,
      "pricePerUnit": {
-      "value": 250,
+      "value": 1200,
+      "unitType": "Volume"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 30,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [
+      {
+       "type": "sugarFree",
+       "text": "Sukkerfri"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Mix 2 stk. 25,-",
+       "accessibilityText": "Mix 2 styk 25 kroner",
+       "url": null,
+       "campaignType": "Mix"
+      },
+      {
+       "text": "Priskup",
+       "accessibilityText": "Priskup",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "God pris",
+      "secondaryText": null,
+      "accessibilityText": "God pris"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Ltr.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/106517.webp",
+      "accessibilityText": "Billede af Coca-Cola Zero"
+     }
+    },
+    {
+     "id": "5604110",
+     "url": "5604110",
+     "title": "Anarkist IPA (0,5%) (dåse)",
+     "description": "6 x 0,33 l / ex. pant / alkoholfri / Anarkist",
+     "price": 7995,
+     "priceOriginal": null,
+     "priceDiscount": null,
+     "pricePerUnit": {
+      "value": 1331,
       "unitType": "Pieces"
      },
      "currency": "DKK",
      "labelMaxQuantity": null,
-     "labelFreshnessDays": null,
+     "labelFreshnessDays": 30,
      "labelHighlighted": null,
-     "certificates": [],
+     "certificates": [
+      {
+       "type": "alcoholFree",
+       "text": "Alkoholfri"
+      }
+     ],
      "campaignLines": [],
      "campaignBadge": {
       "primaryText": "God pris",
@@ -1390,8 +1751,415 @@
       "reasonMessage": []
      },
      "image": {
-      "source": "https://product-images.nemlig.io/5066321.webp",
-      "accessibilityText": "Billede af Æbler Kanzi"
+      "source": "https://product-images.nemlig.io/5604110.webp",
+      "accessibilityText": "Billede af Anarkist IPA (0,5%) (dåse)"
+     }
+    },
+    {
+     "id": "5070387",
+     "url": "5070387",
+     "title": "Harboe Classic 0,0% (dåse)",
+     "description": "6 x 0,33 l / ex. pant / alkoholfri / Harboe",
+     "price": 2850,
+     "priceOriginal": null,
+     "priceDiscount": null,
+     "pricePerUnit": {
+      "value": 475,
+      "unitType": "Pieces"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 30,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "alcoholFree",
+       "text": "Alkoholfri"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Mix 2 stk. 45,-",
+       "accessibilityText": "Mix 2 styk 45 kroner",
+       "url": null,
+       "campaignType": "Mix"
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "God pris",
+      "secondaryText": null,
+      "accessibilityText": "God pris"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Stk.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5070387.webp",
+      "accessibilityText": "Billede af Harboe Classic 0,0% (dåse)"
+     }
+    },
+    {
+     "id": "5605401",
+     "url": "5605401",
+     "title": "Implosion 0,3% (dåse)",
+     "description": "6 x 0,33 l / ex. pant / alkoholfri / To Øl",
+     "price": 6900,
+     "priceOriginal": 7900,
+     "priceDiscount": 1000,
+     "pricePerUnit": {
+      "value": 1150,
+      "unitType": "Pieces"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 60,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "alcoholFree",
+       "text": "Alkoholfri"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "10,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 10 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Stk.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5605401.webp",
+      "accessibilityText": "Billede af Implosion 0,3% (dåse)"
+     }
+    },
+    {
+     "id": "5602213",
+     "url": "5602213",
+     "title": "San Pellegrino",
+     "description": "0,50 l / ex. pant / San Pellegrino",
+     "price": 2095,
+     "priceOriginal": null,
+     "priceDiscount": null,
+     "pricePerUnit": {
+      "value": 4190,
+      "unitType": "Volume"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 90,
+     "labelHighlighted": {
+      "type": "Premium",
+      "url": "/dagligvarer/nye-varer-inspiration/premium"
+     },
+     "certificates": [],
+     "campaignLines": [
+      {
+       "text": "6 stk. 69,-",
+       "accessibilityText": "6 styk 69 kroner",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "56,70",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 56,70 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Ltr.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5602213.webp",
+      "accessibilityText": "Billede af San Pellegrino"
+     }
+    }
+   ]
+  },
+  {
+   "contentType": "ProductList",
+   "anchorId": "22-c310af43-cdb8-4c90-b884-011a5b1e5446",
+   "layout": "Showall",
+   "header": {
+    "title": "Brød, kiks og kager",
+    "subtitle": null,
+    "image": null,
+    "button": {
+     "label": "Se alle",
+     "url": "/tilbud/broed-kiks-og-kager"
+    }
+   },
+   "products": [
+    {
+     "id": "5606369",
+     "url": "5606369",
+     "title": "Tasty sandwich",
+     "description": "4 stk. / 400 g  / Schulstad - Det Gode",
+     "price": 0,
+     "priceOriginal": 2245,
+     "priceDiscount": 2245,
+     "pricePerUnit": {
+      "value": 0,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": 1,
+     "labelFreshnessDays": 2,
+     "labelHighlighted": null,
+     "certificates": [],
+     "campaignLines": [
+      {
+       "text": "En gave til dig",
+       "accessibilityText": "En gave til dig",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "Gratis",
+      "secondaryText": null,
+      "accessibilityText": "Gratis"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "SoldOut",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5606369.webp",
+      "accessibilityText": "Billede af Tasty sandwich"
+     }
+    },
+    {
+     "id": "5055078",
+     "url": "5055078",
+     "title": "Veganske æbleskiver øko.",
+     "description": "Ca. 12 stk. / 360 g / frost / Karen Volf",
+     "price": 2700,
+     "priceOriginal": 3375,
+     "priceDiscount": 675,
+     "pricePerUnit": {
+      "value": 7500,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 30,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "dkProduced",
+       "text": "Produceret i Danmark"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      },
+      {
+       "type": "frozen",
+       "text": "Frost"
+      },
+      {
+       "type": "vegan",
+       "text": "Vegansk"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "20%",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 20 procent"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5055078.webp",
+      "accessibilityText": "Billede af Veganske æbleskiver øko."
+     }
+    },
+    {
+     "id": "5062435",
+     "url": "5062435",
+     "title": "Knækbrød (flatbrød)",
+     "description": "190 g / Wasa",
+     "price": 2000,
+     "priceOriginal": null,
+     "priceDiscount": null,
+     "pricePerUnit": {
+      "value": 10526,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 30,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "nordicKeyholeLabel",
+       "text": "Nøglehulsmærket"
+      },
+      {
+       "type": "wholeGrain",
+       "text": "Fuldkornsmærket"
+      }
+     ],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "God pris",
+      "secondaryText": null,
+      "accessibilityText": "God pris"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5062435.webp",
+      "accessibilityText": "Billede af Knækbrød (flatbrød)"
+     }
+    },
+    {
+     "id": "5047400",
+     "url": "5047400",
+     "title": "Brødstænger m. havsalt",
+     "description": "250 g / Deli Drengene",
+     "price": 3150,
+     "priceOriginal": null,
+     "priceDiscount": null,
+     "pricePerUnit": {
+      "value": 15750,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 90,
+     "labelHighlighted": null,
+     "certificates": [],
+     "campaignLines": [
+      {
+       "text": "Mix 2 stk. 50,-",
+       "accessibilityText": "Mix 2 styk 50 kroner",
+       "url": null,
+       "campaignType": "Mix"
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "13,-",
+      "secondaryText": "Spar op til",
+      "accessibilityText": "Spar op til 13 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5047400.webp",
+      "accessibilityText": "Billede af Brødstænger m. havsalt"
+     }
+    }
+   ]
+  },
+  {
+   "contentType": "ProductList",
+   "anchorId": "10-49c65160-bf50-435b-97cf-097ebb4b70fc",
+   "layout": "Showall",
+   "header": {
+    "title": "Frugt og grønt",
+    "subtitle": null,
+    "image": null,
+    "button": {
+     "label": "Se alle",
+     "url": "/tilbud/frugt-og-groent"
+    }
+   },
+   "products": [
+    {
+     "id": "5058121",
+     "url": "5058121",
+     "title": "Æbler Granny Smith",
+     "description": "4 stk. /  ca. 500g",
+     "price": 1500,
+     "priceOriginal": 1800,
+     "priceDiscount": 300,
+     "pricePerUnit": {
+      "value": 375,
+      "unitType": "Pieces"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": null,
+     "labelHighlighted": null,
+     "certificates": [],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "3,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 3 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Stk.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5058121.webp",
+      "accessibilityText": "Billede af Æbler Granny Smith"
      }
     },
     {
@@ -1446,15 +2214,141 @@
       "source": "https://product-images.nemlig.io/5024698.webp",
       "accessibilityText": "Billede af Bergamotte citron øko."
      }
+    },
+    {
+     "id": "5001423",
+     "url": "5001423",
+     "title": "Pærer Conference",
+     "description": "1 kg",
+     "price": 1500,
+     "priceOriginal": 2300,
+     "priceDiscount": 800,
+     "pricePerUnit": {
+      "value": 1500,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": null,
+     "labelHighlighted": null,
+     "certificates": [],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "8,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 8 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5001423.webp",
+      "accessibilityText": "Billede af Pærer Conference"
+     }
+    },
+    {
+     "id": "5603155",
+     "url": "5603155",
+     "title": "Abrikoser øko.",
+     "description": "120 g / Urtekram",
+     "price": 2205,
+     "priceOriginal": 3675,
+     "priceDiscount": 1470,
+     "pricePerUnit": {
+      "value": 18375,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": 90,
+     "labelHighlighted": null,
+     "certificates": [
+      {
+       "type": "dkOrganic",
+       "text": "Øko (dansk)"
+      },
+      {
+       "type": "euOrganic",
+       "text": "Øko (europæisk)"
+      }
+     ],
+     "campaignLines": [
+      {
+       "text": "Skarp pris",
+       "accessibilityText": "Skarp pris",
+       "url": null,
+       "campaignType": null
+      }
+     ],
+     "campaignBadge": {
+      "primaryText": "40%",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 40 procent"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "SoldOut",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5603155.webp",
+      "accessibilityText": "Billede af Abrikoser øko."
+     }
+    },
+    {
+     "id": "5049872",
+     "url": "5049872",
+     "title": "Blåbær",
+     "description": "125 g",
+     "price": 1500,
+     "priceOriginal": 1800,
+     "priceDiscount": 300,
+     "pricePerUnit": {
+      "value": 12000,
+      "unitType": "Weight"
+     },
+     "currency": "DKK",
+     "labelMaxQuantity": null,
+     "labelFreshnessDays": null,
+     "labelHighlighted": {
+      "type": "PriceMatch",
+      "url": "/dagligvarer/nye-varer-inspiration/prismatch"
+     },
+     "certificates": [],
+     "campaignLines": [],
+     "campaignBadge": {
+      "primaryText": "3,-",
+      "secondaryText": "Spar",
+      "accessibilityText": "Spar 3 kroner"
+     },
+     "quantity": 0,
+     "unitOfMeasure": "Kg.",
+     "quantityLimit": null,
+     "isFavorite": false,
+     "isInShoppingList": false,
+     "availability": {
+      "type": "Available",
+      "nextAvailableDate": "0001-01-01T00:00:00Z",
+      "reasonMessage": []
+     },
+     "image": {
+      "source": "https://product-images.nemlig.io/5049872.webp",
+      "accessibilityText": "Billede af Blåbær"
+     }
     }
-   ],
-   "layout": "Showall",
-   "header": {
-    "title": "Frugt og grønt",
-    "subtitle": null,
-    "image": null,
-    "button": null
-   }
+   ]
   }
  ],
  "topBanner": {
@@ -1484,7 +2378,7 @@
  "navigationItems": [
   {
    "title": "Skarp pris",
-   "anchorId": "2-88b4e263-59f7-44ee-96b9-290fe463646b",
+   "anchorId": "1-88b4e263-59f7-44ee-96b9-290fe463646b",
    "image": {
     "source": "https://media.umbraco.io/nemlig3/042px1js/skarppris.png?mode=crop&anchor=center&width=64&height=64",
     "accessibilityText": "Skarp Pris"
@@ -1492,18 +2386,10 @@
   },
   {
    "title": "Priskup",
-   "anchorId": "4-3779700e-3897-4ca5-8e37-7510942c2267",
+   "anchorId": "3-3779700e-3897-4ca5-8e37-7510942c2267",
    "image": {
     "source": "https://media.umbraco.io/nemlig3/luzg50su/priskup.png?mode=crop&anchor=center&width=64&height=64",
     "accessibilityText": "Priskup"
-   }
-  },
-  {
-   "title": "Gratis",
-   "anchorId": "6-495d0786-0cd1-428f-8e71-910e2b8c31c9",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/cuudx4w0/graftis-gave.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Gratis gave"
    }
   },
   {
@@ -1531,147 +2417,27 @@
    }
   },
   {
-   "title": "Kød",
-   "anchorId": "12-fd228920-2cb1-415e-811b-bc0cb58814c7",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/gbii4ffm/koed.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Kød"
-   }
-  },
-  {
-   "title": "Fisk og skaldyr",
-   "anchorId": "14-a72be593-c62c-436c-b244-3e7449279c08",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/rtxl3fjn/fisk-og-skaldyr.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Fisk og skaldyr"
-   }
-  },
-  {
    "title": "Mejeri og æg",
-   "anchorId": "16-7bc1c888-2abb-49ea-a57d-64bccff83933",
+   "anchorId": "15-7bc1c888-2abb-49ea-a57d-64bccff83933",
    "image": {
     "source": "https://media.umbraco.io/nemlig3/reyjoedp/mejeri-og-aeg.png?mode=crop&anchor=center&width=64&height=64",
     "accessibilityText": "Mejeri og æg"
    }
   },
   {
-   "title": "Pålæg",
-   "anchorId": "17-d8caafc2-e482-4e86-b3f5-8dba7fe018c3",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/nbqdqzhp/paalaeg.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Pålæg"
-   }
-  },
-  {
-   "title": "Færdig mad",
-   "anchorId": "18-bfb562c2-5472-475b-a46c-05f070d5d66e",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/pcfjlpuj/faerdig-mad.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Færdig mad"
-   }
-  },
-  {
-   "title": "Plantebaseret",
-   "anchorId": "19-cae01c44-dbcb-4bc3-9502-ef0851bd0474",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/v40hhs5e/plantebaseret.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Plantebaseret"
-   }
-  },
-  {
    "title": "Drikkevarer",
-   "anchorId": "20-2bdd7c29-fcbe-48cd-a08f-94d871e84ecb",
+   "anchorId": "19-2bdd7c29-fcbe-48cd-a08f-94d871e84ecb",
    "image": {
     "source": "https://media.umbraco.io/nemlig3/4vsltanp/drikkevarer.png?mode=crop&anchor=center&width=64&height=64",
     "accessibilityText": "Drikkevarer"
    }
   },
   {
-   "title": "Vin og spiritus",
-   "anchorId": "21-1af0ae15-e97d-404b-ab97-a947b861693b",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/rgggx0vh/vin.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Vin"
-   }
-  },
-  {
-   "title": "Ris, pasta og konserves",
-   "anchorId": "22-2dbd30ec-84f9-4898-9dea-e638c18cddf3",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/1qpgch03/ris-pasta-og-konserves.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Konserves3"
-   }
-  },
-  {
    "title": "Brød, kiks og kager",
-   "anchorId": "23-c310af43-cdb8-4c90-b884-011a5b1e5446",
+   "anchorId": "22-c310af43-cdb8-4c90-b884-011a5b1e5446",
    "image": {
     "source": "https://media.umbraco.io/nemlig3/ui3bcukg/broed-kiks-kager.png?mode=crop&anchor=center&width=64&height=64",
     "accessibilityText": "Brød"
-   }
-  },
-  {
-   "title": "Morgenmad og müsli",
-   "anchorId": "25-e8ebf36a-8731-4d01-aca2-781588e9bc3f",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/zzjjii4o/morgenmad-musli.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Morgenmad og musli"
-   }
-  },
-  {
-   "title": "Frost",
-   "anchorId": "26-d925f4e8-440a-49e4-ad3a-058479c43b21",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/crehof4z/frost.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Frost"
-   }
-  },
-  {
-   "title": "Chips, slik og snacks",
-   "anchorId": "27-4f06030f-3c4b-4962-acba-92af0ef726b0",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/bspl420a/chips-slik-snacks.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Chips"
-   }
-  },
-  {
-   "title": "Husholdning",
-   "anchorId": "28-8ed6fe9f-38c1-44b5-b3f7-d9e70ff518d5",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/31ylz0qd/husholdning.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Husholdning"
-   }
-  },
-  {
-   "title": "Pleje",
-   "anchorId": "29-70b10032-e6c4-4225-847c-663ab453d938",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/sh4bhg5q/pleje.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Pleje"
-   }
-  },
-  {
-   "title": "Baby, børn og legetøj",
-   "anchorId": "30-3bd78ae0-dafc-4776-a705-4ec2831224a4",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/35od3gdk/baby-boern-legetoej.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Bleer"
-   }
-  },
-  {
-   "title": "Dyremad og tilbehør",
-   "anchorId": "31-d336384d-2571-4ff5-b44c-b36ea4728bf4",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/du3lgenn/dyremad.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Dyremad"
-   }
-  },
-  {
-   "title": "Blomster og planter",
-   "anchorId": "32-3b37d6a6-bf8b-4fa2-963f-39720ce82bb8",
-   "image": {
-    "source": "https://media.umbraco.io/nemlig3/yj4nhldz/blomster-planter.png?mode=crop&anchor=center&width=64&height=64",
-    "accessibilityText": "Blomster"
    }
   }
  ]

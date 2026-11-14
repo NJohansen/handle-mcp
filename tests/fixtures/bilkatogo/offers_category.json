@@ -1,0 +1,336 @@
+{
+ "hits": [
+  {
+   "storeData": {
+    "1653": {
+     "inStock": true,
+     "multipromo": "2680",
+     "offerDescription": "Mix 10 for 25,00",
+     "offerFrom": "",
+     "offerUntil": "",
+     "offerMax": 0,
+     "offerMaxDescription": "",
+     "offerCount": 10,
+     "price": 275,
+     "beforePrice": 0,
+     "multiPromoPrice": "2500",
+     "unitsOfMeasurePrice": 275,
+     "unitsOfMeasurePriceUnit": "Stk.",
+     "unitsOfMeasureOfferPrice": 250,
+     "unitsOfMeasureShowPrice": 275
+    }
+   },
+   "price": 275,
+   "isInCurrentLeaflet": false,
+   "leafletTitle": "",
+   "gtin": "5712873461653",
+   "name": "Bananer",
+   "brand": "",
+   "netcontent": "1 stk",
+   "consumerFacingHierarchy": {
+    "lvl0": [
+     "Frugt & grønt"
+    ],
+    "lvl1": [
+     "Frugt & grønt > Frugt"
+    ],
+    "lvl2": [
+     "Frugt & grønt > Frugt > Bananer"
+    ]
+   },
+   "deepestCategoryPath": "Frugt & grønt > Frugt > Bananer",
+   "categories": {
+    "lvl0": [
+     "Frugt og grønt"
+    ],
+    "lvl1": [
+     "Frugt og grønt > Frugt og bær"
+    ],
+    "lvl2": [
+     "Frugt og grønt > Frugt og bær > Banan, pærer og æbler"
+    ]
+   },
+   "productType": "Bananer",
+   "objectID": "18381"
+  },
+  {
+   "storeData": {
+    "1653": {
+     "inStock": true,
+     "multipromo": "2681",
+     "offerDescription": "Mix 3 for 35,00",
+     "offerFrom": "",
+     "offerUntil": "",
+     "offerMax": 0,
+     "offerMaxDescription": "",
+     "offerCount": 3,
+     "price": 1300,
+     "beforePrice": 0,
+     "multiPromoPrice": "3500",
+     "unitsOfMeasurePrice": 433,
+     "unitsOfMeasurePriceUnit": "Stk.",
+     "unitsOfMeasureOfferPrice": 389,
+     "unitsOfMeasureShowPrice": 433
+    }
+   },
+   "price": 1300,
+   "isInCurrentLeaflet": false,
+   "leafletTitle": "",
+   "gtin": "5712873514977",
+   "name": "Skoleagurker 3 pak",
+   "brand": "Salling",
+   "netcontent": "3 stk",
+   "consumerFacingHierarchy": {
+    "lvl0": [
+     "Frugt & grønt"
+    ],
+    "lvl1": [
+     "Frugt & grønt > Grøntsager"
+    ],
+    "lvl2": [
+     "Frugt & grønt > Grøntsager > Agurker"
+    ]
+   },
+   "deepestCategoryPath": "Frugt & grønt > Grøntsager > Agurker",
+   "categories": {
+    "lvl0": [
+     "Frugt og grønt"
+    ],
+    "lvl1": [
+     "Frugt og grønt > Grønt, salat og krydderurter"
+    ],
+    "lvl2": [
+     "Frugt og grønt > Grønt, salat og krydderurter > Agurk og tomat"
+    ]
+   },
+   "productType": "Skoleagurker",
+   "objectID": "71729"
+  },
+  {
+   "storeData": {
+    "1653": {
+     "inStock": true,
+     "multipromo": "",
+     "offerDescription": "Skarp pris",
+     "offerFrom": "",
+     "offerUntil": "",
+     "offerMax": 0,
+     "offerMaxDescription": "",
+     "offerCount": 0,
+     "price": 1400,
+     "beforePrice": 0,
+     "multiPromoPrice": "",
+     "unitsOfMeasurePrice": 2250,
+     "unitsOfMeasurePriceUnit": "Kg.",
+     "unitsOfMeasureOfferPrice": 1750,
+     "unitsOfMeasureShowPrice": 1750
+    }
+   },
+   "price": 1800,
+   "isInCurrentLeaflet": true,
+   "leafletTitle": "Økologiske danske håndsorterede gulerødder",
+   "gtin": "5712870248851",
+   "name": "Håndsorterede gulerødder 800 g",
+   "brand": "Salling ØKO",
+   "netcontent": "800 g",
+   "consumerFacingHierarchy": {
+    "lvl0": [
+     "Frugt & grønt"
+    ],
+    "lvl1": [
+     "Frugt & grønt > Grøntsager"
+    ],
+    "lvl2": [
+     "Frugt & grønt > Grøntsager > Kartofler & rodfrugter"
+    ],
+    "lvl3": [
+     "Frugt & grønt > Grøntsager > Kartofler & rodfrugter > Gulerødder"
+    ]
+   },
+   "deepestCategoryPath": "Frugt & grønt > Grøntsager > Kartofler & rodfrugter > Gulerødder",
+   "categories": {
+    "lvl0": [
+     "Frugt og grønt"
+    ],
+    "lvl1": [
+     "Frugt og grønt > Grønt, salat og krydderurter"
+    ],
+    "lvl2": [
+     "Frugt og grønt > Grønt, salat og krydderurter > Gulerødder og rodfrugter"
+    ]
+   },
+   "productType": "Gulerødder",
+   "objectID": "41870"
+  },
+  {
+   "storeData": {
+    "1653": {
+     "inStock": true,
+     "multipromo": "",
+     "offerDescription": "Skarp pris",
+     "offerFrom": "",
+     "offerUntil": "",
+     "offerMax": 0,
+     "offerMaxDescription": "",
+     "offerCount": 0,
+     "price": 1600,
+     "beforePrice": 0,
+     "multiPromoPrice": "",
+     "unitsOfMeasurePrice": 1333,
+     "unitsOfMeasurePriceUnit": "Kg.",
+     "unitsOfMeasureOfferPrice": 1067,
+     "unitsOfMeasureShowPrice": 1067
+    }
+   },
+   "price": 2000,
+   "isInCurrentLeaflet": true,
+   "leafletTitle": "Danske lammefjordskartofler",
+   "gtin": "5712877789128",
+   "name": "Lammefjordskartofler",
+   "brand": "",
+   "netcontent": "1.5 kg",
+   "consumerFacingHierarchy": {
+    "lvl0": [
+     "Frugt & grønt"
+    ],
+    "lvl1": [
+     "Frugt & grønt > Grøntsager"
+    ],
+    "lvl2": [
+     "Frugt & grønt > Grøntsager > Kartofler & rodfrugter"
+    ],
+    "lvl3": [
+     "Frugt & grønt > Grøntsager > Kartofler & rodfrugter > Kartofler"
+    ]
+   },
+   "deepestCategoryPath": "Frugt & grønt > Grøntsager > Kartofler & rodfrugter > Kartofler",
+   "categories": {
+    "lvl0": [
+     "Frugt og grønt"
+    ],
+    "lvl1": [
+     "Frugt og grønt > Grønt, salat og krydderurter"
+    ],
+    "lvl2": [
+     "Frugt og grønt > Grønt, salat og krydderurter > Kartofler"
+    ]
+   },
+   "productType": "Kartofler",
+   "objectID": "153856"
+  },
+  {
+   "storeData": {
+    "1653": {
+     "inStock": true,
+     "multipromo": "",
+     "offerDescription": "Se Her",
+     "offerFrom": "",
+     "offerUntil": "",
+     "offerMax": 0,
+     "offerMaxDescription": "",
+     "offerCount": 0,
+     "price": 3500,
+     "beforePrice": 0,
+     "multiPromoPrice": "",
+     "unitsOfMeasurePrice": 7800,
+     "unitsOfMeasurePriceUnit": "Kg.",
+     "unitsOfMeasureOfferPrice": 7000,
+     "unitsOfMeasureShowPrice": 7000
+    }
+   },
+   "price": 3900,
+   "isInCurrentLeaflet": true,
+   "leafletTitle": "Deglet Nour dadler",
+   "gtin": "5708147007146",
+   "name": "Dadler Deglet Noir øko",
+   "brand": "Green Dates",
+   "netcontent": "500 g",
+   "consumerFacingHierarchy": {
+    "lvl0": [
+     "Frugt & grønt"
+    ],
+    "lvl1": [
+     "Frugt & grønt > Frugt"
+    ],
+    "lvl2": [
+     "Frugt & grønt > Frugt > Stenfrugt & druer"
+    ]
+   },
+   "deepestCategoryPath": "Frugt & grønt > Frugt > Stenfrugt & druer",
+   "categories": {
+    "lvl0": [
+     "Frugt og grønt"
+    ],
+    "lvl1": [
+     "Frugt og grønt > Nødder og tørret frugt"
+    ],
+    "lvl2": [
+     "Frugt og grønt > Nødder og tørret frugt > Tørret frugt"
+    ]
+   },
+   "productType": "Dadler",
+   "objectID": "121987"
+  },
+  {
+   "storeData": {
+    "1653": {
+     "inStock": true,
+     "multipromo": "",
+     "offerDescription": "Se Her",
+     "offerFrom": "",
+     "offerUntil": "",
+     "offerMax": 0,
+     "offerMaxDescription": "",
+     "offerCount": 0,
+     "price": 500,
+     "beforePrice": 0,
+     "multiPromoPrice": "",
+     "unitsOfMeasurePrice": 600,
+     "unitsOfMeasurePriceUnit": "Stk.",
+     "unitsOfMeasureOfferPrice": 500,
+     "unitsOfMeasureShowPrice": 500
+    }
+   },
+   "price": 600,
+   "isInCurrentLeaflet": true,
+   "leafletTitle": "Kaki",
+   "gtin": "5710405076641",
+   "name": "Kakifrugt",
+   "brand": "",
+   "netcontent": "1 stk",
+   "consumerFacingHierarchy": {
+    "lvl0": [
+     "Frugt & grønt"
+    ],
+    "lvl1": [
+     "Frugt & grønt > Frugt"
+    ],
+    "lvl2": [
+     "Frugt & grønt > Frugt > Eksotiske frugter"
+    ]
+   },
+   "deepestCategoryPath": "Frugt & grønt > Frugt > Eksotiske frugter",
+   "categories": {
+    "lvl0": [
+     "Frugt og grønt"
+    ],
+    "lvl1": [
+     "Frugt og grønt > Frugt og bær"
+    ],
+    "lvl2": [
+     "Frugt og grønt > Frugt og bær > Eksotisk frugt"
+    ]
+   },
+   "productType": "Kakifrugter",
+   "objectID": "179775"
+  }
+ ],
+ "nbHits": 24,
+ "page": 0,
+ "nbPages": 1,
+ "hitsPerPage": 100,
+ "exhaustiveTypo": true,
+ "query": "",
+ "params": "query=&hitsPerPage=100&filters=consumerFacingHierarchy.lvl0%3A%22Frugt+%26+gr%C3%B8nt%22+AND+isInOffer%3A1653+AND+isInAssortmentIn%3A1653+AND+nonsearchable%3Afalse&attributesToRetrieve=%5B%22name%22%2C+%22brand%22%2C+%22gtin%22%2C+%22netcontent%22%2C+%22productType%22%2C+%22deepestCategoryPath%22%2C+%22price%22%2C+%22storeData.1653%22%2C+%22leafletTitle%22%2C+%22isInCurrentLeaflet%22%2C+%22categories%22%2C+%22consumerFacingHierarchy%22%5D",
+ "index": "prod_BILKATOGO_PRODUCTS"
+}

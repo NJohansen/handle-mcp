@@ -18,6 +18,33 @@ store id. Offer fields are in `storeData.<sid>`: `offerDescription` ("Skarp pris
 `offerCount` for mix offers, `offerMax` / `offerMaxDescription`, `offerFrom` / `offerUntil`
 (empty in this capture), `beforePrice` (0 in this capture).
 
+## Offers by category (live capture, 2026-11-14, public search-only key, read-only)
+
+Same endpoint and index as `algolia_offers.json`. The store id in `params` and the `storeData`
+key are replaced with 1653, the public store id the other fixtures use, so the counts belong to
+another store than 1653. `_highlightResult` and Algolia's timing fields are removed.
+
+`offers_facets.json`: `query=&hitsPerPage=0&filters=isInOffer:<sid> AND isInAssortmentIn:<sid>
+AND nonsearchable:false&facets=[...]&maxValuesPerFacet=200`. The index has two category trees,
+both facets: `categories.lvl0`-`lvl2` (13 top names, "Frugt og grønt") and
+`consumerFacingHierarchy.lvl0`-`lvl4` (22 top names, "Frugt & grønt"; the tree behind
+`deepestCategoryPath`). The file keeps `lvl0` of both; the call also asked for `lvl1` and
+`searchHierachy`. `nbHits` is every offer in the store: 14,644.
+
+`offers_category.json`: the offers in one category:
+
+    filters=consumerFacingHierarchy.lvl0:"Frugt & grønt" AND isInOffer:<sid>
+            AND isInAssortmentIn:<sid> AND nonsearchable:false
+    attributesToRetrieve=[name,brand,gtin,netcontent,productType,deepestCategoryPath,price,
+                          storeData.<sid>,leafletTitle,isInCurrentLeaflet,categories,
+                          consumerFacingHierarchy]
+
+24 hits, cut to 6: two mix offers ("Mix 10 for 25,00", "Mix 3 for 35,00"), two "Skarp pris" and
+two "Se Her". The last four are in the leaflet: `isInCurrentLeaflet` true and `leafletTitle`
+the leaflet's name for the offer ("Danske lammefjordskartofler"); the mix offers have
+`isInCurrentLeaflet` false and `leafletTitle` "". `categories.lvl0:"Frugt og grønt"` gives 69
+hits instead: it also holds 43 products from "Mejeri & køl" (sandwich salads) in the other tree.
+
 ## `available_delivery_dates.json` (live capture, 2026-11-02, logged in, read-only GET)
 
 `GET https://api.bilkatogo.dk/api/shop/v3/AvailableDeliveryDates?u=w`, trimmed to 3 days. `uid`,

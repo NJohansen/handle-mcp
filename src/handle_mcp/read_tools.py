@@ -11,6 +11,8 @@ from pydantic import Field
 
 from handle_mcp import compare
 from handle_mcp.app import (
+    CATEGORY_RESULTS,
+    MAX_CATEGORY_RESULTS,
     MAX_ITEMS,
     MAX_RESULTS,
     READ,
@@ -23,6 +25,7 @@ from handle_mcp.app import (
     _persons,
     _tool,
 )
+from handle_mcp.stores import OFFER_CATEGORIES
 
 
 @_tool(READ)
@@ -109,16 +112,38 @@ async def list_recipes(
 @_tool(READ)
 async def list_offers(
     stores: StoreNames = None,
-    limit: Annotated[int, Field(description="Products per offer list, 1-25.")] = 25,
+    limit: Annotated[
+        int | None,
+        Field(
+            description="Without `category`: products per offer list, 1-25 (default 25). "
+            "With it: products per store, 1-100 (default 60)."
+        ),
+    ] = None,
+    category: Annotated[
+        str | None,
+        Field(description="One category: " + ", ".join(f'"{c}"' for c in OFFER_CATEGORIES) + "."),
+    ] = None,
 ) -> dict:
-    """List this week's offers in each store, also items you would not search for: nemlig's
-    Skarp pris, Priskup, Dagstilbud, Undgå madspild and gifts; BilkaToGo's offers; REMA 1000's
-    leaflet (Avisvarer, often with a max per customer in offer_text). `limit` is
-    per list; a product on two lists is shown once. A list the store fails to send is left out
-    (see the server log). Free gifts come from a separate search and are not cut by `limit`.
-    They have price 0 and "max_per_order". Use them when they fit the plan."""
-    limit = max(1, min(limit, MAX_RESULTS))
-    return _out(await _each(_names(stores), lambda s: s.offers(limit)))
+    """List this week's offers in each store, also items you would not search for. For one
+    named product, use search_products.
+    Without `category`, a first look only: nemlig's Skarp pris, Priskup, Dagstilbud, Undgå
+    madspild and gifts; the first of BilkaToGo's offers; REMA 1000's leaflet (Avisvarer). For a
+    meal plan or a shopping list, call once per `category` you buy from: every offer in it, in
+    each store.
+    Each product has price, before_price and offer_until (null when the store does not say),
+    offer_text (multi-buy, max per customer) and campaign (the store's name for the offer). A
+    product on two lists is shown once. A list the store fails to send is left out (see the
+    server log). Free gifts have price 0, max_per_order and their own product id, and are not
+    cut by `limit`."""
+    if category is not None:
+        category = category.strip().lower()
+        if category not in OFFER_CATEGORIES:
+            known = ", ".join(OFFER_CATEGORIES)
+            raise ToolError(f"Ukendt kategori '{category}'. Vælg en af: {known}.")
+        limit = max(1, min(limit or CATEGORY_RESULTS, MAX_CATEGORY_RESULTS))
+    else:
+        limit = max(1, min(limit or MAX_RESULTS, MAX_RESULTS))
+    return _out(await _each(_names(stores), lambda s: s.offers(limit, category)))
 
 
 @_tool(READ)

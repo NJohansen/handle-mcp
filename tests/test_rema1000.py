@@ -9,9 +9,11 @@ import httpx
 import pytest
 
 from handle_mcp import compare
-from handle_mcp.stores import STORES, StoreError  # the real dict: conftest swaps in fakes later
+
+# STORES is the real dict: conftest swaps in fakes later
+from handle_mcp.stores import OFFER_CATEGORIES, STORES, StoreError
 from handle_mcp.stores import rema1000 as rema_module
-from handle_mcp.stores.rema1000 import NOTE, Rema1000Store, product
+from handle_mcp.stores.rema1000 import DEPARTMENTS, NOTE, Rema1000Store, product
 
 FIXTURES = Path(__file__).parent / "fixtures" / "rema1000"
 NOW = datetime(2026, 11, 10, 12, tzinfo=UTC)  # inside the offer week in offers.json
@@ -29,6 +31,8 @@ class FakeRema:
     def handle(self, request: httpx.Request) -> httpx.Response:
         self.requests.append(request)
         params = request.url.params
+        if params.get("filter[departments]"):
+            return httpx.Response(200, json=fixture("offers_department"))
         if params.get("filter[labels]") == "9001":
             return httpx.Response(200, json=fixture("offers"))
         key = params.get("query")
@@ -109,6 +113,61 @@ async def test_search_pages_until_limit(fake):
     store = Rema1000Store(httpx.AsyncClient(transport=httpx.MockTransport(fake.handle)))
     hits = await store.search("x", limit=5)
     assert len(hits) == 5 and [r.url.params["page"] for r in fake.requests] == ["1", "2"]
+
+
+async def test_offers_in_a_category_ask_per_department(store, fake):
+    offers = {p.id: p for p in await store.offers(25, "mejeri og æg")}
+    asked = sorted(r.url.params["filter[departments]"] for r in fake.requests)
+    assert asked == ["60", "70"]  # Mejeri and Ost m.v., at once
+    assert all(r.url.params["filter[labels]"] == "9001" for r in fake.requests)
+    assert set(offers) == {"60033", "60106", "66038"}  # the same product twice is shown once
+    two = await store.offers(2, "frugt og grønt")
+    assert [p.id for p in two] == ["60033", "60106"]  # campaigns before a fixed price
+    assert list(offers)[-1] == "66038"
+    milk = (await store.search("mælk", 1))[0]
+    assert not milk.on_offer
+
+
+async def test_one_failing_department_does_not_hide_the_others(fake):
+    def handle(request):
+        if request.url.params.get("filter[departments]") in ("60", "50"):
+            return httpx.Response(404)  # no retry
+        return fake.handle(request)
+
+    store = Rema1000Store(httpx.AsyncClient(transport=httpx.MockTransport(handle)))
+    assert len(await store.offers(25, "mejeri og æg")) == 3  # Ost m.v. still answers
+    with pytest.raises(StoreError):
+        await store.offers(25, "frost")  # its only department fails
+
+
+async def test_a_campaign_on_a_later_page_comes_before_a_fixed_price(fake):
+    bread, _, burger = fixture("offers_department")["data"]
+    page = fixture("offers_department")["meta"]["pagination"]
+    pages = {
+        "1": {"data": [burger], "meta": {"pagination": page | {"last_page": 2}}},
+        "2": {"data": [bread], "meta": {"pagination": page | {"current_page": 2, "last_page": 2}}},
+    }
+
+    def handle(request):
+        fake.requests.append(request)
+        return httpx.Response(200, json=pages[request.url.params["page"]])
+
+    store = Rema1000Store(httpx.AsyncClient(transport=httpx.MockTransport(handle)))
+    assert [p.id for p in await store.offers(1)] == ["60033"]  # the campaign, from page 2
+    assert [p.id for p in await store.offers(2)] == ["60033", "66038"]
+    assert [p.id for p in await store.offers(1, "brød og kager")] == ["60033"]
+
+
+def test_an_advertised_leaflet_product_is_an_offer_without_a_price_before():
+    hit = fixture("offers_department")["data"][2]  # is_campaign false
+    assert product(hit, NOW).on_offer is False  # in a search: a normal price
+    burger = product(hit, NOW, advertised=True)  # in the offer list
+    assert (burger.on_offer, burger.campaign, burger.before_price) == (True, "Avisvare", None)
+    assert (burger.offer_text, burger.max_per_order) == ("Avisvare, fast pris", None)
+    assert burger.offer_until == date(2027, 2, 6)
+    bread = product(fixture("offers_department")["data"][0], NOW)  # a campaign, as before
+    assert bread.offer_text == "Avisvare, maks 6 stk. (derefter 22,50 kr)"
+    assert set(DEPARTMENTS) == set(OFFER_CATEGORIES)
 
 
 async def test_offers(store, fake):

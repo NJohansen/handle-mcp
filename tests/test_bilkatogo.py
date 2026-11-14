@@ -11,9 +11,11 @@ import pytest
 
 from handle_mcp import app, server
 from handle_mcp import stores as registry
-from handle_mcp.stores import StoreError, _http
+from handle_mcp.stores import OFFER_CATEGORIES, StoreError, _http
 from handle_mcp.stores import bilkatogo as bilka_module
 from handle_mcp.stores.bilkatogo import UNKNOWN_MODE, BilkaStore
+from handle_mcp.stores.bilkatogo.algolia import OFFER_CATEGORIES as BILKA_CATEGORIES
+from handle_mcp.stores.bilkatogo.algolia import category_filter
 
 FIXTURES = Path(__file__).parent / "fixtures" / "bilkatogo"
 
@@ -61,6 +63,7 @@ class FakeBilka:
         if path == "/1/indexes/*/queries":
             params = json.loads(request.content)["requests"][0]["params"]
             name = "algolia_offers" if "isInOffer" in params else "algolia_products"
+            name = "offers_category" if "consumerFacingHierarchy" in params else name
             return httpx.Response(200, json={"results": [fixture(name)]})
         if path == "/api/shop/v6/ChangeLineCount":
             pid, count = request.url.params["productId"], int(request.url.params["count"])
@@ -434,6 +437,33 @@ async def test_offers_filter_on_our_store(store, fake):
     by_id = {p.id: p for p in offers}
     assert (by_id["40258"].campaign, by_id["40258"].price) == ("Skarp pris", Decimal(25))
     assert (by_id["18381"].campaign, by_id["18381"].offer_text) == ("Mix", "Mix 10 for 25,00")
+
+
+async def test_offers_in_a_category_filter_on_the_category(store, fake):
+    fake.cart = {**fake.cart, "deliveryAddress": {**fake.cart["deliveryAddress"], "sid": "1653"}}
+    offers = {p.id: p for p in await store.offers(25, "frugt og grønt")}
+    [call] = [r for r in fake.requests if r.url.path == "/1/indexes/*/queries"]
+    params = parse_qs(json.loads(call.content)["requests"][0]["params"])
+    assert params["filters"] == [
+        (
+            '(consumerFacingHierarchy.lvl0:"Frugt & grønt") AND isInOffer:1653'
+            " AND isInAssortmentIn:1653 AND nonsearchable:false"
+        )
+    ]
+    assert params["hitsPerPage"] == ["25"] and len(offers) == 6
+    assert offers["18381"].offer_text == "Mix 10 for 25,00"  # not in the leaflet: no name
+    potato = offers["153856"]  # the leaflet names the offer
+    assert potato.offer_text == "Skarp pris (avisen: Danske lammefjordskartofler)"
+    assert (potato.campaign, potato.price) == ("Skarp pris", Decimal(16))
+    assert all(p.category.startswith("Frugt & grønt") for p in offers.values())
+
+
+def test_a_category_can_be_more_than_one_bilka_category():
+    assert category_filter("kolonial") == (
+        '(consumerFacingHierarchy.lvl0:"Kolonial"'
+        ' OR consumerFacingHierarchy.lvl0:"Mad fra hele verden")'
+    )
+    assert set(BILKA_CATEGORIES) == set(OFFER_CATEGORIES)
 
 
 async def test_delivery_slots_flat_fee_and_night_slots(store, fake):

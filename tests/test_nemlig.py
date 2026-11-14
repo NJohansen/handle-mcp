@@ -14,7 +14,7 @@ from handle_mcp.stores import StoreError, _http
 from handle_mcp.stores.nemlig import NemligStore
 from handle_mcp.stores.nemlig import delivery as nemlig_delivery
 from handle_mcp.stores.nemlig import offers as nemlig_offers
-from handle_mcp.stores.nemlig.offers import offer_product
+from handle_mcp.stores.nemlig.offers import category_offer, offer_product
 
 FIXTURES = Path(__file__).parent / "fixtures" / "nemlig"
 
@@ -37,6 +37,7 @@ class FakeNemlig:
         self.token_count = 0
         self.queue = False  # page URLs (/, /tilbud) go to queue-it, as seen live 2026-11-03
         self.api_queue = False  # the API too: not seen, but nemlig could
+        self.gone: set[str] = set()  # page paths nemlig has removed: 404
         self.endless_days = False
         self.history, self.details = "order_history", "order_details"
 
@@ -83,9 +84,15 @@ class FakeNemlig:
         if path == "/productbff/api/web/meals/allRecipes":
             return httpx.Response(200, json=fixture("recipes_by_tag"))
         if path == "/productbff/api/web/page":
-            page = {"/maaltider": "meals_page", "/tilbud": "offers_page"}[
-                request.url.params["path"]
-            ]
+            page = {
+                "/maaltider": "meals_page",
+                "/tilbud": "offers_page",
+                "/tilbud/frugt-og-groent": "offers_page_frugt-og-groent",
+                "/tilbud/mejeri-og-aeg": "offers_page_mejeri-og-aeg",
+                "/fordele/det-nye-nemlig": "gift_page",
+            }.get(request.url.params["path"])
+            if page is None or request.url.params["path"] in self.gone:
+                return httpx.Response(404)
             return httpx.Response(200, json=fixture(page))
         if path == "/searchgateway/api/search":
             if request.url.params.get("query") in ("mums rosinboller", "gratis"):
@@ -602,9 +609,9 @@ async def test_offers_reads_every_offer_list(store, fake):
         "Undgå madspild",
         "Gratis",
     }
-    assert "5066321" not in {p.id for p in offers}  # "Frugt og grønt" is a category, not a list
-    (page,) = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
-    assert page.url.params["path"] == "/tilbud"
+    assert "5058121" not in {p.id for p in offers}  # "Frugt og grønt" is a category, not a list
+    pages = [r.url.params["path"] for r in fake.requests if r.url.path.endswith("/web/page")]
+    assert sorted(pages) == ["/fordele/det-nye-nemlig", "/tilbud"]  # no sub-page: two calls
     assert all(r.method == "GET" for r in fake.requests if r.url.path != "/webapi/login")
     steak = next(p for p in offers if p.id == "5067616")
     assert (steak.price, steak.before_price, steak.campaign, steak.unit) == (
@@ -622,20 +629,70 @@ async def test_offers_reads_every_offer_list(store, fake):
 
 async def test_offers_fit_the_basket_delivery_time(store, fake):
     await store.offers()
-    (page,) = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
-    assert page.url.params["timeslotId"] == "2435672"
+    pages = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
+    assert pages and all(r.url.params["timeslotId"] == "2435672" for r in pages)
 
 
 async def test_offers_without_a_delivery_time_send_none(store, fake):
     fake.basket = {k: v for k, v in fake.basket.items() if k != "DeliveryTimeSlot"}
     await store.offers()
-    (page,) = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
-    assert "timeslotId" not in page.url.params
+    pages = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
+    assert pages and all("timeslotId" not in r.url.params for r in pages)
 
 
 async def test_offers_limit_is_per_list(store):
     offers = await store.offers(1)
     assert len([p for p in offers if p.campaign == "Skarp pris"]) == 1
+
+
+async def test_offers_find_gifts_outside_the_gift_list(store, fake):
+    gifts = {p.id: p for p in await store.offers(10) if p.campaign == "Gratis"}
+    cola = gifts["5064572"]  # on a page of its own, with its own id (the cola to pay for: 106517)
+    assert (cola.price, cola.before_price, cola.max_per_order) == (Decimal(0), Decimal(18), 1)
+    assert cola.offer_text == "Gratis (max 1 stk.)"
+    assert gifts["5606369"].available is False  # in a category block on /tilbud, sold out
+    assert "106517" not in gifts
+
+
+async def test_offers_work_when_the_gift_page_is_gone(store, fake):
+    fake.gone.add("/fordele/det-nye-nemlig")
+    offers = await store.offers(10)
+    assert "5064572" not in {p.id for p in offers}
+    assert {p.campaign for p in offers} >= {"Skarp pris", "Priskup", "Gratis"}
+
+
+async def test_offers_in_a_category_read_its_sub_page(store, fake):
+    offers = {p.id: p for p in await store.offers(25, "frugt og grønt")}
+    pages = [r.url.params["path"] for r in fake.requests if r.url.path.endswith("/web/page")]
+    assert pages == ["/tilbud/frugt-og-groent"]  # one small call, not /tilbud
+    assert len(offers) == 6
+    apple = offers["5058121"]  # cheaper than its normal price, no campaign line
+    assert (apple.price, apple.before_price, apple.campaign) == (Decimal(15), Decimal(18), "Tilbud")
+    assert (apple.offer_text, apple.offer_until) == ("Tilbud, før 18 kr", None)
+    assert offers["5603155"].campaign == "Skarp pris" and not offers["5603155"].available
+
+
+async def test_a_campaign_block_names_the_campaign(store):
+    offers = {p.id: p for p in await store.offers(25, "mejeri og æg")}
+    assert offers["5038613"].campaign == offers["104373"].campaign == "Lurpak kun 12 kr."
+    assert offers["5038613"].price == Decimal(12)
+    assert offers["706008"].campaign == "Priskup"
+    assert {"5605447", "5071597", "5062129"} <= set(offers)  # only on the sub-page
+    assert len(await store.offers(3, "mejeri og æg")) == 3
+
+
+def test_a_product_at_its_normal_price_is_no_category_offer():
+    drinks = fixture("offers_page")["pageContent"][7]["products"]
+    by_id = {p["id"]: category_offer(p, None) for p in drinks}
+    assert by_id["5604110"] is None  # "God pris", no normal price, no multi-buy
+    assert by_id["106517"].offer_text == "Mix 2 stk. 25,-" and by_id["106517"].campaign == "Priskup"
+    assert by_id["5602213"].offer_text == "6 stk. 69,-" and by_id["5602213"].campaign == "Tilbud"
+
+
+async def test_a_category_page_that_fails_is_a_clear_error(store, fake):
+    fake.gone.add("/tilbud/frugt-og-groent")
+    with pytest.raises(StoreError):
+        await store.offers(25, "frugt og grønt")
 
 
 def test_multi_buy_text_is_the_offer():
@@ -785,9 +842,10 @@ async def test_offers_work_without_a_login(store, fake, no_login):
     assert "/webapi/login" not in fake.paths()
     assert "/webapi/basket/GetBasket" not in fake.paths()
     assert "/searchgateway/api/search" not in fake.paths()
-    (page,) = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
-    assert page.headers["Authorization"] == "Bearer bearer-1"  # the anonymous token
-    assert "timeslotId" not in page.url.params
+    pages = [r for r in fake.requests if r.url.path == "/productbff/api/web/page"]
+    assert len(pages) == 2  # /tilbud and the gift page, at once, with one anonymous token
+    assert all(r.headers["Authorization"] == "Bearer bearer-1" for r in pages)
+    assert all("timeslotId" not in r.url.params for r in pages)
 
 
 async def test_search_needs_a_login(store, fake, no_login):
