@@ -354,7 +354,7 @@
  },
  {
   "name": "list_offers",
-  "description": "List this week's offers in each store, also items you would not search for: nemlig's\nSkarp pris, Priskup, Dagstilbud, Undgå madspild and gifts; BilkaToGo's offers; REMA 1000's\nleaflet (Avisvarer, often with a max per customer in offer_text). `limit` is\nper list; a product on two lists is shown once. A list the store fails to send is left out\n(see the server log). Free gifts come from a separate search and are not cut by `limit`.\nThey have price 0 and \"max_per_order\". Use them when they fit the plan.",
+  "description": "List this week's offers in each store, also items you would not search for.\nWithout `category`, a first look: nemlig's Skarp pris, Priskup, Dagstilbud, Undgå madspild\nand gifts; the first of BilkaToGo's offers; REMA 1000's leaflet (Avisvarer, often with a max\nper customer in offer_text). That is a small part of the offers. For a meal plan or a\nshopping list, call once per `category` you buy from: every offer in it, in each store,\ne.g. nemlig's fruit at one price. `campaign` is the store's name for the offer when it has\none. A product on two lists is shown once. A list the store fails to send is left out (see\nthe server log). Free gifts have price 0, \"max_per_order\" and their own product id, and\nare not cut by `limit`. Use them when they fit the plan.",
   "inputSchema": {
    "properties": {
     "stores": {
@@ -374,10 +374,30 @@
      "title": "Stores"
     },
     "limit": {
-     "default": 25,
-     "description": "Products per offer list, 1-25.",
-     "title": "Limit",
-     "type": "integer"
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Without `category`: products per offer list, 1-25 (default 25). With it: products per store, 1-100 (default 60).",
+     "title": "Limit"
+    },
+    "category": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "One category: \"frugt og grønt\", \"kød og fisk\", \"mejeri og æg\", \"pålæg\", \"brød og kager\", \"kolonial\", \"frost\", \"drikkevarer\", \"slik og snacks\", \"husholdning\", \"pleje\", \"baby\".",
+     "title": "Category"
     }
    },
    "type": "object",

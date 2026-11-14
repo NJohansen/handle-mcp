@@ -11,7 +11,7 @@ import os
 import pytest
 
 from handle_mcp import app, compare, recipe_cart
-from handle_mcp.stores import STORES
+from handle_mcp.stores import OFFER_CATEGORIES, STORES
 from handle_mcp.stores.rema1000.pickup import GateClosed
 
 pytestmark = [
@@ -91,6 +91,20 @@ async def test_offers(store):
     assert all(p.before_price is None or p.before_price > p.price for p in offers)
     if store.name == "nemlig":
         assert {"Skarp pris", "Priskup"} & lists
+
+
+async def test_offers_in_every_category(store):
+    """Read only. Every shared category must still exist in the store: a renamed sub-page,
+    category or department gives an error or nothing. A category can be empty in one week, so
+    only the big ones must have offers."""
+    for category in OFFER_CATEGORIES:
+        offers = await store.offers(100, category)
+        names = sorted({str(p.campaign) for p in offers})
+        print(f"\n[{store.name}] {category}: {len(offers)} tilbud, {names}")
+        assert all(p.on_offer and p.id and p.name for p in offers)
+        assert all(p.before_price is None or p.before_price > p.price for p in offers)
+        if category in ("kolonial", "drikkevarer"):
+            assert offers
 
 
 async def test_nemlig_add_recipe_dry_run(monkeypatch):

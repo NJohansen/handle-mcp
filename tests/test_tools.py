@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from mcp.server.mcpserver.exceptions import ToolError
 
-from handle_mcp import server
+from handle_mcp import app, server
 from handle_mcp import stores as registry
 from handle_mcp.models import Product
 from handle_mcp.stores.bilkatogo import BilkaStore
@@ -111,6 +111,23 @@ async def test_delivery_slots_in_time_order_cheapest_first_only_free():
     ]  # sold-out slot left out
     assert [s["price"] for s in fake["cheapest"]] == ["0.00", "19.00", "25.00"]
     assert fake["cheapest"][0]["start"] == "2026-11-04T14:00:00"
+
+
+async def test_offers_without_a_category_keep_the_small_limit():
+    await server.list_offers(stores=["fake"])
+    await server.list_offers(stores=["fake"], limit=500)
+    assert app._store("fake").offer_calls[-2:] == [(25, None), (25, None)]
+
+
+async def test_offers_in_a_category_reach_the_store_with_a_wider_limit():
+    await server.list_offers(stores=["fake"], category=" Frugt og grønt ")
+    await server.list_offers(stores=["fake"], category="pålæg", limit=500)
+    assert app._store("fake").offer_calls[-2:] == [(60, "frugt og grønt"), (100, "pålæg")]
+
+
+async def test_an_unknown_offer_category_names_the_known_ones():
+    with pytest.raises(ToolError, match="Ukendt kategori 'slik'. Vælg en af: frugt og grønt, "):
+        await server.list_offers(category="slik")
 
 
 async def test_search_sort_puts_unknown_unit_price_last(monkeypatch):
