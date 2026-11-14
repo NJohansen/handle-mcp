@@ -27,6 +27,23 @@ from handle_mcp.stores.rema1000.shopping_list import RemaListMixin
 log = logging.getLogger(__name__)
 
 LEAFLET = 9001  # the label "Avisvare": this week's leaflet
+# A shared category (stores.OFFER_CATEGORIES) is one or more departments: `filter[departments]`
+# takes a department id. No call lists them (live 2026-11-14: tests/fixtures/rema1000/README.md).
+DEPARTMENTS = {
+    "frugt og grønt": (20,),
+    "kød og fisk": (30,),
+    "mejeri og æg": (60, 70),  # Mejeri, Ost m.v.
+    "pålæg": (40,),  # Køl
+    "brød og kager": (10,),
+    "kolonial": (80, 160),  # Kolonial, Nemt & hurtigt
+    "frost": (50,),
+    "drikkevarer": (90,),
+    "slik og snacks": (130,),
+    "husholdning": (100,),
+    "pleje": (120,),
+    "baby": (110,),
+}
+
 PER_PAGE = 100  # the most one page gives
 UNITS = {"kg": "kg", "ltr": "l", "l": "l", "stk": "stk"}
 __all__ = ["NOTE", "Rema1000Store", "product"]
@@ -68,6 +85,8 @@ def _kr(value: Decimal) -> str:
 
 def _offer_text(period: dict, leaflet: bool) -> str:
     text = "Avisvare" if leaflet else "Tilbud"
+    if not period.get("is_campaign"):  # in the leaflet at a fixed price, for months
+        return "Avisvare, fast pris"
     most, over = period.get("max_quantity"), _money(period.get("price_over_max_quantity"))
     if isinstance(most, int) and most > 0 and over is not None:
         text += f", maks {most} stk. (derefter {_kr(over)} kr)"
@@ -84,7 +103,11 @@ def product(hit: dict, now: datetime | None = None) -> Product | None:
     period = prices[at]
     size, _, brand = str(hit.get("underline") or "").partition(" / ")
     labels = {lbl.get("id") for lbl in hit.get("labels") or [] if isinstance(lbl, dict)}
-    on_offer = bool(period.get("is_campaign"))
+    # A leaflet product can be advertised at a fixed price and be no campaign (live 2026-11-14:
+    # 191 of the leaflet's 416). The store shows it as an offer, so it is one; no price before.
+    on_offer = bool(period.get("is_campaign")) or (
+        LEAFLET in labels and bool(period.get("is_advertised"))
+    )
     before = None
     if on_offer:  # the next period that is no offer: what it costs after the offer
         later = [p for p in prices[at + 1 :] if not p.get("is_campaign")]
@@ -169,9 +192,20 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
     async def search(self, query: str, limit: int = 10) -> list[Product]:
         return await self._products({"query": query}, limit)
 
-    async def offers(self, limit: int = 25) -> list[Product]:
+    async def offers(self, limit: int = 25, category: str | None = None) -> list[Product]:
+        """The leaflet (Avisvarer). With `category`: the leaflet in its departments, one call
+        per department at once."""
         params = {"filter[labels]": LEAFLET, "sort": "department"}
-        return await self._products(params, limit, offers_only=True)
+        if not category:
+            return await self._products(params, limit, offers_only=True)
+        found = await asyncio.gather(
+            *(
+                self._products(params | {"filter[departments]": dept}, limit, offers_only=True)
+                for dept in DEPARTMENTS[category]
+            )
+        )
+        unique = {p.id: p for products in found for p in products}
+        return list(unique.values())[:limit]
 
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
         raise NotImplementedError
