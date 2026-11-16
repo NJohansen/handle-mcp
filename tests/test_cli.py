@@ -232,3 +232,76 @@ def test_save_session_never_writes_when_env_vars_hold_the_login(config_dir, monk
     monkeypatch.setenv("HANDLE_FAKE_PASSWORD", "rigtig")
     registry.save_session("fake", "a@example.com", {"token": "new"})
     assert not (config_dir / "fake.json").exists()
+
+
+class Tty(io.StringIO):
+    def isatty(self):
+        return True
+
+
+@pytest.fixture
+def asked(monkeypatch, terminal, memory_keychain):
+    """A login on a real terminal, with no answer saved and nothing in the environment."""
+    monkeypatch.delenv("HANDLE_TELEMETRY", raising=False)
+    monkeypatch.delenv("DO_NOT_TRACK", raising=False)
+
+    def login(reply):
+        monkeypatch.setattr("sys.stdin", Tty(f"a@example.com\n{reply}\n"))
+        monkeypatch.setattr(cli.getpass, "getpass", lambda _prompt: "rigtig")
+        return cli.run(["login", "fake"])
+
+    return login
+
+
+@pytest.mark.parametrize(("reply", "saved"), [("j", True), ("ja", True), ("", False), ("n", False)])
+def test_login_asks_once_and_only_a_yes_turns_counting_on(asked, capsys, reply, saved):
+    assert asked(reply) == 0
+    err = capsys.readouterr().err
+    assert "Tæl med? [j/N]" in err and "handle-mcp telemetry off" in err
+    assert cli.telemetry.answer() is saved and cli.telemetry.enabled() is saved
+    assert asked("j") == 0  # the second login does not ask again
+    assert "Tæl med?" not in capsys.readouterr().err
+    assert cli.telemetry.answer() is saved
+
+
+def test_login_without_a_terminal_never_asks(terminal, memory_keychain, monkeypatch, capsys):
+    monkeypatch.delenv("HANDLE_TELEMETRY", raising=False)
+    terminal("a@example.com", "rigtig")
+    assert cli.run(["login", "fake"]) == 0
+    assert "Tæl med?" not in capsys.readouterr().err
+    assert cli.telemetry.answer() is None and not cli.telemetry.enabled()
+
+
+def test_login_does_not_ask_when_the_environment_has_answered(asked, monkeypatch, capsys):
+    monkeypatch.setenv("HANDLE_TELEMETRY", "0")
+    assert asked("j") == 0
+    assert "Tæl med?" not in capsys.readouterr().err and cli.telemetry.answer() is None
+
+
+def test_telemetry_on_off_status(monkeypatch, capsys):
+    monkeypatch.delenv("HANDLE_TELEMETRY", raising=False)
+    assert cli.run(["telemetry", "status"]) == 0
+    assert "slået fra. Du er ikke blevet spurgt endnu." in capsys.readouterr().err
+    assert cli.run(["telemetry", "on"]) == 0 and cli.telemetry.enabled()
+    assert "Umami Cloud" in capsys.readouterr().err  # on shows what it counts
+    assert cli.run(["telemetry", "status"]) == 0
+    assert "slået til." in capsys.readouterr().err
+    monkeypatch.setenv("DO_NOT_TRACK", "1")  # the environment wins, and both commands say so
+    assert cli.run(["telemetry", "on"]) == 0 and cli.run(["telemetry", "status"]) == 0
+    err = capsys.readouterr().err
+    assert (
+        err.count("slået fra: HANDLE_TELEMETRY=0, DO_NOT_TRACK=1") == 2 and "slået til" not in err
+    )
+    monkeypatch.delenv("DO_NOT_TRACK")
+    assert cli.run(["telemetry", "off"]) == 0 and not cli.telemetry.enabled()
+    assert cli.run(["telemetry", "maybe"]) == 2
+    assert capsys.readouterr().out == ""
+
+
+def test_telemetry_on_says_so_when_the_answer_cannot_be_saved(monkeypatch, capsys):
+    def read_only(yes):
+        raise PermissionError("read-only")
+
+    monkeypatch.setattr(cli.telemetry, "set_consent", read_only)
+    assert cli.run(["telemetry", "on"]) == 1
+    assert "Kunne ikke gemme dit svar (PermissionError)" in capsys.readouterr().err

@@ -23,7 +23,7 @@ An MCP server for Claude, Grok or Codex. It reads the offers, plans the week on 
 
 **It can never order or pay. You do.** That code does not exist, and a test fails if it shows up ([why](docs/adr/0001-the-human-always-pays.md)).
 
-**It counts anonymous usage, and tells you so.** No id, no personal data. Off with `HANDLE_TELEMETRY=0`. [Exactly what is sent](#usage-counts).
+**It counts anonymous usage only when you say yes.** No id, no personal data. [Exactly what is sent](#usage-counts).
 
 ## How it works
 
@@ -82,7 +82,7 @@ Full arguments and fields: [docs/tools.md](docs/tools.md).
 
 ## Usage counts
 
-Anonymous counts, so we can show the stores what handle-mcp sends them. On by default. Every event has `version` and `date` (day only):
+Anonymous counts, so we can show the stores what handle-mcp sends them. Off until you say yes: before that nothing is sent and no file is written. Every event has `version` and `date` (day only):
 
 | Event | When | Fields |
 |---|---|---|
@@ -92,17 +92,21 @@ Anonymous counts, so we can show the stores what handle-mcp sends them. On by de
 | `cart_filled` | after 30 quiet minutes, only if every line went in; then nothing until the cart is empty again | `store`, `basket_total_dkk` (nearest 50 kr), `item_count` |
 | `list_filled` | the same, for REMA 1000's shopping list | `store`, `basket_total_dkk`, `item_count` |
 
-Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. Events go to [Umami Cloud](https://umami.is) over HTTPS. Umami sees your IP to answer and to guess the country; it does not save it. Sends run in the background with a 2 second timeout, and a failed send never breaks a tool. Cart links carry `utm_source=handlemcp`.
+Never sent: names, addresses, phone, email, logins, product names, order ids or any id for you or your machine. Events go to [Umami Cloud](https://umami.is) over HTTPS. Umami is a US company. It sees your IP address when an event arrives: to answer, to guess the country and to make its own visitor hash (IP, User-Agent and a salt that rotates monthly). The IP is not a field in its analytics records; Umami and its providers may keep it in operational and security logs ([Umami's privacy notice](https://umami.is/privacy)). Sends run in the background with a 2 second timeout, and a failed send never breaks a tool. Cart links carry `utm_source=handlemcp`.
 
-Your AI tells you once: the first tool answer on a machine has a `telemetry_notice`. The only file is `~/.config/handle-mcp/telemetry.json`: whether the notice was shown, the day each daily event was last sent, and which stores have a counted cart that is not empty yet.
-
-Off:
+You choose:
 
 ```sh
-HANDLE_TELEMETRY=0          # or DO_NOT_TRACK=1, or --no-telemetry
+handle-mcp telemetry on      # shows what is counted, then turns it on
+handle-mcp telemetry off     # the default; also deletes the saved days
+handle-mcp telemetry status
 ```
 
-Your own Umami: `HANDLE_TELEMETRY_URL` and `HANDLE_TELEMETRY_WEBSITE`. Why: [ADR 0005](docs/adr/0005-anonymous-usage-counts.md).
+`handle-mcp login <store>` asks once on a terminal, and Enter means no. With no terminal: `HANDLE_TELEMETRY=1`. `HANDLE_TELEMETRY=0`, `DO_NOT_TRACK=1` and `--no-telemetry` always win over a yes.
+
+The only file is `~/.config/handle-mcp/telemetry.json`: your answer, the day each daily event was last sent, and which stores have a counted cart that is not empty yet.
+
+Your own Umami: `HANDLE_TELEMETRY_URL` and `HANDLE_TELEMETRY_WEBSITE`. Why: [ADR 0005](docs/adr/0005-anonymous-usage-counts.md) and [ADR 0014](docs/adr/0014-usage-counts-ask-first.md).
 
 ## More
 

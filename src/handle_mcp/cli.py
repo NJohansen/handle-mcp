@@ -6,6 +6,7 @@
                                         session in ~/.config/handle-mcp/nemlig.json (chmod 600).
                                         For a headless machine or an AI agent with no terminal.
     handle-mcp logout nemlig            removes the login from the keychain and the file
+    handle-mcp telemetry on|off|status  anonymous usage counts: off until you say yes (ADR 0014)
 
 A store that needs a pickup store (REMA 1000) asks for it after the login, on this terminal.
 With --from-env, set HANDLE_<STORE>_STORE_ID (store ids, comma-separated) for the server.
@@ -55,12 +56,15 @@ def _say(text: str) -> None:
 
 def run(args: list[str]) -> int:
     known = ", ".join(sorted(registry.STORES))
+    if args[:1] == ["telemetry"]:
+        return _telemetry(args[1:])
     from_env = "--from-env" in args
     args = [a for a in args if a != "--from-env"]
     if len(args) != 2 or args[0] not in ("login", "logout") or args[1] not in registry.STORES:
         _say(
             "Brug: handle-mcp login <butik> [--from-env]  eller  handle-mcp logout <butik>\n"
-            f"Butikker: {known}"
+            f"Butikker: {known}\n"
+            "Anonym tælling: handle-mcp telemetry on|off|status"
         )
         return 2
     command, store = args
@@ -92,6 +96,47 @@ def run(args: list[str]) -> int:
         )
         return 1
     _say(f"Logget ind på {store}. Sessionen er gemt i nøgleringen. Kodeordet er ikke gemt.")
+    _ask_telemetry()
+    return 0
+
+
+def _ask_telemetry() -> None:
+    """Once, on a real terminal, after a login that worked. Enter or anything but yes is a no."""
+    try:
+        if not telemetry.ask() or not sys.stdin.isatty():
+            return
+        _say("\n" + telemetry.QUESTION)
+        yes = _ask("Tæl med? [j/N]: ").lower() in ("j", "ja", "y", "yes")
+        telemetry.set_consent(yes)
+        _say("Tak. Tællingen er slået til." if yes else "Tællingen er slået fra. Intet sendes.")
+    except Exception:  # the question never breaks a login
+        logging.getLogger(__name__).debug("telemetry question failed", exc_info=True)
+
+
+FORCED_OFF = "HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 eller --no-telemetry er sat, og de vinder."
+
+
+def _telemetry(args: list[str]) -> int:
+    if args not in (["on"], ["off"], ["status"]):
+        _say("Brug: handle-mcp telemetry on|off|status")
+        return 2
+    try:
+        if args != ["status"]:
+            telemetry.set_consent(args == ["on"])
+    except OSError as exc:
+        _say(f"Kunne ikke gemme dit svar ({type(exc).__name__}). Intet er ændret.")
+        return 1
+    if args == ["on"]:
+        _say("Det har du sagt ja til:\n" + telemetry.QUESTION)
+    if args == ["off"]:
+        _say("Tællingen er slået fra. Intet sendes.")
+    elif telemetry.enabled():
+        _say("Anonym tælling er slået til. Fra igen: handle-mcp telemetry off")
+    elif telemetry.forced_off():
+        _say(f"Anonym tælling er slået fra: {FORCED_OFF}")
+    else:
+        asked = "" if telemetry.answer() is not None else " Du er ikke blevet spurgt endnu."
+        _say(f"Anonym tælling er slået fra.{asked}")
     return 0
 
 

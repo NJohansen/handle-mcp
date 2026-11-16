@@ -14,9 +14,9 @@ from tests.conftest import LEAK
 
 @pytest.fixture
 def sent(monkeypatch):
-    """Telemetry on, with a website id, and a sender that records instead of posting."""
+    """The human said yes (HANDLE_TELEMETRY=1); a sender that records instead of posting."""
     events: list[dict] = []
-    monkeypatch.delenv("HANDLE_TELEMETRY", raising=False)
+    monkeypatch.setenv("HANDLE_TELEMETRY", "1")
     monkeypatch.delenv("DO_NOT_TRACK", raising=False)
     monkeypatch.setenv("HANDLE_TELEMETRY_WEBSITE", "site-1")
     monkeypatch.setattr(telemetry, "_post", events.append)
@@ -239,13 +239,9 @@ async def test_no_login_no_login_ok(sent, monkeypatch):
 def test_the_file_keeps_days_never_an_id(sent):
     telemetry.start()
     telemetry.login_ok("bilkatogo")
-    telemetry.notice()
     state = json.loads((registry.CONFIG_DIR / "telemetry.json").read_text())
     today = date.today().isoformat()
-    assert state == {
-        "notice_shown": True,
-        "days": {"server_started": today, "login_ok:bilka": today},
-    }
+    assert state == {"days": {"server_started": today, "login_ok:bilka": today}}
 
 
 @pytest.mark.parametrize(
@@ -276,28 +272,50 @@ def test_flag_works_before_a_cli_command(monkeypatch):
     assert calls == [["logout", "fake"]]
 
 
-def test_the_notice_goes_to_stderr_never_stdout(sent, capsys):
+async def test_no_answer_means_nothing_is_sent_and_no_file_is_written(sent, monkeypatch):
+    monkeypatch.delenv("HANDLE_TELEMETRY")
     telemetry.start()
-    out, err = capsys.readouterr()
-    assert out == ""  # stdout is JSON-RPC
-    assert "HANDLE_TELEMETRY=0" in err and "--no-telemetry" in err
+    await server.get_cart("fake")
+    await fill()
+    assert sent == [] and not telemetry.enabled()
+    assert not (registry.CONFIG_DIR / "telemetry.json").exists()
 
 
-async def test_the_first_answer_tells_the_human_once(sent, monkeypatch):
-    first = await server.get_cart("fake")
-    assert "HANDLE_TELEMETRY=0" in first["telemetry_notice"]
-    assert "telemetry_notice" not in await server.get_cart("fake")
-    monkeypatch.setattr(telemetry, "_noticed", False)  # a restart: the file remembers
-    assert "telemetry_notice" not in await server.get_cart("fake")
+async def test_a_saved_yes_turns_it_on(sent, monkeypatch):
+    monkeypatch.delenv("HANDLE_TELEMETRY")
+    telemetry.set_consent(True)
+    telemetry.start()
+    await fill()
+    assert names(sent) == ["server_started", "first_tool_call", "login_ok", "cart_filled"]
 
 
-async def test_no_notice_when_it_is_off(sent, monkeypatch):
-    monkeypatch.setenv("HANDLE_TELEMETRY", "0")
-    assert "telemetry_notice" not in await server.get_cart("fake")
+async def test_a_saved_no_sends_nothing_and_keeps_only_the_answer(sent, monkeypatch):
+    telemetry.start()  # counted while it was on
+    monkeypatch.delenv("HANDLE_TELEMETRY")
+    telemetry.set_consent(False)
+    sent.clear()
+    await fill()
+    assert sent == []
+    assert json.loads((registry.CONFIG_DIR / "telemetry.json").read_text()) == {"consent": False}
 
 
-async def test_the_model_is_told_to_pass_the_notice_on():
-    assert "telemetry_notice" in server.mcp.instructions
+@pytest.mark.parametrize(("env", "value"), [("HANDLE_TELEMETRY", "0"), ("DO_NOT_TRACK", "1")])
+def test_off_in_the_environment_wins_over_a_saved_yes(sent, monkeypatch, env, value):
+    telemetry.set_consent(True)
+    monkeypatch.setenv(env, value)
+    assert not telemetry.enabled() and not telemetry.ask()
+
+
+def test_the_question_says_what_why_who_where_and_how_to_say_no():
+    text = telemetry.QUESTION
+    for part in ["butikkerne", "Niclas Johansen", "Umami Cloud", "USA", "IP-adresse", "50 kr."]:
+        assert part in text
+    assert "handle-mcp telemetry off" in text
+
+
+async def test_a_tool_answer_never_carries_a_telemetry_text(sent):
+    assert "telemetry" not in json.dumps(await server.get_cart("fake"))
+    assert "telemetry" not in server.mcp.instructions
 
 
 def test_instructions_suggest_a_first_prompt():

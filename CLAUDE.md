@@ -27,7 +27,7 @@ src/handle_mcp/
   nutrition.py     get_nutrition: read a Danish nutrition label ("0,13 g", "329 kJ / 78 Kcal")
   recipe_cart.py   add_recipe_to_cart: a recipe's products as absolute cart counts
   links.py         with_utm(): UTM tags on every cart link the human clicks
-  telemetry.py     anonymous counts (server_started, first_tool_call, login_ok, cart_filled, list_filled); off with HANDLE_TELEMETRY=0
+  telemetry.py     anonymous counts (server_started, first_tool_call, login_ok, cart_filled, list_filled); off until a yes (`handle-mcp telemetry on`, ADR 0014)
   models.py        dataclasses; money is Decimal DKK
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES
