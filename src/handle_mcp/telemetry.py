@@ -93,6 +93,11 @@ def enabled() -> bool:
     return answer() is True if env is None else env
 
 
+def forced_off() -> bool:
+    """HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or --no-telemetry: off, whatever the answer is."""
+    return _env() is False
+
+
 def answer() -> bool | None:
     """The saved yes or no. None: the human was never asked."""
     value = _state().get("consent")

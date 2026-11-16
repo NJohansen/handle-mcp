@@ -113,20 +113,30 @@ def _ask_telemetry() -> None:
         logging.getLogger(__name__).debug("telemetry question failed", exc_info=True)
 
 
+FORCED_OFF = "HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 eller --no-telemetry er sat, og de vinder."
+
+
 def _telemetry(args: list[str]) -> int:
-    if args == ["on"]:
-        telemetry.set_consent(True)
-        _say(telemetry.QUESTION + "\nTællingen er slået til. Fra igen: handle-mcp telemetry off")
-    elif args == ["off"]:
-        telemetry.set_consent(False)
-        _say("Tællingen er slået fra. Intet sendes.")
-    elif args != ["status"]:
+    if args not in (["on"], ["off"], ["status"]):
         _say("Brug: handle-mcp telemetry on|off|status")
         return 2
-    if args == ["status"]:
-        state = "til" if telemetry.enabled() else "fra"
+    try:
+        if args != ["status"]:
+            telemetry.set_consent(args == ["on"])
+    except OSError as exc:
+        _say(f"Kunne ikke gemme dit svar ({type(exc).__name__}). Intet er ændret.")
+        return 1
+    if args == ["on"]:
+        _say("Det har du sagt ja til:\n" + telemetry.QUESTION)
+    if args == ["off"]:
+        _say("Tællingen er slået fra. Intet sendes.")
+    elif telemetry.enabled():
+        _say("Anonym tælling er slået til. Fra igen: handle-mcp telemetry off")
+    elif telemetry.forced_off():
+        _say(f"Anonym tælling er slået fra: {FORCED_OFF}")
+    else:
         asked = "" if telemetry.answer() is not None else " Du er ikke blevet spurgt endnu."
-        _say(f"Anonym tælling er slået {state}.{asked}")
+        _say(f"Anonym tælling er slået fra.{asked}")
     return 0
 
 

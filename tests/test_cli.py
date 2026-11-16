@@ -286,6 +286,22 @@ def test_telemetry_on_off_status(monkeypatch, capsys):
     assert "Umami Cloud" in capsys.readouterr().err  # on shows what it counts
     assert cli.run(["telemetry", "status"]) == 0
     assert "slået til." in capsys.readouterr().err
+    monkeypatch.setenv("DO_NOT_TRACK", "1")  # the environment wins, and both commands say so
+    assert cli.run(["telemetry", "on"]) == 0 and cli.run(["telemetry", "status"]) == 0
+    err = capsys.readouterr().err
+    assert (
+        err.count("slået fra: HANDLE_TELEMETRY=0, DO_NOT_TRACK=1") == 2 and "slået til" not in err
+    )
+    monkeypatch.delenv("DO_NOT_TRACK")
     assert cli.run(["telemetry", "off"]) == 0 and not cli.telemetry.enabled()
     assert cli.run(["telemetry", "maybe"]) == 2
     assert capsys.readouterr().out == ""
+
+
+def test_telemetry_on_says_so_when_the_answer_cannot_be_saved(monkeypatch, capsys):
+    def read_only(yes):
+        raise PermissionError("read-only")
+
+    monkeypatch.setattr(cli.telemetry, "set_consent", read_only)
+    assert cli.run(["telemetry", "on"]) == 1
+    assert "Kunne ikke gemme dit svar (PermissionError)" in capsys.readouterr().err
