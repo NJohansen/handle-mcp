@@ -51,8 +51,7 @@ mcp = MCPServer(
     instructions=(
         "Tools for Danish grocery stores with home delivery. You can search, compare "
         "baskets, find recipes, list delivery times and change cart quantities. You can never order or pay: the human "
-        "always does that on the store's website. An answer with `telemetry_notice` says "
-        "what handle-mcp counts anonymously: tell the human in one sentence, once. "
+        "always does that on the store's website. "
         "If the human is new or unsure what to ask, suggest, in their language: 'Vi har "
         "4.000 kr. til mad om måneden. Lav ugens madplan.' Before a meal plan, if you do not "
         "know it yet, ask at most 3 short questions: how many eat (adults, children), what "
@@ -94,10 +93,7 @@ def _tool(annotations: ToolAnnotations) -> Callable[[Callable], Callable]:
 
 def _out(value: Any) -> dict[str, Any]:
     result = scrub(jsonable(value))
-    result = result if isinstance(result, dict) else {"result": result}
-    if notice := telemetry.notice():  # once: the model tells the human what is counted
-        result["telemetry_notice"] = notice
-    return result
+    return result if isinstance(result, dict) else {"result": result}
 
 
 def _error_text(store: str, exc: BaseException) -> str:

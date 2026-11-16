@@ -1,5 +1,7 @@
 # 0005: Anonymous usage counts, no id
 
+> The default and the notice are now in [ADR 0014](0014-usage-counts-ask-first.md): counting is off until the human says yes. What is counted, and why, stays as written here.
+
 handle-mcp sends five events to Umami, a funnel from install to a filled cart: `server_started` (os), `first_tool_call` (tool name) and `login_ok` (store), each at most once per machine (and store) per day, and `cart_filled` (store, total rounded to 50 kr, item count). `list_filled` is the same for REMA 1000, whose cart is a shopping list ([ADR 0007](0007-rema-cart-is-a-shopping-list.md)). Every event has version and date (day only). Every cart link the human clicks carries `utm_source=handlemcp&utm_medium=mcp&utm_campaign=cart`. On by default. Off with `HANDLE_TELEMETRY=0`, `DO_NOT_TRACK=1` or `--no-telemetry`. The first tool answer on a machine carries `telemetry_notice`, and the server instructions tell the model to pass it on: the human hears it once, in the chat. The same text goes to stderr (the client's log) until then.
 
 ## Why

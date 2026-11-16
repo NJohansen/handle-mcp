@@ -1,10 +1,12 @@
 """Anonymous usage counts: how many carts and kroner handle-mcp fills in each store per week.
 
+Off until the human says yes (docs/adr/0014): `handle-mcp telemetry on`, the question after
+`handle-mcp login <store>`, or HANDLE_TELEMETRY=1. Before a yes nothing is sent and no file
+is written. HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 and `--no-telemetry` win over a yes.
 No id, no names, no addresses, no logins, no products, no order ids (docs/adr/0005). The only
-file is `telemetry.json` in the config folder: the notice was shown, the last day each
-daily event went out, and which stores have a counted cart that is not empty yet.
+file is `telemetry.json` in the config folder: the answer, the last day each daily event went
+out, and which stores have a counted cart that is not empty yet.
 The funnel: server_started, first_tool_call, login_ok, cart_filled (list_filled for REMA 1000).
-Off with HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 or `--no-telemetry`.
 Every send runs in a background thread with a short timeout. A failure is logged, never raised.
 """
 
@@ -16,7 +18,6 @@ import json
 import logging
 import os
 import platform
-import sys
 import threading
 from collections.abc import Callable
 from datetime import date
@@ -39,17 +40,21 @@ ROUND_TO = Decimal(50)  # kroner
 STORE_NAMES = {"bilkatogo": "bilka"}
 FILLED = {"rema1000": "list_filled"}  # REMA's cart is a shopping list: never mixed with carts
 OFF = {"0", "false", "no", "off"}
+ON = {"1", "true", "yes", "on"}
 
-NOTICE = """\
-handle-mcp tæller anonymt: start, første værktøj og login pr. dag, og fyldte kurve (butik,
-beløb afrundet til 50 kr., antal varer). Med version, styresystem og dato.
-Ingen navne, adresser, logins, varer, ordre-id eller id for dig eller din computer.
-Slå det fra med HANDLE_TELEMETRY=0 eller: handle-mcp --no-telemetry
+# What the human reads before the yes: what, why, who, where it goes, and how to say no.
+QUESTION = """\
+Må handle-mcp tælle anonymt, hvor mange kurve den fylder?
+Formål: at vise butikkerne, hvad handle-mcp sender dem. Bag det står Niclas Johansen (handlemcp.dk).
+Det sender: start, første værktøj og login pr. dag, og fyldte kurve (butik, beløb afrundet
+til 50 kr., antal varer). Med version, styresystem og dato.
+Ingen navne, adresser, logins, varer eller ordre-id.
+Det går til Umami Cloud, et firma i USA. Umami ser din IP-adresse, når programmet sender.
+Sig nej nu, eller slå det fra senere med: handle-mcp telemetry off
 Læs mere: https://github.com/NJohansen/handle-mcp#brugsstatistik
 """
 
 _off = False
-_noticed = False  # notice() asked the file once in this process
 _sent_today: dict[str, str] = {}  # event key -> day, so the file is read once per day
 _lock = threading.Lock()  # _pending
 _file_lock = threading.Lock()  # telemetry.json: the timer thread and the event loop both write
@@ -74,10 +79,35 @@ def disable() -> None:
     _off = True
 
 
-def enabled() -> bool:
-    if _off or os.environ.get("HANDLE_TELEMETRY", "").strip().lower() in OFF:
+def _env() -> bool | None:
+    """What the environment says: False = off (always wins), True = the human set it on."""
+    value = os.environ.get("HANDLE_TELEMETRY", "").strip().lower()
+    if _off or value in OFF or os.environ.get("DO_NOT_TRACK", "").strip().lower() not in {"", *OFF}:
         return False
-    return os.environ.get("DO_NOT_TRACK", "").strip().lower() in {"", *OFF}
+    return True if value in ON else None
+
+
+def enabled() -> bool:
+    """Only after a yes. No answer is a no: nothing is sent and no file is written."""
+    env = _env()
+    return answer() is True if env is None else env
+
+
+def answer() -> bool | None:
+    """The saved yes or no. None: the human was never asked."""
+    value = _state().get("consent")
+    return value if isinstance(value, bool) else None
+
+
+def ask() -> bool:
+    """Ask after a login? Only when nothing has answered yet: not the file, not the env."""
+    return _env() is None and answer() is None
+
+
+def set_consent(yes: bool) -> None:
+    """Save the answer. A no keeps nothing else: the days and the counted carts go."""
+    with _file_lock:
+        _save({**_state(), "consent": True} if yes else {"consent": False})
 
 
 def _version() -> str:
@@ -114,31 +144,10 @@ def _save(state: dict[str, Any]) -> None:
 
 @_safe
 def start() -> None:
-    """At server start: the notice once per machine, then today's "server_started"."""
+    """At server start: today's "server_started", if the human said yes."""
     if not enabled():
         return
-    if not _state().get("notice_shown"):
-        sys.stderr.write(NOTICE)  # the log; notice() puts it where the human sees it
     _daily("server_started", {"os": platform.system().lower() or "unknown"})
-
-
-def notice() -> str | None:
-    """The notice for the first tool answer on this machine, once. The model tells the human:
-    stderr ends in a log file nobody reads, and counting must never be a secret."""
-    global _noticed
-    if _noticed or not enabled():
-        return None
-    _noticed = True
-    try:
-        with _file_lock:
-            state = _state()
-            if state.get("notice_shown"):
-                return None
-            _save({**state, "notice_shown": True})
-    except Exception:
-        log.debug("telemetry notice failed", exc_info=True)
-        return None
-    return " ".join(NOTICE.split())
 
 
 def counted(fn: Callable[..., Any]) -> Callable[..., Any]:
