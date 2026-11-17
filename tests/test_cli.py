@@ -327,3 +327,65 @@ def test_color_only_where_the_terminal_shows_it(monkeypatch, env, name, tty, col
     monkeypatch.setattr(cli.os, "name", name)
     monkeypatch.setattr("sys.stderr", Tty() if tty else io.StringIO())
     assert cli._color() is color
+
+
+@pytest.fixture
+def fancy(monkeypatch, terminal, memory_keychain):
+    """A login where the terminal can show the logo, frames and arrow keys. Records what it shows."""
+    monkeypatch.delenv("HANDLE_TELEMETRY", raising=False)
+    monkeypatch.delenv("DO_NOT_TRACK", raising=False)
+    shown: list[str] = []
+    monkeypatch.setattr("sys.stdin", Tty())
+    monkeypatch.setattr(cli.tui, "fancy", lambda: True)
+    monkeypatch.setattr(cli.tui, "banner", lambda store: shown.append(f"banner {store}"))
+    monkeypatch.setattr(cli.tui, "text", lambda _message: "a@example.com")
+    monkeypatch.setattr(cli.tui, "password", lambda _message: "rigtig")
+    monkeypatch.setattr(cli.tui, "frame", lambda title, body, dim=(): shown.append(body))
+    monkeypatch.setattr(cli.tui, "done", shown.append)
+    monkeypatch.setattr(cli.tui, "failed", shown.append)
+    return shown
+
+
+@pytest.mark.parametrize(("pick", "saved"), [(0, False), (1, True)])
+def test_the_fancy_login_asks_with_no_first_and_the_same_words(fancy, monkeypatch, pick, saved):
+    offered: list[list[str]] = []
+
+    def choose(_message, choices):
+        offered.append(choices)
+        return choices[pick]
+
+    monkeypatch.setattr(cli.tui, "choose", choose)
+    assert cli.run(["login", "fake"]) == 0
+    assert offered == [["Nej tak", "Ja, tæl med"]]  # the pointer starts on no
+    assert cli.telemetry.answer() is saved
+    body = fancy[2]
+    plain = [line.strip() for line in cli.telemetry.QUESTION.splitlines()[3:]]
+    assert [line.strip() for line in body.splitlines()] == plain
+    assert fancy[0] == "banner fake" and "Logget ind på fake" in fancy[1]
+
+
+@pytest.mark.parametrize(
+    ("env", "name", "tty", "expected"),
+    [
+        ({}, "posix", True, True),
+        ({}, "posix", False, False),
+        ({"NO_COLOR": "1"}, "posix", True, False),
+        ({"TERM": "dumb"}, "posix", True, False),
+        ({}, "nt", True, False),
+        ({"WT_SESSION": "x"}, "nt", True, True),
+    ],
+)
+def test_the_fancy_login_only_on_a_terminal_that_shows_it(monkeypatch, env, name, tty, expected):
+    for key in ("NO_COLOR", "TERM", "WT_SESSION"):
+        monkeypatch.delenv(key, raising=False)
+    for key, value in env.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setattr(cli.tui.os, "name", name)
+    monkeypatch.setattr("sys.stdin", Tty() if tty else io.StringIO())
+    monkeypatch.setattr("sys.stderr", Tty() if tty else io.StringIO())
+    assert cli.tui.fancy() is expected
+
+
+def test_the_logo_spells_handle_mcp_and_fits_a_narrow_terminal():
+    rows = [cli.tui._word("HANDLE", row) + "  " + cli.tui._word("MCP", row) for row in range(5)]
+    assert {len(row) for row in rows} == {54}
