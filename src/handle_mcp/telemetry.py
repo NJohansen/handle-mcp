@@ -51,8 +51,7 @@ WHY = """\
   handle-mcp er lavet til dig, der vil handle nemmere.
   Tallene hjælper med at holde den gratis. De kan også vise
   butikkerne, at den giver mening for dem.
-  Jeg sælger aldrig data. Jeg deler kun samlede tal,
-  fx hvor mange kurve den har fyldt på en uge."""
+  Jeg sælger aldrig data. Jeg deler kun samlede tal."""
 FACTS = (
     ("Tæller", "butik, antal varer, afrundet beløb, brugt i dag"),
     ("Aldrig", "navn, adresse, varer"),
