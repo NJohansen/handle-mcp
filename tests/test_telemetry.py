@@ -7,7 +7,7 @@ from datetime import date
 import pytest
 from mcp.server.mcpserver.exceptions import ToolError
 
-from handle_mcp import server, telemetry
+from handle_mcp import question, server, telemetry
 from handle_mcp import stores as registry
 from tests.conftest import LEAK
 
@@ -307,7 +307,7 @@ def test_off_in_the_environment_wins_over_a_saved_yes(sent, monkeypatch, env, va
 
 
 def test_the_question_says_what_why_who_where_and_how_to_say_no():
-    text = telemetry.QUESTION
+    text = question.QUESTION
     for part in [
         "Niclas Johansen",
         "gratis",
@@ -316,6 +316,12 @@ def test_the_question_says_what_why_who_where_and_how_to_say_no():
         "Umami",
         "USA",
         "din IP",
+        "fyldt kurv",
+        "start",
+        "første værktøj",
+        "login",
+        "version",
+        "styresystem",
     ]:
         assert part in text
     assert "handle-mcp telemetry off" in text and "handlemcp.dk/privatliv" in text
@@ -323,11 +329,11 @@ def test_the_question_says_what_why_who_where_and_how_to_say_no():
 
 
 def test_the_question_in_color_has_the_same_words():
-    plain = telemetry.question(color=True)
+    plain = question.question(color=True)
     for code in ("\033[1m", "\033[2m", "\033[0m"):
         assert code in plain
         plain = plain.replace(code, "")
-    assert plain == telemetry.QUESTION
+    assert plain == question.QUESTION
 
 
 async def test_a_tool_answer_never_carries_a_telemetry_text(sent):

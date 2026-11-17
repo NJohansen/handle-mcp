@@ -284,7 +284,7 @@ def test_telemetry_on_off_status(monkeypatch, capsys):
     assert cli.run(["telemetry", "status"]) == 0
     assert "slået fra. Du er ikke blevet spurgt endnu." in capsys.readouterr().err
     assert cli.run(["telemetry", "on"]) == 0 and cli.telemetry.enabled()
-    assert "Umami (" in capsys.readouterr().err  # on shows what it counts
+    assert cli.question.QUESTION in capsys.readouterr().err  # on shows the whole question, plain
     assert cli.run(["telemetry", "status"]) == 0
     assert "slået til." in capsys.readouterr().err
     monkeypatch.setenv("DO_NOT_TRACK", "1")  # the environment wins, and both commands say so

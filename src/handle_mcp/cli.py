@@ -27,7 +27,7 @@ from typing import Any
 from keyring.errors import KeyringError
 
 from handle_mcp import stores as registry
-from handle_mcp import telemetry
+from handle_mcp import question, telemetry
 
 
 def configure_logging() -> None:
@@ -105,7 +105,7 @@ def _ask_telemetry() -> None:
     try:
         if not telemetry.ask() or not sys.stdin.isatty():
             return
-        _say(telemetry.question(color=_color()))
+        _say(question.question(color=_color()))
         yes = _ask("  Tæl med? (j = ja, Enter = nej): ").lower() in ("j", "ja", "y", "yes")
         telemetry.set_consent(yes)
         _say("Tak. Tællingen er slået til." if yes else "Tællingen er slået fra. Intet sendes.")
@@ -136,7 +136,7 @@ def _telemetry(args: list[str]) -> int:
         _say(f"Kunne ikke gemme dit svar ({type(exc).__name__}). Intet er ændret.")
         return 1
     if args == ["on"]:
-        _say("Det har du sagt ja til:\n" + telemetry.QUESTION)
+        _say("Det har du sagt ja til:\n" + question.QUESTION)
     if args == ["off"]:
         _say("Tællingen er slået fra. Intet sendes.")
     elif telemetry.enabled():

@@ -16,7 +16,7 @@ The choice belongs to the human, and a choice is clearest when it is a question.
 
 The question is asked by handle-mcp itself, in the terminal, never by the model. A model that asks and then calls a tool with the answer could say yes for the human. The answer comes from the human's own keyboard or environment.
 
-The question says what the rules ask for: what is sent, why, who is behind it, where it goes, and how to say no now or later.
+The question says what the rules ask for: what is sent, why, who is behind it, where it goes, and how to say no now or later. It is short and in the first person, so it gets read: a few lines on who asks and why, then one row per fact. The fields of every event and the rounding are one link away, on [handlemcp.dk/privatliv](https://handlemcp.dk/privatliv/) and in the [README](../../README.md#usage-counts). The text lives in `question.py`.
 
 ## Consequences
 

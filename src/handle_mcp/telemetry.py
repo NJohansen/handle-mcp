@@ -42,34 +42,6 @@ FILLED = {"rema1000": "list_filled"}  # REMA's cart is a shopping list: never mi
 OFF = {"0", "false", "no", "off"}
 ON = {"1", "true", "yes", "on"}
 
-# What the human reads before the yes: who asks, why, what, where it goes, and how to say no.
-TITLE = "Anonym tælling i handle-mcp"
-WHY = """\
-  Hej, Niclas Johansen her. Jeg har bygget handle-mcp.
-  Må jeg tælle anonymt, når den fylder en kurv?
-
-  handle-mcp er lavet til dig, der vil handle nemmere.
-  Tallene hjælper med at holde den gratis. De kan også vise
-  butikkerne, at den giver mening for dem."""
-FACTS = (
-    ("Tæller", "butik, antal varer, afrundet beløb, brugt i dag"),
-    ("Aldrig", "navn, adresse, varer"),
-    ("Deles", "kun samlede tal"),
-    ("Ligger hos", "Umami (statistik uden cookies, USA), ser din IP"),
-    ("Slå fra", "handle-mcp telemetry off"),
-    ("Detaljer", "handlemcp.dk/privatliv"),
-)
-
-
-def question(color: bool = False) -> str:
-    """The question as text. With color: a bold title and dim row names, nothing else."""
-    bold, dim, end = ("\033[1m", "\033[2m", "\033[0m") if color else ("", "", "")
-    rows = "\n".join(f"  {dim}{name:<11}{end} {fact}" for name, fact in FACTS)
-    return f"\n  {bold}{TITLE}{end}\n\n{WHY}\n\n{rows}\n"
-
-
-QUESTION = question()
-
 _off = False
 _sent_today: dict[str, str] = {}  # event key -> day, so the file is read once per day
 _lock = threading.Lock()  # _pending
