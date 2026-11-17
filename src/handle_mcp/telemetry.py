@@ -50,11 +50,11 @@ WHY = """\
 
   handle-mcp er lavet til dig, der vil handle nemmere.
   Tallene hjælper med at holde den gratis. De kan også vise
-  butikkerne, at den giver mening for dem.
-  Jeg sælger aldrig data. Jeg deler kun samlede tal."""
+  butikkerne, at den giver mening for dem."""
 FACTS = (
     ("Tæller", "butik, antal varer, afrundet beløb, brugt i dag"),
     ("Aldrig", "navn, adresse, varer"),
+    ("Deles", "kun samlede tal"),
     ("Ligger hos", "Umami (statistik uden cookies, USA), ser din IP"),
     ("Slå fra", "handle-mcp telemetry off"),
     ("Detaljer", "handlemcp.dk/privatliv"),
