@@ -16,8 +16,8 @@ WHY = """\
   Tallene hjælper med at holde den gratis. De kan også vise
   butikkerne, at den giver mening for dem."""
 FACTS = (
-    ("Tæller", "butik, antal varer og afrundet beløb pr. fyldt kurv"),
-    ("Dagligt", "start, første værktøj, login, version og styresystem"),
+    ("Tæller", "butik, antal varer, afrundet beløb pr. fyldt kurv"),
+    ("Dagligt", "start, første værktøj, login, version, styresystem"),
     ("Aldrig", "navn, adresse, varer"),
     ("Deles", "kun samlede tal"),
     ("Ligger hos", "Umami (statistik uden cookies, USA), ser din IP"),

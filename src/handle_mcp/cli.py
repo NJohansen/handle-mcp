@@ -26,8 +26,8 @@ from typing import Any
 
 from keyring.errors import KeyringError
 
-from handle_mcp import stores as registry
 from handle_mcp import question, telemetry
+from handle_mcp import stores as registry
 
 
 def configure_logging() -> None:
