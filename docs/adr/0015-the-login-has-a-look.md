@@ -22,5 +22,5 @@ Two well-known libraries are less code to own than escape codes and key handling
 ## Consequences
 
 - Everyone who installs handle-mcp gets `rich` and `prompt-toolkit` and what they need, also those who only run the server. Dependabot watches them like the rest.
-- The logo is drawn with half blocks in exact colors. A terminal without them still gets the frames; a narrow one (under 90 columns) gets no logo.
+- The logo is drawn with half blocks in exact colors. A terminal without them still gets the frames; a narrow one (under 80 columns) gets no logo.
 - `tests/test_tui.py` types into the real questions through a pipe. How it looks in a given terminal is checked by eye.

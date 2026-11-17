@@ -12,8 +12,8 @@ import os
 import sys
 from typing import Any
 
-BLUE, YELLOW, INK = "#9ccbf3", "#f5e211", "#12161c"  # handlemcp.dk's sky and button
-ACCENT, EDGE = "#2f7fc1", "#8a94a3"  # a deeper blue and a grey: readable on light and on dark
+GREEN, YELLOW, INK = "#8bd86a", "#f5e211", "#12161c"  # handlemcp.dk's logo and button
+ACCENT, EDGE = "#2f9440", "#8a94a3"  # a deeper green and a grey: readable on light and on dark
 WIDTH = 62  # inside a frame
 # Block letters, five units high. A unit is two columns wide and one line high: about square.
 LETTERS = {
@@ -28,11 +28,11 @@ LETTERS = {
     "P": ["XXX", "X.X", "XXX", "X..", "X.."],
 }
 # Per word: the fade of its letters from top to bottom, and the one color of its depth.
-HANDLE = (BLUE, ACCENT, "#1b4f8a")
+HANDLE = (GREEN, ACCENT, "#1f6e34")
 MCP = ("#aeb6c2", "#6f7a88", "#444c57")
 
 
-AIR = 3  # columns between letters: one for the depth, two empty
+AIR = 2  # columns between letters: one for the depth, one empty
 
 
 def pixels(text: str) -> list[str]:
@@ -70,14 +70,14 @@ def painted(text: str, colors: tuple[str, str, str]) -> list[list[str | None]]:
 
 
 def logo_rows() -> list[str]:
-    """The logo as rich markup, six lines: HANDLE in blue, MCP in grey, both with depth.
+    """The logo as rich markup, six lines: HANDLE in green, MCP in grey, both with depth.
     A cell is a half block: its upper pixel is the text color, its lower pixel the background."""
     left, right = painted("HANDLE", HANDLE), painted("MCP", MCP)
     out = []
     for y in range(0, 12, 2):
         line = ""
         for up, down in zip(
-            left[y] + [None] * 5 + right[y], left[y + 1] + [None] * 5 + right[y + 1], strict=True
+            left[y] + [None] * 3 + right[y], left[y + 1] + [None] * 3 + right[y + 1], strict=True
         ):
             if up and down:
                 line += f"[{up} on {down}]▀[/]" if up != down else f"[{up}]█[/]"
@@ -109,14 +109,14 @@ def _show() -> Any:
 
 def banner(store: str) -> None:
     """The logo, the title bar and one line about the store."""
-    show, wide = _show(), _console().width >= 90
+    show, wide = _show(), _console().width >= 80
     show()
     for row in logo_rows() if wide else []:
         show(" " + row)
     show()
     show(f" [bold {INK} on {YELLOW}] ✦ HandleMCP :: Log ind :: Du betaler altid selv ✦ [/]")
     show()
-    show(f" Lad os fylde kurven hos [bold {INK} on {BLUE}] {store} [/]")
+    show(f" Lad os fylde kurven hos [bold {INK} on {GREEN}] {store} [/]")
     show()
 
 
