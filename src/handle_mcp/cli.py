@@ -1,5 +1,6 @@
 """Command line for a human in a terminal: save or remove a store login.
 
+    handle-mcp login                    on a terminal: pick your stores, then as below for each
     handle-mcp login nemlig             asks for email and password, logs in, saves the store's
                                         session in the keychain
     handle-mcp login nemlig --from-env  reads HANDLE_NEMLIG_EMAIL/_PASSWORD, logs in, saves the
@@ -60,10 +61,13 @@ def run(args: list[str]) -> int:
         return _telemetry(args[1:])
     from_env = "--from-env" in args
     args = [a for a in args if a != "--from-env"]
+    if args == ["login"] and not from_env and tui.fancy():
+        return _login_picked()
     if len(args) != 2 or args[0] not in ("login", "logout") or args[1] not in registry.STORES:
         _say(
             "Brug: handle-mcp login <butik> [--from-env]  eller  handle-mcp logout <butik>\n"
             f"Butikker: {known}\n"
+            "Uden terminal: sæt HANDLE_<BUTIK>_EMAIL og HANDLE_<BUTIK>_PASSWORD, kør med --from-env\n"
             "Anonym tælling: handle-mcp telemetry on|off|status"
         )
         return 2
@@ -72,10 +76,39 @@ def run(args: list[str]) -> int:
         return _logout(store)
     if from_env:
         return _login_from_env(store)
-
     fancy = tui.fancy()  # a real terminal gets the logo, frames and arrow keys; the words stay
     if fancy:
         tui.banner(store)
+    code = _login(store, fancy)
+    if code == 0:
+        _ask_telemetry(fancy)
+    return min(code, 1)
+
+
+def _login_picked() -> int:
+    """`handle-mcp login` with no store, on a terminal that can show a list: pick the stores,
+    log in to each in turn. The question about counting comes once, after a login that worked."""
+    tui.banner()
+    hint = "Pil op/ned flytter. Mellemrum vælger. Enter bekræfter."
+    picked = tui.choose("Hvor handler du?", list(registry.STORES), hint, many=True)
+    if not picked:
+        _say("Ingen butik valgt. Intet er gemt.")
+        return 1
+    codes: list[int] = []
+    for store in picked:
+        codes.append(_login(store, fancy=True))
+        if codes[-1] == LEFT:  # Ctrl-C or nothing typed: the human is done, ask for no more
+            break
+    if 0 in codes:
+        _ask_telemetry(fancy=True)
+    return min(max(codes), 1)
+
+
+LEFT = 2  # _login: no email or no password was given
+
+
+def _login(store: str, fancy: bool) -> int:
+    if fancy:
         email = tui.text(f"Email til {store}", "Den email, du bruger på butikkens hjemmeside.")
         # No email (empty, or Ctrl-C): stop here, do not ask for the password.
         password = email and tui.password(f"Kodeord til {store}", "Vises ikke, og gemmes ikke.")
@@ -89,7 +122,7 @@ def run(args: list[str]) -> int:
         password = getpass.getpass(f"Kodeord til {store} (vises ikke): ")
     if not email or not password:
         _say("Email og kodeord skal udfyldes. Intet er gemt.")
-        return 1
+        return LEFT
     try:  # log in first, save after: a failed login never touches a saved one
         session = _check(store, email, password, choose=True)
     except registry.StoreError as exc:
@@ -107,7 +140,6 @@ def run(args: list[str]) -> int:
         return 1
     text = f"Logget ind på {store}. Sessionen er gemt i nøgleringen. Kodeordet er ikke gemt."
     tui.done(text) if fancy else _say(text)
-    _ask_telemetry(fancy)
     return 0
 
 
@@ -122,22 +154,13 @@ def _ask_telemetry(fancy: bool = False) -> None:
             hint = "Pil op/ned vælger. Enter bekræfter."
             yes = tui.choose("Tæl med?", ["Nej", "Ja"], hint) == "Ja"
         else:
-            _say(question.question(color=_color()))
+            _say(question.question(color=tui.color()))
             yes = _ask("  Tæl med? (j = ja, Enter = nej): ").lower() in ("j", "ja", "y", "yes")
         telemetry.set_consent(yes)
         text = "Tak. Tællingen er slået til." if yes else "Tællingen er slået fra. Intet sendes."
         tui.done(text) if fancy else _say(text)
     except Exception:  # the question never breaks a login
         logging.getLogger(__name__).debug("telemetry question failed", exc_info=True)
-
-
-def _color() -> bool:
-    """Bold and dim only where the terminal shows them: never in a pipe, a dumb terminal,
-    with NO_COLOR, or in the old Windows console."""
-    env = os.environ
-    if not sys.stderr.isatty() or "NO_COLOR" in env or env.get("TERM") == "dumb":
-        return False
-    return os.name != "nt" or "WT_SESSION" in env
 
 
 FORCED_OFF = "HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 eller --no-telemetry er sat, og de vinder."

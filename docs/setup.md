@@ -5,6 +5,12 @@ Works on macOS, Linux and Windows. Needs [uv](https://docs.astral.sh/uv/getting-
 **1. Logins.** Save each store's login in your OS keychain (macOS Keychain, Windows Credential Locker or Linux Secret Service). It asks for email and password, logs in, and saves only the session the store gives back. The password is never saved ([ADR 0003](adr/0003-save-the-session-not-the-password.md)). When the session expires (nemlig: about once a year), the tool asks you to log in again:
 
 ```sh
+uvx handle-mcp@latest login
+```
+
+It asks where you shop: mark your stores with space, confirm with Enter, and log in to each in turn. Or name one store:
+
+```sh
 uvx handle-mcp@latest login nemlig
 uvx handle-mcp@latest login bilkatogo
 uvx handle-mcp@latest login rema1000

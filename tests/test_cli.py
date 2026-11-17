@@ -326,7 +326,7 @@ def test_color_only_where_the_terminal_shows_it(monkeypatch, env, name, tty, col
         monkeypatch.setenv(key, value)
     monkeypatch.setattr(cli.os, "name", name)
     monkeypatch.setattr("sys.stderr", Tty() if tty else io.StringIO())
-    assert cli._color() is color
+    assert cli.tui.color() is color
 
 
 @pytest.fixture
@@ -370,6 +370,61 @@ def test_the_fancy_login_asks_with_no_first_and_the_same_words(fancy, monkeypatc
     plain = [line.strip() for line in cli.question.QUESTION.splitlines()[3:]]
     assert [line.strip() for line in body.splitlines()] == plain
     assert fancy[0] == "banner fake" and "Logget ind på fake" in fancy[1]
+
+
+def test_login_with_no_store_picks_stores_and_asks_about_counting_once(fancy, monkeypatch):
+    monkeypatch.setattr(registry, "STORES", {"fake": CheckingStore, "fake2": FakeStore})
+    asked: list[str] = []
+
+    def choose(title, choices, _hint="", many=False):
+        asked.append(title)
+        return choices if many else choices[0]  # both stores, then no to counting
+
+    monkeypatch.setattr(cli.tui, "choose", choose)
+    monkeypatch.setattr(cli.tui, "banner", lambda store="": fancy.append(f"banner {store}"))
+    assert cli.run(["login"]) == 0
+    assert asked == ["Hvor handler du?", "Tæl med?"]
+    assert fancy[0] == "banner " and "Logget ind på fake." in fancy[1]
+    assert registry.keychain_get("fake") == SAVED and cli.telemetry.answer() is False
+
+
+def test_login_with_no_store_goes_on_after_a_wrong_password_and_stops_at_ctrl_c(fancy, monkeypatch):
+    stores = {"fake": CheckingStore, "fake2": FakeStore, "fake3": FakeStore}
+    monkeypatch.setattr(registry, "STORES", stores)
+    monkeypatch.setattr(cli.tui, "banner", lambda store="": None)
+    monkeypatch.setattr(cli.tui, "choose", lambda _t, c, _h="", many=False: c if many else c[0])
+    emails: list[str] = []
+
+    def text(title, _hint=""):
+        emails.append(title)
+        return "" if "fake3" in title else "a@example.com"  # Ctrl-C at the third store
+
+    monkeypatch.setattr(cli.tui, "text", text)
+    monkeypatch.setattr(cli.tui, "password", lambda title, _hint="": "forkert")
+    assert cli.run(["login"]) == 1
+    assert emails == ["Email til fake", "Email til fake2", "Email til fake3"]  # wrong: go on
+    assert registry.keychain_get("fake") is None and registry.keychain_get("fake2") is not None
+    emails.clear()
+    monkeypatch.setattr(cli.tui, "text", lambda title, _hint="": emails.append(title) or "")
+    assert cli.run(["login"]) == 1
+    assert emails == ["Email til fake"]  # Ctrl-C at the first store: no more questions
+
+
+def test_login_with_no_store_and_none_picked_saves_nothing(fancy, monkeypatch, capsys):
+    monkeypatch.setattr(cli.tui, "choose", lambda *_a, **_k: [])
+    monkeypatch.setattr(cli.tui, "banner", lambda store="": None)
+    monkeypatch.setattr(cli.tui, "text", lambda *_: pytest.fail("asked for an email"))
+    assert cli.run(["login"]) == 1
+    assert "Ingen butik valgt." in capsys.readouterr().err
+    assert registry.keychain_get("fake") is None and cli.telemetry.answer() is None
+
+
+def test_login_with_no_store_in_a_pipe_says_how(terminal, monkeypatch, capsys):
+    monkeypatch.setattr(cli.tui, "fancy", lambda: False)
+    assert cli.run(["login"]) == 2
+    err = capsys.readouterr().err
+    assert "Brug: handle-mcp login" in err
+    assert "HANDLE_<BUTIK>_EMAIL og HANDLE_<BUTIK>_PASSWORD" in err  # an agent reads what to set
 
 
 @pytest.mark.parametrize(
