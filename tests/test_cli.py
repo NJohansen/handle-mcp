@@ -386,14 +386,14 @@ def test_the_fancy_login_only_on_a_terminal_that_shows_it(monkeypatch, env, name
     assert cli.tui.fancy() is expected
 
 
-def test_the_logo_is_solid_letters_with_air_and_fits_80_columns():
-    logo = cli.tui.LOGO
-    assert len(logo) == 5 and {len(row) for row in logo} == {76}
-    assert set("".join(logo)) == {"█", " "}  # no box characters: every font draws these the same
-    letters = ["".join(row[i] for row in logo).strip() == "" for i in range(76)]  # empty columns
-    assert "".join("." if empty else "X" for empty in letters).count("X..X") == 8  # air between 9
-    rows = cli.tui.logo_rows()
-    assert cli.tui.ACCENT in rows[0] and cli.tui.BLUE in rows[4]
+def test_the_wordmark_is_small_flat_and_only_handle_has_color():
+    handle, mcp = cli.tui.word("handle"), cli.tui.word("mcp")
+    assert len(handle) == len(mcp) == 5 and {len(row) for row in handle} == {26}
+    assert len(handle[0]) + 1 + len(mcp[0]) == 44  # fits a narrow terminal
+    assert set("".join(handle + mcp)) <= set("█▀▄ ")  # block characters only
+    for row in cli.tui.logo_rows():
+        assert row.startswith(f"[{cli.tui.ACCENT}]") and f"[{cli.tui.EDGE}]" in row
+    assert cli.tui.BLUE not in "".join(cli.tui.logo_rows())  # no fade
 
 
 def test_a_frame_is_the_same_width_on_every_row():

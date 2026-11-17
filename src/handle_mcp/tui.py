@@ -15,22 +15,30 @@ from typing import Any
 BLUE, YELLOW, INK = "#9ccbf3", "#f5e211", "#12161c"  # handlemcp.dk's sky and button
 ACCENT, EDGE = "#2f7fc1", "#8a94a3"  # a deeper blue and a grey: readable on light and on dark
 WIDTH = 62  # inside a frame
-# Five rows per letter, "X" is two columns of solid block. Two columns of air between letters.
+# The wordmark in small letters, as on handlemcp.dk. Ten pixel rows per letter; two pixel rows
+# make one line of half blocks, so a pixel is about square.
 LETTERS = {
-    "H": ["X.X", "X.X", "XXX", "X.X", "X.X"],
-    "A": ["XXX", "X.X", "XXX", "X.X", "X.X"],
-    "N": ["X..X", "XX.X", "X.XX", "X..X", "X..X"],
-    "D": ["XX.", "X.X", "X.X", "X.X", "XX."],
-    "L": ["X..", "X..", "X..", "X..", "XXX"],
-    "E": ["XXX", "X..", "XX.", "X..", "XXX"],
-    "M": ["X...X", "XX.XX", "X.X.X", "X...X", "X...X"],
-    "C": ["XXX", "X..", "X..", "X..", "XXX"],
-    "P": ["XXX", "X.X", "XXX", "X..", "X.."],
+    "h": ["X...", "X...", "X...", "XXX.", "X..X", "X..X", "X..X", "X..X", "....", "...."],
+    "a": ["....", "....", "....", ".XX.", "...X", ".XXX", "X..X", ".XXX", "....", "...."],
+    "n": ["....", "....", "....", "XXX.", "X..X", "X..X", "X..X", "X..X", "....", "...."],
+    "d": ["...X", "...X", "...X", ".XXX", "X..X", "X..X", "X..X", ".XXX", "....", "...."],
+    "l": ["X", "X", "X", "X", "X", "X", "X", "X", ".", "."],
+    "e": ["....", "....", "....", ".XX.", "X..X", "XXXX", "X...", ".XXX", "....", "...."],
+    "m": [".......", ".......", ".......", "XXX.XX.", "X..X..X", "X..X..X", "X..X..X"]
+    + ["X..X..X", ".......", "......."],
+    "c": ["....", "....", "....", ".XXX", "X...", "X...", "X...", ".XXX", "....", "...."],
+    "p": ["....", "....", "....", "XXX.", "X..X", "X..X", "X..X", "XXX.", "X...", "X..."],
 }
-LOGO = [
-    "  ".join(LETTERS[letter][row].replace("X", "██").replace(".", "  ") for letter in "HANDLEMCP")
-    for row in range(5)
-]
+HALF = {"XX": "█", "X.": "▀", ".X": "▄", "..": " "}
+
+
+def word(text: str) -> list[str]:
+    """A word as five lines of half blocks, one column of air between letters."""
+    pixels = [".".join(LETTERS[letter][row] for letter in text) for row in range(10)]
+    return [
+        "".join(HALF[a + b] for a, b in zip(pixels[row], pixels[row + 1], strict=True))
+        for row in range(0, 10, 2)
+    ]
 
 
 def fancy() -> bool:
@@ -53,23 +61,16 @@ def _show() -> Any:
     return _console().print
 
 
-def _mix(step: int, steps: int) -> str:
-    """A color on the way from the deeper blue to the sky blue."""
-    a = [int(ACCENT[i : i + 2], 16) for i in (1, 3, 5)]
-    b = [int(BLUE[i : i + 2], 16) for i in (1, 3, 5)]
-    return "#" + "".join(
-        f"{round(x + (y - x) * step / steps):02x}" for x, y in zip(a, b, strict=True)
-    )
-
-
 def logo_rows() -> list[str]:
-    """The logo as rich markup: solid letters that fade from the deeper blue to the sky blue."""
-    return [f"[{_mix(number, len(LOGO) - 1)}]{line}[/]" for number, line in enumerate(LOGO)]
+    """The wordmark as rich markup: handle in blue, mcp in grey. Flat, no edge, no fade."""
+    return [
+        f"[{ACCENT}]{a}[/] [{EDGE}]{b}[/]" for a, b in zip(word("handle"), word("mcp"), strict=True)
+    ]
 
 
 def banner(store: str) -> None:
     """The logo, the title bar and one line about the store."""
-    show, wide = _show(), _console().width > max(map(len, LOGO)) + 2
+    show, wide = _show(), _console().width >= 48
     show()
     for row in logo_rows() if wide else []:
         show(" " + row)
