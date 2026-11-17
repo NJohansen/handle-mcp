@@ -8,7 +8,7 @@ Works on macOS, Linux and Windows. Needs [uv](https://docs.astral.sh/uv/getting-
 uvx handle-mcp@latest login
 ```
 
-It asks where you shop: mark your stores with space, confirm with Enter, and log in to each in turn. Or name one store:
+It asks where you shop: mark your stores with Enter, go on with "Videre", and log in to each in turn. Or name one store:
 
 ```sh
 uvx handle-mcp@latest login nemlig

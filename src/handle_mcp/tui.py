@@ -238,41 +238,56 @@ def password(title: str, hint: str = "") -> str:
 
 def choose(title: str, choices: list[str], hint: str = "", many: bool = False) -> Any:
     """Arrow keys. One answer: the first choice is where the pointer starts, and what Ctrl-C
-    gives. With `many`: space marks, the answer is the marked ones, and Ctrl-C gives none."""
+    gives. With `many`: Enter (or space) marks and takes the mark off, Enter on the last row
+    gives the marked ones (it waits for one), and Ctrl-C gives none."""
     from prompt_toolkit.key_binding import KeyBindings
     from prompt_toolkit.layout import Window
     from prompt_toolkit.layout.controls import FormattedTextControl
 
     at, marked, keys = [0], set(), KeyBindings()
+    onward = len(choices)  # with `many`: the row under the choices
 
     def move(step: int) -> Any:
         def handler(_event: Any) -> None:
-            at[0] = (at[0] + step) % len(choices)
+            at[0] = (at[0] + step) % (onward + many)
 
         return handler
+
+    def enter(event: Any) -> None:
+        if not many:
+            event.app.exit(result=[at[0]])
+        elif at[0] < onward:
+            marked.symmetric_difference_update({at[0]})  # one key to learn; the pointer stays
+        elif marked:
+            event.app.exit(result=sorted(marked))
 
     for key in ("up", "k"):
         keys.add(key)(move(-1))
     for key in ("down", "j", "tab"):
         keys.add(key)(move(1))
+    keys.add("enter")(enter)
     if many:
-        keys.add("space")(lambda _event: marked.symmetric_difference_update({at[0]}))
-        keys.add("enter")(lambda event: event.app.exit(result=sorted(marked)))
-    else:
-        keys.add("enter")(lambda event: event.app.exit(result=[at[0]]))
+        keys.add("space")(lambda _event: marked.symmetric_difference_update({at[0]} - {onward}))
 
     def rows() -> list[tuple[str, str]]:
         out = []
         for number, choice in enumerate(choices):
             here = number == at[0]
             on = number in marked if many else here
-            end = "" if number == len(choices) - 1 else "\n"
-            line = f"{'›' if here else ' '} {'●' if on else '○'} {choice}{end}"
+            end = "" if number == len(choices) - 1 and not many else "\n"
+            mark = ("[x]" if on else "[ ]") if many else ("●" if on else "○")
+            line = f"{'›' if here else ' '} {mark} {choice}{end}"
             out.append(("class:on" if on or here else "class:off", line))
+        if many:  # an empty row, then the row that goes on: it says what it goes on with
+            here, names = at[0] == onward, ", ".join(choices[n] for n in sorted(marked))
+            onward_text = f"Videre med {names}" if names else "Vælg mindst én"
+            out.append(
+                ("class:on" if here else "class:off", f"\n{'›' if here else ' '} {onward_text}")
+            )
         return out
 
     body = Window(FormattedTextControl(rows, focusable=True, show_cursor=False), width=WIDTH)
-    answer = _ask(title, body, hint, len(choices), keys)
+    answer = _ask(title, body, hint, len(choices) + 2 * many, keys)
     picked = [choices[n] for n in (answer if answer is not None else [] if many else [0])]
     frame(title, ", ".join(picked) or "Ingen")
     return picked if many else picked[0]

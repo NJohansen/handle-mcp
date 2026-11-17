@@ -467,3 +467,15 @@ def test_a_frame_is_the_same_width_on_every_row():
     for title in ("Tæl med?", "Email til nemlig", "Anonym tælling i handle-mcp"):
         left, right, under = cli.tui.edges(title)
         assert len(left + title + right) == len(under) == cli.tui.WIDTH + 4
+
+
+def test_the_store_list_shows_names_a_human_reads_and_logs_in_to_the_store(fancy, monkeypatch):
+    shown: list[str] = []
+    monkeypatch.setattr(registry, "STORES", dict.fromkeys(registry.LABELS, FakeStore))
+    monkeypatch.setattr(cli.tui, "banner", lambda store="": None)
+    monkeypatch.setattr(
+        cli.tui, "choose", lambda _t, c, _h="", many=False: shown.extend(c) or c[2:]
+    )
+    monkeypatch.setattr(cli, "_login", lambda store, fancy: shown.append(store) or cli.LEFT)
+    assert cli.run(["login"]) == 1
+    assert shown == ["nemlig.com", "BilkaToGo", "REMA 1000", "rema1000"]

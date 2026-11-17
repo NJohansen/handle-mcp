@@ -46,11 +46,14 @@ def test_choose_moves_with_the_keys_and_ctrl_c_is_the_first_choice(keys, typed, 
 @pytest.mark.parametrize(
     ("typed", "picked"),
     [
-        (ENTER, []),  # a blind Enter picks nothing
-        (" " + ENTER, ["nemlig"]),
-        (" " + DOWN + DOWN + " " + ENTER, ["nemlig", "rema1000"]),
-        (DOWN + " " + UP + " " + " " + ENTER, ["bilkatogo"]),  # space twice takes the mark off
-        (" " + DOWN + " " + CTRL_C, []),  # Ctrl-C picks nothing
+        (ENTER + UP + ENTER, ["nemlig"]),  # Enter marks in place; up from the top is Videre
+        (DOWN + ENTER + DOWN + DOWN + ENTER, ["bilkatogo"]),
+        (ENTER + DOWN + DOWN + ENTER + DOWN + ENTER, ["nemlig", "rema1000"]),
+        (" " + DOWN + DOWN + " " + DOWN + ENTER, ["nemlig", "rema1000"]),  # space marks too
+        (ENTER + ENTER + DOWN + ENTER + DOWN + DOWN + ENTER, ["bilkatogo"]),  # twice: mark off
+        (UP + ENTER + UP + ENTER + DOWN + ENTER, ["rema1000"]),  # Videre waits for a store
+        (ENTER + ENTER + UP + ENTER + CTRL_C, []),  # no mark left: Videre waits
+        (ENTER + DOWN + ENTER + CTRL_C, []),  # Ctrl-C picks nothing
     ],
 )
 def test_choose_many_marks_with_space(keys, typed, picked):
