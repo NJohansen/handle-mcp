@@ -34,4 +34,11 @@ def question(color: bool = False) -> str:
     return f"\n  {bold}{TITLE}{end}\n\n{WHY}\n\n{rows}\n"
 
 
+def body() -> str:
+    """The same words with no title and no indent: for a frame that has its own title."""
+    why = "\n".join(line[2:] for line in WHY.splitlines())
+    rows = "\n".join(f"{name:<11} {fact}" for name, fact in FACTS)
+    return f"{why}\n\n{rows}"
+
+
 QUESTION = question()

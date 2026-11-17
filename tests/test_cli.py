@@ -364,7 +364,7 @@ def test_the_fancy_login_asks_with_no_first_and_the_same_words(fancy, monkeypatc
 
     monkeypatch.setattr(cli.tui, "choose", choose)
     assert cli.run(["login", "fake"]) == 0
-    assert offered == [["Nej tak", "Ja, tæl med"]]  # the pointer starts on no
+    assert offered == [["Nej", "Ja"]]  # the pointer starts on no
     assert cli.telemetry.answer() is saved
     body = fancy[2]
     plain = [line.strip() for line in cli.question.QUESTION.splitlines()[3:]]
