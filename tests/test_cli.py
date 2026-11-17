@@ -391,9 +391,8 @@ def test_the_wordmark_fades_has_depth_and_no_line_characters():
 
     rows = cli.tui.logo_rows()
     plain = [re.sub(r"\[[^\]]*\]", "", row) for row in rows]
-    assert len(rows) == 6 and {len(row) for row in plain} == {
-        85
-    }  # the banner shows it from 88 columns
+    assert len(rows) == 6
+    assert {len(row) for row in plain} == {88}  # the banner shows it from 90 columns
     assert set("".join(plain)) <= set("█▀▄ ")  # solid blocks only: no lines between letters
     handle = cli.tui.painted("HANDLE", cli.tui.HANDLE)
     assert handle[0][0] == cli.tui.BLUE and handle[9][0] == cli.tui.ACCENT  # the letters fade
