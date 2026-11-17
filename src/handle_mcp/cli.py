@@ -1,5 +1,6 @@
 """Command line for a human in a terminal: save or remove a store login.
 
+    handle-mcp login                    on a terminal: pick your stores, then as below for each
     handle-mcp login nemlig             asks for email and password, logs in, saves the store's
                                         session in the keychain
     handle-mcp login nemlig --from-env  reads HANDLE_NEMLIG_EMAIL/_PASSWORD, logs in, saves the
@@ -60,6 +61,8 @@ def run(args: list[str]) -> int:
         return _telemetry(args[1:])
     from_env = "--from-env" in args
     args = [a for a in args if a != "--from-env"]
+    if args == ["login"] and not from_env and tui.fancy():
+        return _login_picked()
     if len(args) != 2 or args[0] not in ("login", "logout") or args[1] not in registry.STORES:
         _say(
             "Brug: handle-mcp login <butik> [--from-env]  eller  handle-mcp logout <butik>\n"
@@ -72,10 +75,32 @@ def run(args: list[str]) -> int:
         return _logout(store)
     if from_env:
         return _login_from_env(store)
-
     fancy = tui.fancy()  # a real terminal gets the logo, frames and arrow keys; the words stay
     if fancy:
         tui.banner(store)
+    code = _login(store, fancy)
+    if code == 0:
+        _ask_telemetry(fancy)
+    return code
+
+
+def _login_picked() -> int:
+    """`handle-mcp login` with no store, on a terminal that can show a list: pick the stores,
+    log in to each in turn. The question about counting comes once, after a login that worked."""
+    tui.banner()
+    hint = "Pil op/ned flytter. Mellemrum vælger. Enter bekræfter."
+    picked = tui.choose("Hvor handler du?", list(registry.STORES), hint, many=True)
+    if not picked:
+        _say("Ingen butik valgt. Intet er gemt.")
+        return 1
+    codes = [_login(store, fancy=True) for store in picked]
+    if 0 in codes:
+        _ask_telemetry(fancy=True)
+    return max(codes)
+
+
+def _login(store: str, fancy: bool) -> int:
+    if fancy:
         email = tui.text(f"Email til {store}", "Den email, du bruger på butikkens hjemmeside.")
         # No email (empty, or Ctrl-C): stop here, do not ask for the password.
         password = email and tui.password(f"Kodeord til {store}", "Vises ikke, og gemmes ikke.")
@@ -107,7 +132,6 @@ def run(args: list[str]) -> int:
         return 1
     text = f"Logget ind på {store}. Sessionen er gemt i nøgleringen. Kodeordet er ikke gemt."
     tui.done(text) if fancy else _say(text)
-    _ask_telemetry(fancy)
     return 0
 
 

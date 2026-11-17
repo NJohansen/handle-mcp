@@ -107,8 +107,8 @@ def _show() -> Any:
     return _console().print
 
 
-def banner(store: str) -> None:
-    """The logo, the title bar and one line about the store."""
+def banner(store: str = "") -> None:
+    """The logo, the title bar and, for one store, a line about it."""
     show, wide = _show(), _console().width >= 80
     show()
     for row in logo_rows() if wide else []:
@@ -116,8 +116,9 @@ def banner(store: str) -> None:
     show()
     show(f" [bold {INK} on {YELLOW}] ✦ HandleMCP :: Log ind :: Du betaler altid selv ✦ [/]")
     show()
-    show(f" Lad os fylde kurven hos [bold {INK} on {GREEN}] {store} [/]")
-    show()
+    if store:
+        show(f" Lad os fylde kurven hos [bold {INK} on {GREEN}] {store} [/]")
+        show()
 
 
 def frame(title: str, body: str, dim: tuple[str, ...] = (), hint: str = "") -> None:
@@ -231,13 +232,14 @@ def password(title: str, hint: str = "") -> str:
     return _typed(title, hint, secret=True)
 
 
-def choose(title: str, choices: list[str], hint: str = "") -> str:
-    """Arrow keys. The first choice is where the pointer starts, and what Ctrl-C gives."""
+def choose(title: str, choices: list[str], hint: str = "", many: bool = False) -> Any:
+    """Arrow keys. One answer: the first choice is where the pointer starts, and what Ctrl-C
+    gives. With `many`: space marks, the answer is the marked ones, and Ctrl-C gives none."""
     from prompt_toolkit.key_binding import KeyBindings
     from prompt_toolkit.layout import Window
     from prompt_toolkit.layout.controls import FormattedTextControl
 
-    at, keys = [0], KeyBindings()
+    at, marked, keys = [0], set(), KeyBindings()
 
     def move(step: int) -> Any:
         def handler(_event: Any) -> None:
@@ -249,19 +251,24 @@ def choose(title: str, choices: list[str], hint: str = "") -> str:
         keys.add(key)(move(-1))
     for key in ("down", "j", "tab"):
         keys.add(key)(move(1))
-    keys.add("enter")(lambda event: event.app.exit(result=choices[at[0]]))
+    if many:
+        keys.add("space")(lambda _event: marked.symmetric_difference_update({at[0]}))
+        keys.add("enter")(lambda event: event.app.exit(result=sorted(marked)))
+    else:
+        keys.add("enter")(lambda event: event.app.exit(result=[at[0]]))
 
     def rows() -> list[tuple[str, str]]:
         out = []
         for number, choice in enumerate(choices):
-            on = number == at[0]
+            here = number == at[0]
+            on = number in marked if many else here
             end = "" if number == len(choices) - 1 else "\n"
-            out.append(
-                ("class:on" if on else "class:off", f"{'› ●' if on else '  ○'} {choice}{end}")
-            )
+            line = f"{'›' if here else ' '} {'●' if on else '○'} {choice}{end}"
+            out.append(("class:on" if on or here else "class:off", line))
         return out
 
     body = Window(FormattedTextControl(rows, focusable=True, show_cursor=False), width=WIDTH)
-    picked = _ask(title, body, hint, len(choices), keys) or choices[0]
-    frame(title, picked)
-    return picked
+    answer = _ask(title, body, hint, len(choices), keys)
+    picked = [choices[n] for n in (answer if answer is not None else [] if many else [0])]
+    frame(title, ", ".join(picked) or "Ingen")
+    return picked if many else picked[0]

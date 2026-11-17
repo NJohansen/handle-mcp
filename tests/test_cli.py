@@ -372,6 +372,37 @@ def test_the_fancy_login_asks_with_no_first_and_the_same_words(fancy, monkeypatc
     assert fancy[0] == "banner fake" and "Logget ind på fake" in fancy[1]
 
 
+def test_login_with_no_store_picks_stores_and_asks_about_counting_once(fancy, monkeypatch):
+    monkeypatch.setattr(registry, "STORES", {"fake": CheckingStore, "fake2": FakeStore})
+    asked: list[str] = []
+
+    def choose(title, choices, _hint="", many=False):
+        asked.append(title)
+        return choices if many else choices[0]  # both stores, then no to counting
+
+    monkeypatch.setattr(cli.tui, "choose", choose)
+    monkeypatch.setattr(cli.tui, "banner", lambda store="": fancy.append(f"banner {store}"))
+    assert cli.run(["login"]) == 0
+    assert asked == ["Hvor handler du?", "Tæl med?"]
+    assert fancy[0] == "banner " and "Logget ind på fake." in fancy[1]
+    assert registry.keychain_get("fake") == SAVED and cli.telemetry.answer() is False
+
+
+def test_login_with_no_store_and_none_picked_saves_nothing(fancy, monkeypatch, capsys):
+    monkeypatch.setattr(cli.tui, "choose", lambda *_a, **_k: [])
+    monkeypatch.setattr(cli.tui, "banner", lambda store="": None)
+    monkeypatch.setattr(cli.tui, "text", lambda *_: pytest.fail("asked for an email"))
+    assert cli.run(["login"]) == 1
+    assert "Ingen butik valgt." in capsys.readouterr().err
+    assert registry.keychain_get("fake") is None and cli.telemetry.answer() is None
+
+
+def test_login_with_no_store_in_a_pipe_says_how(terminal, monkeypatch, capsys):
+    monkeypatch.setattr(cli.tui, "fancy", lambda: False)
+    assert cli.run(["login"]) == 2
+    assert "Brug: handle-mcp login" in capsys.readouterr().err
+
+
 @pytest.mark.parametrize(
     ("env", "name", "tty", "expected"),
     [
