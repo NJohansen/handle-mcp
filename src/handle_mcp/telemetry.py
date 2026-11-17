@@ -48,8 +48,9 @@ WHY = """\
   Hej, Niclas Johansen her. Jeg har bygget handle-mcp.
   Må jeg tælle anonymt, når den fylder en kurv?
 
-  Tallene hjælper med at holde handle-mcp gratis. De kan også
-  vise butikkerne, at den giver mening.
+  handle-mcp er lavet til dig, der vil handle nemmere.
+  Tallene hjælper med at holde den gratis. De kan også vise
+  butikkerne, at den giver mening for dem.
   Jeg sælger aldrig data. Jeg deler kun samlede tal,
   fx hvor mange kurve den har fyldt på en uge."""
 FACTS = (
