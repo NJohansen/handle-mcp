@@ -29,6 +29,7 @@ src/handle_mcp/
   links.py         with_utm(): UTM tags on every cart link the human clicks
   telemetry.py     anonymous counts (server_started, first_tool_call, login_ok, cart_filled, list_filled); off until a yes (`handle-mcp telemetry on`, ADR 0014)
   question.py      the Danish question before any count: who, why, what, where, how to say no
+  tui.py           how `handle-mcp login` looks on a real terminal (rich, prompt_toolkit); plain text in a pipe
   models.py        dataclasses; money is Decimal DKK
   privacy.py       scrub(): removes personal data
   stores/__init__.py  Store protocol, StoreError, load_login(), STORES
