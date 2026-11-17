@@ -76,8 +76,8 @@ def run(args: list[str]) -> int:
     fancy = tui.fancy()  # a real terminal gets the logo, frames and arrow keys; the words stay
     if fancy:
         tui.banner(store)
-        email = tui.text(f"Email til {store}")
-        password = tui.password(f"Kodeord til {store} (vises ikke)")
+        email = tui.text(f"Email til {store}", "Den email, du bruger på butikkens hjemmeside.")
+        password = tui.password(f"Kodeord til {store}", "Vises ikke, og gemmes ikke.")
     else:
         _say(
             f"Log ind på {store}. Brug den email og det kodeord, du bruger på butikkens hjemmeside."
@@ -119,7 +119,8 @@ def _ask_telemetry(fancy: bool = False) -> None:
             names = tuple(name for name, _ in question.FACTS)
             body = question.question().split("\n", 3)[3].replace("\n  ", "\n")[2:].rstrip()
             tui.frame(question.TITLE, body, dim=names)
-            yes = tui.choose("Tæl med?", ["Nej tak", "Ja, tæl med"]) == "Ja, tæl med"
+            hint = "Pil op/ned vælger. Enter bekræfter. Enter alene er nej."
+            yes = tui.choose("Tæl med?", ["Nej tak", "Ja, tæl med"], hint) == "Ja, tæl med"
         else:
             _say(question.question(color=_color()))
             yes = _ask("  Tæl med? (j = ja, Enter = nej): ").lower() in ("j", "ja", "y", "yes")

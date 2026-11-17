@@ -338,9 +338,9 @@ def fancy(monkeypatch, terminal, memory_keychain):
     monkeypatch.setattr("sys.stdin", Tty())
     monkeypatch.setattr(cli.tui, "fancy", lambda: True)
     monkeypatch.setattr(cli.tui, "banner", lambda store: shown.append(f"banner {store}"))
-    monkeypatch.setattr(cli.tui, "text", lambda _message: "a@example.com")
-    monkeypatch.setattr(cli.tui, "password", lambda _message: "rigtig")
-    monkeypatch.setattr(cli.tui, "frame", lambda title, body, dim=(): shown.append(body))
+    monkeypatch.setattr(cli.tui, "text", lambda _title, _hint="": "a@example.com")
+    monkeypatch.setattr(cli.tui, "password", lambda _title, _hint="": "rigtig")
+    monkeypatch.setattr(cli.tui, "frame", lambda title, body, dim=(), hint="": shown.append(body))
     monkeypatch.setattr(cli.tui, "done", shown.append)
     monkeypatch.setattr(cli.tui, "failed", shown.append)
     return shown
@@ -350,7 +350,7 @@ def fancy(monkeypatch, terminal, memory_keychain):
 def test_the_fancy_login_asks_with_no_first_and_the_same_words(fancy, monkeypatch, pick, saved):
     offered: list[list[str]] = []
 
-    def choose(_message, choices):
+    def choose(_title, choices, _hint=""):
         offered.append(choices)
         return choices[pick]
 
@@ -386,6 +386,9 @@ def test_the_fancy_login_only_on_a_terminal_that_shows_it(monkeypatch, env, name
     assert cli.tui.fancy() is expected
 
 
-def test_the_logo_spells_handle_mcp_and_fits_a_narrow_terminal():
-    rows = [cli.tui._word("HANDLE", row) + "  " + cli.tui._word("MCP", row) for row in range(5)]
-    assert {len(row) for row in rows} == {54}
+def test_the_logo_rows_line_up_and_fade_from_blue_to_yellow():
+    assert len(cli.tui.LOGO) == 6 and max(map(len, cli.tui.LOGO)) <= 78
+    rows = cli.tui.logo_rows()
+    assert cli.tui.BLUE in rows[0] and cli.tui.YELLOW in rows[4]
+    assert all(cli.tui.ACCENT in row for row in rows)  # the shadow edge
+    assert cli.tui._mix(0, 4) == cli.tui.BLUE and cli.tui._mix(4, 4) == cli.tui.YELLOW
