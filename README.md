@@ -83,7 +83,7 @@ Full arguments and fields: [docs/tools.md](docs/tools.md).
 
 ## Usage counts
 
-Anonymous counts, so we can show the stores what handle-mcp sends them. Off until you say yes: before that nothing is sent and no file is written. Every event has `version` and `date` (day only):
+Anonymous counts, so we can see that handle-mcp is used and keep it free. The data is never sold. Only totals are shared, e.g. carts filled in a week, and totals may be shown to the stores. Off until you say yes: before that nothing is sent and no file is written. Every event has `version` and `date` (day only):
 
 | Event | When | Fields |
 |---|---|---|

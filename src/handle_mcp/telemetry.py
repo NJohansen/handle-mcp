@@ -42,18 +42,6 @@ FILLED = {"rema1000": "list_filled"}  # REMA's cart is a shopping list: never mi
 OFF = {"0", "false", "no", "off"}
 ON = {"1", "true", "yes", "on"}
 
-# What the human reads before the yes: what, why, who, where it goes, and how to say no.
-QUESTION = """\
-Må handle-mcp tælle anonymt, hvor mange kurve den fylder?
-Formål: at vise butikkerne, hvad handle-mcp sender dem. Bag det står Niclas Johansen (handlemcp.dk).
-Det sender: start, første værktøj og login pr. dag, og fyldte kurve (butik, beløb afrundet
-til 50 kr., antal varer). Med version, styresystem og dato.
-Ingen navne, adresser, logins, varer eller ordre-id.
-Det går til Umami Cloud, et firma i USA. Umami ser din IP-adresse, når programmet sender.
-Sig nej nu, eller slå det fra senere med: handle-mcp telemetry off
-Læs mere: https://github.com/NJohansen/handle-mcp#brugsstatistik
-"""
-
 _off = False
 _sent_today: dict[str, str] = {}  # event key -> day, so the file is read once per day
 _lock = threading.Lock()  # _pending
