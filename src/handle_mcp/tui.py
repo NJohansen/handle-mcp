@@ -257,8 +257,7 @@ def choose(title: str, choices: list[str], hint: str = "", many: bool = False) -
         if not many:
             event.app.exit(result=[at[0]])
         elif at[0] < onward:
-            marked.symmetric_difference_update({at[0]})  # one key to learn: Enter marks and unmarks
-            at[0] = onward if at[0] in marked else at[0]  # marked: Enter again goes on
+            marked.symmetric_difference_update({at[0]})  # one key to learn; the pointer stays
         elif marked:
             event.app.exit(result=sorted(marked))
 
