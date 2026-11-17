@@ -139,16 +139,24 @@ def frame(title: str, body: str, dim: tuple[str, ...] = (), hint: str = "") -> N
     show()
 
 
-def done(text: str) -> None:
+def _result(mark: str, text: str) -> None:
+    """One line with a mark. A long line wraps under its own first word, not under the mark."""
     from rich.markup import escape
+    from rich.table import Table
 
-    _show()(f" [bold {ACCENT}]✔[/] {escape(text)}\n")
+    row = Table.grid(padding=(0, 1))
+    row.add_row(" " + mark, escape(text))
+    show = _show()
+    show(row)
+    show()
+
+
+def done(text: str) -> None:
+    _result(f"[bold {ACCENT}]✔[/]", text)
 
 
 def failed(text: str) -> None:
-    from rich.markup import escape
-
-    _show()(f" [red]✘[/] {escape(text)}\n")
+    _result("[red]✘[/]", text)
 
 
 def edges(title: str) -> tuple[str, str, str]:
