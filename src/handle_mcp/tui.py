@@ -238,7 +238,7 @@ def password(title: str, hint: str = "") -> str:
 
 def choose(title: str, choices: list[str], hint: str = "", many: bool = False) -> Any:
     """Arrow keys. One answer: the first choice is where the pointer starts, and what Ctrl-C
-    gives. With `many`: Enter or space marks, Enter on the last row, "Videre", gives the marked
+    gives. With `many`: Enter marks, space marks or takes the mark off, Enter on the last row, "Videre", gives the marked
     ones (it waits for one), and Ctrl-C gives none."""
     from prompt_toolkit.key_binding import KeyBindings
     from prompt_toolkit.layout import Window
@@ -257,8 +257,8 @@ def choose(title: str, choices: list[str], hint: str = "", many: bool = False) -
         if not many:
             event.app.exit(result=[at[0]])
         elif at[0] < onward:
-            marked.symmetric_difference_update({at[0]})
-            at[0] = onward if at[0] in marked else at[0]  # marked: Enter again goes on
+            marked.add(at[0])  # Enter never takes a mark off: space does
+            at[0] = onward  # Enter again goes on
         elif marked:
             event.app.exit(result=sorted(marked))
 

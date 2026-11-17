@@ -52,7 +52,8 @@ def test_choose_moves_with_the_keys_and_ctrl_c_is_the_first_choice(keys, typed, 
         (" " + DOWN + DOWN + " " + DOWN + ENTER, ["nemlig", "rema1000"]),  # space marks in place
         (" " + " " + DOWN + " " + DOWN + DOWN + ENTER, ["bilkatogo"]),  # twice takes the mark off
         (UP + ENTER + UP + " " + DOWN + ENTER, ["rema1000"]),  # Videre waits for a store
-        (ENTER + UP + UP + UP + ENTER + DOWN + DOWN + DOWN + ENTER + CTRL_C, []),  # no mark left
+        (" " + ENTER + ENTER, ["nemlig"]),  # Enter on a marked store keeps the mark
+        (ENTER + DOWN + " " + UP + ENTER + CTRL_C, []),  # space took it off: Videre waits
         (" " + DOWN + " " + CTRL_C, []),  # Ctrl-C picks nothing
     ],
 )

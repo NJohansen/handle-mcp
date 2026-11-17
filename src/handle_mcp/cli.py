@@ -90,7 +90,7 @@ def _login_picked() -> int:
     log in to each in turn. The question about counting comes once, after a login that worked."""
     tui.banner()
     labels = {registry.LABELS.get(store, store): store for store in registry.STORES}
-    hint = "Pil op/ned flytter. Enter vælger. Du kan vælge flere."
+    hint = "Pil op/ned flytter. Enter vælger. Mellemrum fjerner et kryds."
     picked = [labels[p] for p in tui.choose("Hvor handler du?", list(labels), hint, many=True)]
     if not picked:
         _say("Ingen butik valgt. Intet er gemt.")
