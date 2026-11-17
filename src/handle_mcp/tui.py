@@ -15,30 +15,76 @@ from typing import Any
 BLUE, YELLOW, INK = "#9ccbf3", "#f5e211", "#12161c"  # handlemcp.dk's sky and button
 ACCENT, EDGE = "#2f7fc1", "#8a94a3"  # a deeper blue and a grey: readable on light and on dark
 WIDTH = 62  # inside a frame
-# The wordmark in small letters, as on handlemcp.dk. Ten pixel rows per letter; two pixel rows
-# make one line of half blocks, so a pixel is about square.
+# Block letters, five units high. A unit is two columns wide and one line high: about square.
 LETTERS = {
-    "h": ["X...", "X...", "X...", "XXX.", "X..X", "X..X", "X..X", "X..X", "....", "...."],
-    "a": ["....", "....", "....", ".XX.", "...X", ".XXX", "X..X", ".XXX", "....", "...."],
-    "n": ["....", "....", "....", "XXX.", "X..X", "X..X", "X..X", "X..X", "....", "...."],
-    "d": ["...X", "...X", "...X", ".XXX", "X..X", "X..X", "X..X", ".XXX", "....", "...."],
-    "l": ["X", "X", "X", "X", "X", "X", "X", "X", ".", "."],
-    "e": ["....", "....", "....", ".XX.", "X..X", "XXXX", "X...", ".XXX", "....", "...."],
-    "m": [".......", ".......", ".......", "XXX.XX.", "X..X..X", "X..X..X", "X..X..X"]
-    + ["X..X..X", ".......", "......."],
-    "c": ["....", "....", "....", ".XXX", "X...", "X...", "X...", ".XXX", "....", "...."],
-    "p": ["....", "....", "....", "XXX.", "X..X", "X..X", "X..X", "XXX.", "X...", "X..."],
+    "H": ["X.X", "X.X", "XXX", "X.X", "X.X"],
+    "A": ["XXX", "X.X", "XXX", "X.X", "X.X"],
+    "N": ["X..X", "XX.X", "X.XX", "X..X", "X..X"],
+    "D": ["XX.", "X.X", "X.X", "X.X", "XX."],
+    "L": ["X..", "X..", "X..", "X..", "XXX"],
+    "E": ["XXX", "X..", "XX.", "X..", "XXX"],
+    "M": ["X...X", "XX.XX", "X.X.X", "X...X", "X...X"],
+    "C": ["XXX", "X..", "X..", "X..", "XXX"],
+    "P": ["XXX", "X.X", "XXX", "X..", "X.."],
 }
-HALF = {"XX": "█", "X.": "▀", ".X": "▄", "..": " "}
+# Per word: the fade of its letters from top to bottom, and the one color of its depth.
+HANDLE = (BLUE, ACCENT, "#1b4f8a")
+MCP = ("#aeb6c2", "#6f7a88", "#444c57")
 
 
-def word(text: str) -> list[str]:
-    """A word as five lines of half blocks, one column of air between letters."""
-    pixels = [".".join(LETTERS[letter][row] for letter in text) for row in range(10)]
-    return [
-        "".join(HALF[a + b] for a, b in zip(pixels[row], pixels[row + 1], strict=True))
-        for row in range(0, 10, 2)
+AIR = 3  # columns between letters: one for the depth, two empty
+
+
+def pixels(text: str) -> list[str]:
+    """A word as ten rows of pixels (half lines): every unit is 2 x 2, AIR columns between."""
+    rows = [
+        ("." * AIR).join(LETTERS[c][row].replace("X", "XX").replace(".", "..") for c in text)
+        for row in range(5)
     ]
+    return [row for row in rows for _ in (0, 1)]
+
+
+def _fade(top: str, bottom: str, step: int, steps: int) -> str:
+    a = [int(top[i : i + 2], 16) for i in (1, 3, 5)]
+    b = [int(bottom[i : i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(
+        f"{round(x + (y - x) * step / steps):02x}" for x, y in zip(a, b, strict=True)
+    )
+
+
+def painted(text: str, colors: tuple[str, str, str]) -> list[list[str | None]]:
+    """A word as 12 rows of colors: the letters fade downwards, and a copy one pixel down and
+    to the right, in one darker color, gives depth. Solid areas only: no lines, no outline."""
+    top, bottom, depth = colors
+    rows = pixels(text)
+    grid: list[list[str | None]] = [[None] * (len(rows[0]) + 1) for _ in range(12)]
+    for y, row in enumerate(rows):
+        for x, pixel in enumerate(row):
+            if pixel == "X":
+                grid[y + 1][x + 1] = depth
+    for y, row in enumerate(rows):
+        for x, pixel in enumerate(row):
+            if pixel == "X":
+                grid[y][x] = _fade(top, bottom, y, 9)
+    return grid
+
+
+def logo_rows() -> list[str]:
+    """The logo as rich markup, six lines: HANDLE in blue, MCP in grey, both with depth.
+    A cell is a half block: its upper pixel is the text color, its lower pixel the background."""
+    left, right = painted("HANDLE", HANDLE), painted("MCP", MCP)
+    out = []
+    for y in range(0, 12, 2):
+        line = ""
+        for up, down in zip(
+            left[y] + [None] * 5 + right[y], left[y + 1] + [None] * 5 + right[y + 1], strict=True
+        ):
+            if up and down:
+                line += f"[{up} on {down}]▀[/]" if up != down else f"[{up}]█[/]"
+            else:
+                line += f"[{up}]▀[/]" if up else f"[{down}]▄[/]" if down else " "
+        out.append(line)
+    return out
 
 
 def fancy() -> bool:
@@ -61,16 +107,9 @@ def _show() -> Any:
     return _console().print
 
 
-def logo_rows() -> list[str]:
-    """The wordmark as rich markup: handle in blue, mcp in grey. Flat, no edge, no fade."""
-    return [
-        f"[{ACCENT}]{a}[/] [{EDGE}]{b}[/]" for a, b in zip(word("handle"), word("mcp"), strict=True)
-    ]
-
-
 def banner(store: str) -> None:
     """The logo, the title bar and one line about the store."""
-    show, wide = _show(), _console().width >= 48
+    show, wide = _show(), _console().width >= 90
     show()
     for row in logo_rows() if wide else []:
         show(" " + row)
