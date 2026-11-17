@@ -26,7 +26,7 @@ from typing import Any
 
 from keyring.errors import KeyringError
 
-from handle_mcp import question, telemetry
+from handle_mcp import question, telemetry, tui
 from handle_mcp import stores as registry
 
 
@@ -73,18 +73,28 @@ def run(args: list[str]) -> int:
     if from_env:
         return _login_from_env(store)
 
-    _say(f"Log ind på {store}. Brug den email og det kodeord, du bruger på butikkens hjemmeside.")
-    sys.stderr.write(f"Email til {store}: ")
-    sys.stderr.flush()
-    email = sys.stdin.readline().strip()
-    password = getpass.getpass(f"Kodeord til {store} (vises ikke): ")
+    fancy = tui.fancy()  # a real terminal gets the logo, frames and arrow keys; the words stay
+    if fancy:
+        tui.banner(store)
+        email = tui.text(f"Email til {store}", "Den email, du bruger på butikkens hjemmeside.")
+        # No email (empty, or Ctrl-C): stop here, do not ask for the password.
+        password = email and tui.password(f"Kodeord til {store}", "Vises ikke, og gemmes ikke.")
+    else:
+        _say(
+            f"Log ind på {store}. Brug den email og det kodeord, du bruger på butikkens hjemmeside."
+        )
+        sys.stderr.write(f"Email til {store}: ")
+        sys.stderr.flush()
+        email = sys.stdin.readline().strip()
+        password = getpass.getpass(f"Kodeord til {store} (vises ikke): ")
     if not email or not password:
         _say("Email og kodeord skal udfyldes. Intet er gemt.")
         return 1
     try:  # log in first, save after: a failed login never touches a saved one
         session = _check(store, email, password, choose=True)
     except registry.StoreError as exc:
-        _say(f"Login blev ikke gemt: {exc}\nEt tidligere gemt login er uændret.")
+        text = f"Login blev ikke gemt: {exc}\nEt tidligere gemt login er uændret."
+        tui.failed(text) if fancy else _say(text)
         return 1
     try:
         registry.keychain_set(store, email, session)
@@ -95,20 +105,28 @@ def run(args: list[str]) -> int:
             f"og kør: handle-mcp login {store} --from-env"
         )
         return 1
-    _say(f"Logget ind på {store}. Sessionen er gemt i nøgleringen. Kodeordet er ikke gemt.")
-    _ask_telemetry()
+    text = f"Logget ind på {store}. Sessionen er gemt i nøgleringen. Kodeordet er ikke gemt."
+    tui.done(text) if fancy else _say(text)
+    _ask_telemetry(fancy)
     return 0
 
 
-def _ask_telemetry() -> None:
+def _ask_telemetry(fancy: bool = False) -> None:
     """Once, on a real terminal, after a login that worked. Enter or anything but yes is a no."""
     try:
         if not telemetry.ask() or not sys.stdin.isatty():
             return
-        _say(question.question(color=_color()))
-        yes = _ask("  Tæl med? (j = ja, Enter = nej): ").lower() in ("j", "ja", "y", "yes")
+        if fancy:
+            names = tuple(name for name, _ in question.FACTS)
+            tui.frame(question.TITLE, question.body(), dim=names)
+            hint = "Pil op/ned vælger. Enter bekræfter."
+            yes = tui.choose("Tæl med?", ["Nej", "Ja"], hint) == "Ja"
+        else:
+            _say(question.question(color=_color()))
+            yes = _ask("  Tæl med? (j = ja, Enter = nej): ").lower() in ("j", "ja", "y", "yes")
         telemetry.set_consent(yes)
-        _say("Tak. Tællingen er slået til." if yes else "Tællingen er slået fra. Intet sendes.")
+        text = "Tak. Tællingen er slået til." if yes else "Tællingen er slået fra. Intet sendes."
+        tui.done(text) if fancy else _say(text)
     except Exception:  # the question never breaks a login
         logging.getLogger(__name__).debug("telemetry question failed", exc_info=True)
 

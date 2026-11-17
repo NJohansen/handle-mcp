@@ -327,3 +327,88 @@ def test_color_only_where_the_terminal_shows_it(monkeypatch, env, name, tty, col
     monkeypatch.setattr(cli.os, "name", name)
     monkeypatch.setattr("sys.stderr", Tty() if tty else io.StringIO())
     assert cli._color() is color
+
+
+@pytest.fixture
+def fancy(monkeypatch, terminal, memory_keychain):
+    """A login where the terminal can show the logo, frames and arrow keys. Records what it shows."""
+    monkeypatch.delenv("HANDLE_TELEMETRY", raising=False)
+    monkeypatch.delenv("DO_NOT_TRACK", raising=False)
+    shown: list[str] = []
+    monkeypatch.setattr("sys.stdin", Tty())
+    monkeypatch.setattr(cli.tui, "fancy", lambda: True)
+    monkeypatch.setattr(cli.tui, "banner", lambda store: shown.append(f"banner {store}"))
+    monkeypatch.setattr(cli.tui, "text", lambda _title, _hint="": "a@example.com")
+    monkeypatch.setattr(cli.tui, "password", lambda _title, _hint="": "rigtig")
+    monkeypatch.setattr(cli.tui, "frame", lambda title, body, dim=(), hint="": shown.append(body))
+    monkeypatch.setattr(cli.tui, "done", shown.append)
+    monkeypatch.setattr(cli.tui, "failed", shown.append)
+    return shown
+
+
+def test_the_fancy_login_stops_at_an_empty_email(fancy, monkeypatch, capsys):
+    """Ctrl-C in the email box gives no email: the password box never opens."""
+    monkeypatch.setattr(cli.tui, "text", lambda _title, _hint="": "")
+    monkeypatch.setattr(cli.tui, "password", lambda *_: pytest.fail("asked for the password"))
+    assert cli.run(["login", "fake"]) == 1
+    assert "Intet er gemt." in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(("pick", "saved"), [(0, False), (1, True)])
+def test_the_fancy_login_asks_with_no_first_and_the_same_words(fancy, monkeypatch, pick, saved):
+    offered: list[list[str]] = []
+
+    def choose(_title, choices, _hint=""):
+        offered.append(choices)
+        return choices[pick]
+
+    monkeypatch.setattr(cli.tui, "choose", choose)
+    assert cli.run(["login", "fake"]) == 0
+    assert offered == [["Nej", "Ja"]]  # the pointer starts on no
+    assert cli.telemetry.answer() is saved
+    body = fancy[2]
+    plain = [line.strip() for line in cli.question.QUESTION.splitlines()[3:]]
+    assert [line.strip() for line in body.splitlines()] == plain
+    assert fancy[0] == "banner fake" and "Logget ind på fake" in fancy[1]
+
+
+@pytest.mark.parametrize(
+    ("env", "name", "tty", "expected"),
+    [
+        ({}, "posix", True, True),
+        ({}, "posix", False, False),
+        ({"NO_COLOR": "1"}, "posix", True, False),
+        ({"TERM": "dumb"}, "posix", True, False),
+        ({}, "nt", True, False),
+        ({"WT_SESSION": "x"}, "nt", True, True),
+    ],
+)
+def test_the_fancy_login_only_on_a_terminal_that_shows_it(monkeypatch, env, name, tty, expected):
+    for key in ("NO_COLOR", "TERM", "WT_SESSION"):
+        monkeypatch.delenv(key, raising=False)
+    for key, value in env.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setattr(cli.tui.os, "name", name)
+    monkeypatch.setattr("sys.stdin", Tty() if tty else io.StringIO())
+    monkeypatch.setattr("sys.stderr", Tty() if tty else io.StringIO())
+    assert cli.tui.fancy() is expected
+
+
+def test_the_wordmark_fades_has_depth_and_no_line_characters():
+    import re
+
+    rows = cli.tui.logo_rows()
+    plain = [re.sub(r"\[[^\]]*\]", "", row) for row in rows]
+    assert len(rows) == 6
+    assert {len(row) for row in plain} == {79}  # fits 80 columns with its margin
+    assert set("".join(plain)) <= set("█▀▄ ")  # solid blocks only: no lines between letters
+    handle = cli.tui.painted("HANDLE", cli.tui.HANDLE)
+    assert handle[0][0] == cli.tui.GREEN and handle[9][0] == cli.tui.ACCENT  # the letters fade
+    assert handle[10][1] == cli.tui.HANDLE[2]  # depth: one pixel down and to the right
+    assert cli.tui.MCP[2] in "".join(rows) and cli.tui.YELLOW not in "".join(rows)
+
+
+def test_a_frame_is_the_same_width_on_every_row():
+    for title in ("Tæl med?", "Email til nemlig", "Anonym tælling i handle-mcp"):
+        left, right, under = cli.tui.edges(title)
+        assert len(left + title + right) == len(under) == cli.tui.WIDTH + 4
