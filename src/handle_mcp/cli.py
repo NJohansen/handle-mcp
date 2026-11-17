@@ -26,8 +26,8 @@ from typing import Any
 
 from keyring.errors import KeyringError
 
+from handle_mcp import question, telemetry, tui
 from handle_mcp import stores as registry
-from handle_mcp import telemetry, tui
 
 
 def configure_logging() -> None:
@@ -116,12 +116,12 @@ def _ask_telemetry(fancy: bool = False) -> None:
         if not telemetry.ask() or not sys.stdin.isatty():
             return
         if fancy:
-            names = tuple(name for name, _ in telemetry.FACTS)
-            body = telemetry.question().split("\n", 3)[3].replace("\n  ", "\n")[2:].rstrip()
-            tui.frame(telemetry.TITLE, body, dim=names)
+            names = tuple(name for name, _ in question.FACTS)
+            body = question.question().split("\n", 3)[3].replace("\n  ", "\n")[2:].rstrip()
+            tui.frame(question.TITLE, body, dim=names)
             yes = tui.choose("Tæl med?", ["Nej tak", "Ja, tæl med"]) == "Ja, tæl med"
         else:
-            _say(telemetry.question(color=_color()))
+            _say(question.question(color=_color()))
             yes = _ask("  Tæl med? (j = ja, Enter = nej): ").lower() in ("j", "ja", "y", "yes")
         telemetry.set_consent(yes)
         text = "Tak. Tællingen er slået til." if yes else "Tællingen er slået fra. Intet sendes."
@@ -153,7 +153,7 @@ def _telemetry(args: list[str]) -> int:
         _say(f"Kunne ikke gemme dit svar ({type(exc).__name__}). Intet er ændret.")
         return 1
     if args == ["on"]:
-        _say("Det har du sagt ja til:\n" + telemetry.QUESTION)
+        _say("Det har du sagt ja til:\n" + question.QUESTION)
     if args == ["off"]:
         _say("Tællingen er slået fra. Intet sendes.")
     elif telemetry.enabled():

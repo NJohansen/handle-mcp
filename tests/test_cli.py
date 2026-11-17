@@ -284,7 +284,7 @@ def test_telemetry_on_off_status(monkeypatch, capsys):
     assert cli.run(["telemetry", "status"]) == 0
     assert "slået fra. Du er ikke blevet spurgt endnu." in capsys.readouterr().err
     assert cli.run(["telemetry", "on"]) == 0 and cli.telemetry.enabled()
-    assert "Umami (" in capsys.readouterr().err  # on shows what it counts
+    assert cli.question.QUESTION in capsys.readouterr().err  # on shows the whole question, plain
     assert cli.run(["telemetry", "status"]) == 0
     assert "slået til." in capsys.readouterr().err
     monkeypatch.setenv("DO_NOT_TRACK", "1")  # the environment wins, and both commands say so
@@ -359,7 +359,7 @@ def test_the_fancy_login_asks_with_no_first_and_the_same_words(fancy, monkeypatc
     assert offered == [["Nej tak", "Ja, tæl med"]]  # the pointer starts on no
     assert cli.telemetry.answer() is saved
     body = fancy[2]
-    plain = [line.strip() for line in cli.telemetry.QUESTION.splitlines()[3:]]
+    plain = [line.strip() for line in cli.question.QUESTION.splitlines()[3:]]
     assert [line.strip() for line in body.splitlines()] == plain
     assert fancy[0] == "banner fake" and "Logget ind på fake" in fancy[1]
 
