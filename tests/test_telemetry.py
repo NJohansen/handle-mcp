@@ -315,7 +315,7 @@ def test_the_question_says_what_why_who_where_and_how_to_say_no():
         "kun samlede tal",
         "Umami",
         "USA",
-        "din IP",
+        "IP-adresse",
         "fyldt kurv",
         "start",
         "første værktøj",
