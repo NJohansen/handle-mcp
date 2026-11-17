@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import os
+
 import pytest
 from prompt_toolkit.application import create_app_session
 from prompt_toolkit.input import create_pipe_input
+from prompt_toolkit.output import DummyOutput
 
 from handle_mcp import question, tui
 
@@ -16,6 +19,8 @@ def keys(monkeypatch):
     """Type into the open question. The answer frame is recorded, not drawn."""
     frames: list[tuple[str, str]] = []
     monkeypatch.setattr(tui, "frame", lambda title, body, **_: frames.append((title, body)))
+    if os.name == "nt":  # a test run has no Windows console to draw on: the keys still run
+        monkeypatch.setattr("prompt_toolkit.output.create_output", lambda **_: DummyOutput())
     with create_pipe_input() as pipe, create_app_session(input=pipe):
         pipe.frames = frames
         yield pipe
