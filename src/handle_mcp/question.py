@@ -20,7 +20,8 @@ FACTS = (
     ("Dagligt", "start, første værktøj, login, version, styresystem"),
     ("Aldrig", "navn, adresse, varer"),
     ("Deles", "kun samlede tal"),
-    ("Ligger hos", "Umami (statistik uden cookies, USA), ser din IP"),
+    ("Ligger hos", "Umami (statistik uden cookies, USA)"),
+    ("IP-adresse", "ses af Umami, som af ethvert website du besøger"),
     ("Slå fra", "handle-mcp telemetry off"),
     ("Detaljer", "handlemcp.dk/privatliv"),
 )
