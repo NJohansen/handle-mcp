@@ -238,7 +238,8 @@ def password(title: str, hint: str = "") -> str:
 
 def choose(title: str, choices: list[str], hint: str = "", many: bool = False) -> Any:
     """Arrow keys. One answer: the first choice is where the pointer starts, and what Ctrl-C
-    gives. With `many`: space marks, the answer is the marked ones, and Ctrl-C gives none."""
+    gives. With `many`: space marks, Enter gives the marked ones (none marked: the one the pointer is
+    on), and Ctrl-C gives none."""
     from prompt_toolkit.key_binding import KeyBindings
     from prompt_toolkit.layout import Window
     from prompt_toolkit.layout.controls import FormattedTextControl
@@ -257,7 +258,7 @@ def choose(title: str, choices: list[str], hint: str = "", many: bool = False) -
         keys.add(key)(move(1))
     if many:
         keys.add("space")(lambda _event: marked.symmetric_difference_update({at[0]}))
-        keys.add("enter")(lambda event: event.app.exit(result=sorted(marked)))
+        keys.add("enter")(lambda event: event.app.exit(result=sorted(marked or {at[0]})))
     else:
         keys.add("enter")(lambda event: event.app.exit(result=[at[0]]))
 
