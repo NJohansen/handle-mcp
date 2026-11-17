@@ -308,9 +308,26 @@ def test_off_in_the_environment_wins_over_a_saved_yes(sent, monkeypatch, env, va
 
 def test_the_question_says_what_why_who_where_and_how_to_say_no():
     text = telemetry.QUESTION
-    for part in ["butikkerne", "Niclas Johansen", "Umami Cloud", "USA", "IP-adresse", "50 kr."]:
+    for part in [
+        "Niclas Johansen",
+        "gratis",
+        "butikkerne",
+        "sælger aldrig data",
+        "Umami",
+        "USA",
+        "din IP",
+    ]:
         assert part in text
-    assert "handle-mcp telemetry off" in text
+    assert "handle-mcp telemetry off" in text and "handlemcp.dk/privatliv" in text
+    assert "\033" not in text and max(map(len, text.splitlines())) <= 64
+
+
+def test_the_question_in_color_has_the_same_words():
+    plain = telemetry.question(color=True)
+    for code in ("\033[1m", "\033[2m", "\033[0m"):
+        assert code in plain
+        plain = plain.replace(code, "")
+    assert plain == telemetry.QUESTION
 
 
 async def test_a_tool_answer_never_carries_a_telemetry_text(sent):

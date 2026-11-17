@@ -105,12 +105,21 @@ def _ask_telemetry() -> None:
     try:
         if not telemetry.ask() or not sys.stdin.isatty():
             return
-        _say("\n" + telemetry.QUESTION)
-        yes = _ask("Tæl med? [j/N]: ").lower() in ("j", "ja", "y", "yes")
+        _say(telemetry.question(color=_color()))
+        yes = _ask("  Tæl med? (j = ja, Enter = nej): ").lower() in ("j", "ja", "y", "yes")
         telemetry.set_consent(yes)
         _say("Tak. Tællingen er slået til." if yes else "Tællingen er slået fra. Intet sendes.")
     except Exception:  # the question never breaks a login
         logging.getLogger(__name__).debug("telemetry question failed", exc_info=True)
+
+
+def _color() -> bool:
+    """Bold and dim only where the terminal shows them: never in a pipe, a dumb terminal,
+    with NO_COLOR, or in the old Windows console."""
+    env = os.environ
+    if not sys.stderr.isatty() or "NO_COLOR" in env or env.get("TERM") == "dumb":
+        return False
+    return os.name != "nt" or "WT_SESSION" in env
 
 
 FORCED_OFF = "HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 eller --no-telemetry er sat, og de vinder."

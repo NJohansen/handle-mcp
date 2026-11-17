@@ -257,7 +257,8 @@ def asked(monkeypatch, terminal, memory_keychain):
 def test_login_asks_once_and_only_a_yes_turns_counting_on(asked, capsys, reply, saved):
     assert asked(reply) == 0
     err = capsys.readouterr().err
-    assert "Tæl med? [j/N]" in err and "handle-mcp telemetry off" in err
+    assert "Tæl med? (j = ja, Enter = nej)" in err and "handle-mcp telemetry off" in err
+    assert "\033" not in err  # the test terminal is not a real one: plain text
     assert cli.telemetry.answer() is saved and cli.telemetry.enabled() is saved
     assert asked("j") == 0  # the second login does not ask again
     assert "Tæl med?" not in capsys.readouterr().err
@@ -283,7 +284,7 @@ def test_telemetry_on_off_status(monkeypatch, capsys):
     assert cli.run(["telemetry", "status"]) == 0
     assert "slået fra. Du er ikke blevet spurgt endnu." in capsys.readouterr().err
     assert cli.run(["telemetry", "on"]) == 0 and cli.telemetry.enabled()
-    assert "Umami Cloud" in capsys.readouterr().err  # on shows what it counts
+    assert "Umami (" in capsys.readouterr().err  # on shows what it counts
     assert cli.run(["telemetry", "status"]) == 0
     assert "slået til." in capsys.readouterr().err
     monkeypatch.setenv("DO_NOT_TRACK", "1")  # the environment wins, and both commands say so
@@ -305,3 +306,24 @@ def test_telemetry_on_says_so_when_the_answer_cannot_be_saved(monkeypatch, capsy
     monkeypatch.setattr(cli.telemetry, "set_consent", read_only)
     assert cli.run(["telemetry", "on"]) == 1
     assert "Kunne ikke gemme dit svar (PermissionError)" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    ("env", "name", "tty", "color"),
+    [
+        ({}, "posix", True, True),
+        ({}, "posix", False, False),
+        ({"NO_COLOR": "1"}, "posix", True, False),
+        ({"TERM": "dumb"}, "posix", True, False),
+        ({}, "nt", True, False),
+        ({"WT_SESSION": "x"}, "nt", True, True),
+    ],
+)
+def test_color_only_where_the_terminal_shows_it(monkeypatch, env, name, tty, color):
+    for key in ("NO_COLOR", "TERM", "WT_SESSION"):
+        monkeypatch.delenv(key, raising=False)
+    for key, value in env.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setattr(cli.os, "name", name)
+    monkeypatch.setattr("sys.stderr", Tty() if tty else io.StringIO())
+    assert cli._color() is color

@@ -42,17 +42,33 @@ FILLED = {"rema1000": "list_filled"}  # REMA's cart is a shopping list: never mi
 OFF = {"0", "false", "no", "off"}
 ON = {"1", "true", "yes", "on"}
 
-# What the human reads before the yes: what, why, who, where it goes, and how to say no.
-QUESTION = """\
-Må handle-mcp tælle anonymt, hvor mange kurve den fylder?
-Formål: at vise butikkerne, hvad handle-mcp sender dem. Bag det står Niclas Johansen (handlemcp.dk).
-Det sender: start, første værktøj og login pr. dag, og fyldte kurve (butik, beløb afrundet
-til 50 kr., antal varer). Med version, styresystem og dato.
-Ingen navne, adresser, logins, varer eller ordre-id.
-Det går til Umami Cloud, et firma i USA. Umami ser din IP-adresse, når programmet sender.
-Sig nej nu, eller slå det fra senere med: handle-mcp telemetry off
-Læs mere: https://github.com/NJohansen/handle-mcp#brugsstatistik
-"""
+# What the human reads before the yes: who asks, why, what, where it goes, and how to say no.
+TITLE = "Anonym tælling i handle-mcp"
+WHY = """\
+  Hej, Niclas Johansen her. Jeg har bygget handle-mcp.
+  Må jeg tælle anonymt, når den fylder en kurv?
+
+  Tallene hjælper med at holde handle-mcp gratis. De kan også
+  vise butikkerne, at den giver mening.
+  Jeg sælger aldrig data. Jeg deler kun samlede tal,
+  fx hvor mange kurve den har fyldt på en uge."""
+FACTS = (
+    ("Tæller", "butik, antal varer, afrundet beløb, brugt i dag"),
+    ("Aldrig", "navn, adresse, varer"),
+    ("Ligger hos", "Umami (statistik uden cookies, USA), ser din IP"),
+    ("Slå fra", "handle-mcp telemetry off"),
+    ("Detaljer", "handlemcp.dk/privatliv"),
+)
+
+
+def question(color: bool = False) -> str:
+    """The question as text. With color: a bold title and dim row names, nothing else."""
+    bold, dim, end = ("\033[1m", "\033[2m", "\033[0m") if color else ("", "", "")
+    rows = "\n".join(f"  {dim}{name:<11}{end} {fact}" for name, fact in FACTS)
+    return f"\n  {bold}{TITLE}{end}\n\n{WHY}\n\n{rows}\n"
+
+
+QUESTION = question()
 
 _off = False
 _sent_today: dict[str, str] = {}  # event key -> day, so the file is read once per day
