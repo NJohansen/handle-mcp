@@ -102,7 +102,7 @@ def _prompt(kind: str, message: str, **more: Any) -> Any:
         ]
     )
     ask = getattr(questionary, kind)
-    return ask(message, qmark=" ›", style=style, output=create_output(stdout=sys.stderr), **more)
+    return ask(message, qmark=" ?", style=style, output=create_output(stdout=sys.stderr), **more)
 
 
 def text(message: str) -> str:
