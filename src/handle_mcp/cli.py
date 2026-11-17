@@ -77,7 +77,8 @@ def run(args: list[str]) -> int:
     if fancy:
         tui.banner(store)
         email = tui.text(f"Email til {store}", "Den email, du bruger på butikkens hjemmeside.")
-        password = tui.password(f"Kodeord til {store}", "Vises ikke, og gemmes ikke.")
+        # No email (empty, or Ctrl-C): stop here, do not ask for the password.
+        password = email and tui.password(f"Kodeord til {store}", "Vises ikke, og gemmes ikke.")
     else:
         _say(
             f"Log ind på {store}. Brug den email og det kodeord, du bruger på butikkens hjemmeside."

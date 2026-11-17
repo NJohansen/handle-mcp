@@ -346,6 +346,14 @@ def fancy(monkeypatch, terminal, memory_keychain):
     return shown
 
 
+def test_the_fancy_login_stops_at_an_empty_email(fancy, monkeypatch, capsys):
+    """Ctrl-C in the email box gives no email: the password box never opens."""
+    monkeypatch.setattr(cli.tui, "text", lambda _title, _hint="": "")
+    monkeypatch.setattr(cli.tui, "password", lambda *_: pytest.fail("asked for the password"))
+    assert cli.run(["login", "fake"]) == 1
+    assert "Intet er gemt." in capsys.readouterr().err
+
+
 @pytest.mark.parametrize(("pick", "saved"), [(0, False), (1, True)])
 def test_the_fancy_login_asks_with_no_first_and_the_same_words(fancy, monkeypatch, pick, saved):
     offered: list[list[str]] = []
