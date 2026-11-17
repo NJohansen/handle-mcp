@@ -82,7 +82,7 @@ def run(args: list[str]) -> int:
     code = _login(store, fancy)
     if code == 0:
         _ask_telemetry(fancy)
-    return code
+    return min(code, 1)
 
 
 def _login_picked() -> int:
@@ -94,10 +94,17 @@ def _login_picked() -> int:
     if not picked:
         _say("Ingen butik valgt. Intet er gemt.")
         return 1
-    codes = [_login(store, fancy=True) for store in picked]
+    codes: list[int] = []
+    for store in picked:
+        codes.append(_login(store, fancy=True))
+        if codes[-1] == LEFT:  # Ctrl-C or nothing typed: the human is done, ask for no more
+            break
     if 0 in codes:
         _ask_telemetry(fancy=True)
-    return max(codes)
+    return min(max(codes), 1)
+
+
+LEFT = 2  # _login: no email or no password was given
 
 
 def _login(store: str, fancy: bool) -> int:
@@ -115,7 +122,7 @@ def _login(store: str, fancy: bool) -> int:
         password = getpass.getpass(f"Kodeord til {store} (vises ikke): ")
     if not email or not password:
         _say("Email og kodeord skal udfyldes. Intet er gemt.")
-        return 1
+        return LEFT
     try:  # log in first, save after: a failed login never touches a saved one
         session = _check(store, email, password, choose=True)
     except registry.StoreError as exc:
@@ -147,22 +154,13 @@ def _ask_telemetry(fancy: bool = False) -> None:
             hint = "Pil op/ned vælger. Enter bekræfter."
             yes = tui.choose("Tæl med?", ["Nej", "Ja"], hint) == "Ja"
         else:
-            _say(question.question(color=_color()))
+            _say(question.question(color=tui.color()))
             yes = _ask("  Tæl med? (j = ja, Enter = nej): ").lower() in ("j", "ja", "y", "yes")
         telemetry.set_consent(yes)
         text = "Tak. Tællingen er slået til." if yes else "Tællingen er slået fra. Intet sendes."
         tui.done(text) if fancy else _say(text)
     except Exception:  # the question never breaks a login
         logging.getLogger(__name__).debug("telemetry question failed", exc_info=True)
-
-
-def _color() -> bool:
-    """Bold and dim only where the terminal shows them: never in a pipe, a dumb terminal,
-    with NO_COLOR, or in the old Windows console."""
-    env = os.environ
-    if not sys.stderr.isatty() or "NO_COLOR" in env or env.get("TERM") == "dumb":
-        return False
-    return os.name != "nt" or "WT_SESSION" in env
 
 
 FORCED_OFF = "HANDLE_TELEMETRY=0, DO_NOT_TRACK=1 eller --no-telemetry er sat, og de vinder."

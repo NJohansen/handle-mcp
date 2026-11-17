@@ -87,13 +87,17 @@ def logo_rows() -> list[str]:
     return out
 
 
-def fancy() -> bool:
+def color() -> bool:
+    """Bold and dim only where the terminal shows them: never in a pipe, a dumb terminal,
+    with NO_COLOR, or in the old Windows console."""
     env = os.environ
-    if not (sys.stdin.isatty() and sys.stderr.isatty()):
-        return False
-    if "NO_COLOR" in env or env.get("TERM") == "dumb":
+    if not sys.stderr.isatty() or "NO_COLOR" in env or env.get("TERM") == "dumb":
         return False
     return os.name != "nt" or "WT_SESSION" in env
+
+
+def fancy() -> bool:
+    return sys.stdin.isatty() and color()
 
 
 def _console() -> Any:
