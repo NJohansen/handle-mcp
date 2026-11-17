@@ -89,7 +89,7 @@ def _login_picked() -> int:
     """`handle-mcp login` with no store, on a terminal that can show a list: pick the stores,
     log in to each in turn. The question about counting comes once, after a login that worked."""
     tui.banner()
-    hint = "Pil op/ned flytter. Mellemrum vælger flere. Enter bekræfter."
+    hint = "Pil op/ned flytter. Enter vælger. Videre, når du er færdig."
     picked = tui.choose("Hvor handler du?", list(registry.STORES), hint, many=True)
     if not picked:
         _say("Ingen butik valgt. Intet er gemt.")

@@ -46,11 +46,13 @@ def test_choose_moves_with_the_keys_and_ctrl_c_is_the_first_choice(keys, typed, 
 @pytest.mark.parametrize(
     ("typed", "picked"),
     [
-        (ENTER, ["nemlig"]),  # Enter with no mark picks the one the pointer is on
-        (DOWN + ENTER, ["bilkatogo"]),
-        (" " + ENTER, ["nemlig"]),
-        (" " + DOWN + DOWN + " " + ENTER, ["nemlig", "rema1000"]),
-        (DOWN + " " + UP + " " + " " + ENTER, ["bilkatogo"]),  # space twice takes the mark off
+        (ENTER + ENTER, ["nemlig"]),  # Enter marks and moves to Videre; Enter again goes on
+        (DOWN + ENTER + ENTER, ["bilkatogo"]),
+        (ENTER + UP + ENTER + ENTER, ["nemlig", "rema1000"]),  # up from Videre: the last store
+        (" " + DOWN + DOWN + " " + DOWN + ENTER, ["nemlig", "rema1000"]),  # space marks in place
+        (" " + " " + DOWN + " " + DOWN + DOWN + ENTER, ["bilkatogo"]),  # twice takes the mark off
+        (UP + ENTER + UP + " " + DOWN + ENTER, ["rema1000"]),  # Videre waits for a store
+        (ENTER + UP + UP + UP + ENTER + DOWN + DOWN + DOWN + ENTER + CTRL_C, []),  # no mark left
         (" " + DOWN + " " + CTRL_C, []),  # Ctrl-C picks nothing
     ],
 )
