@@ -19,7 +19,7 @@ src/handle_mcp/
   app.py           the MCPServer, limits, store selection, error handling, `_out()`
   read_tools.py    the tools that read products, recipes, offers and nutrition; compare_basket
   cart_tools.py    the cart, delivery and order tools. Both register on app.mcp; nothing imports server.py
-  cli.py           `handle-mcp` entry: stdio server or `login <store>` (logins into the OS keychain)
+  cli.py           `handle-mcp` entry: stdio server or `login [<store>]` (logins into the OS keychain)
   compare.py       compare_basket: best product per item, cheapest store
   candidates.py    the products per item the caller picks from, with flags
   match.py         words: does this product match the item?

@@ -67,6 +67,7 @@ def run(args: list[str]) -> int:
         _say(
             "Brug: handle-mcp login <butik> [--from-env]  eller  handle-mcp logout <butik>\n"
             f"Butikker: {known}\n"
+            "Uden terminal: sæt HANDLE_<BUTIK>_EMAIL og HANDLE_<BUTIK>_PASSWORD, kør med --from-env\n"
             "Anonym tælling: handle-mcp telemetry on|off|status"
         )
         return 2

@@ -400,7 +400,9 @@ def test_login_with_no_store_and_none_picked_saves_nothing(fancy, monkeypatch, c
 def test_login_with_no_store_in_a_pipe_says_how(terminal, monkeypatch, capsys):
     monkeypatch.setattr(cli.tui, "fancy", lambda: False)
     assert cli.run(["login"]) == 2
-    assert "Brug: handle-mcp login" in capsys.readouterr().err
+    err = capsys.readouterr().err
+    assert "Brug: handle-mcp login" in err
+    assert "HANDLE_<BUTIK>_EMAIL og HANDLE_<BUTIK>_PASSWORD" in err  # an agent reads what to set
 
 
 @pytest.mark.parametrize(
