@@ -386,9 +386,17 @@ def test_the_fancy_login_only_on_a_terminal_that_shows_it(monkeypatch, env, name
     assert cli.tui.fancy() is expected
 
 
-def test_the_logo_rows_line_up_and_fade_from_blue_to_yellow():
-    assert len(cli.tui.LOGO) == 6 and max(map(len, cli.tui.LOGO)) <= 78
+def test_the_logo_is_solid_letters_with_air_and_fits_80_columns():
+    logo = cli.tui.LOGO
+    assert len(logo) == 5 and {len(row) for row in logo} == {76}
+    assert set("".join(logo)) == {"█", " "}  # no box characters: every font draws these the same
+    letters = ["".join(row[i] for row in logo).strip() == "" for i in range(76)]  # empty columns
+    assert "".join("." if empty else "X" for empty in letters).count("X..X") == 8  # air between 9
     rows = cli.tui.logo_rows()
-    assert cli.tui.BLUE in rows[0] and cli.tui.YELLOW in rows[4]
-    assert all(cli.tui.ACCENT in row for row in rows)  # the shadow edge
-    assert cli.tui._mix(0, 4) == cli.tui.BLUE and cli.tui._mix(4, 4) == cli.tui.YELLOW
+    assert cli.tui.ACCENT in rows[0] and cli.tui.BLUE in rows[4]
+
+
+def test_a_frame_is_the_same_width_on_every_row():
+    for title in ("Tæl med?", "Email til nemlig", "Anonym tælling i handle-mcp"):
+        left, right, under = cli.tui.edges(title)
+        assert len(left + title + right) == len(under) == cli.tui.WIDTH + 4

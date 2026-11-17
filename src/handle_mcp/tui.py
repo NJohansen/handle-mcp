@@ -13,16 +13,24 @@ import sys
 from typing import Any
 
 BLUE, YELLOW, INK = "#9ccbf3", "#f5e211", "#12161c"  # handlemcp.dk's sky and button
-ACCENT, EDGE = "#3d8fd1", "#8a94a3"  # small text and frames: readable on light and on dark
+ACCENT, EDGE = "#2f7fc1", "#8a94a3"  # a deeper blue and a grey: readable on light and on dark
 WIDTH = 62  # inside a frame
-# Block letters with a shadow edge, six rows each: HANDLE and MCP.
-LOGO = """\
-██╗  ██╗ █████╗ ███╗   ██╗██████╗ ██╗     ███████╗███╗   ███╗ ██████╗██████╗
-██║  ██║██╔══██╗████╗  ██║██╔══██╗██║     ██╔════╝████╗ ████║██╔════╝██╔══██╗
-███████║███████║██╔██╗ ██║██║  ██║██║     █████╗  ██╔████╔██║██║     ██████╔╝
-██╔══██║██╔══██║██║╚██╗██║██║  ██║██║     ██╔══╝  ██║╚██╔╝██║██║     ██╔═══╝
-██║  ██║██║  ██║██║ ╚████║██████╔╝███████╗███████╗██║ ╚═╝ ██║╚██████╗██║
-╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚══════╝╚═╝     ╚═╝ ╚═════╝╚═╝""".splitlines()
+# Five rows per letter, "X" is two columns of solid block. Two columns of air between letters.
+LETTERS = {
+    "H": ["X.X", "X.X", "XXX", "X.X", "X.X"],
+    "A": ["XXX", "X.X", "XXX", "X.X", "X.X"],
+    "N": ["X..X", "XX.X", "X.XX", "X..X", "X..X"],
+    "D": ["XX.", "X.X", "X.X", "X.X", "XX."],
+    "L": ["X..", "X..", "X..", "X..", "XXX"],
+    "E": ["XXX", "X..", "XX.", "X..", "XXX"],
+    "M": ["X...X", "XX.XX", "X.X.X", "X...X", "X...X"],
+    "C": ["XXX", "X..", "X..", "X..", "XXX"],
+    "P": ["XXX", "X.X", "XXX", "X..", "X.."],
+}
+LOGO = [
+    "  ".join(LETTERS[letter][row].replace("X", "██").replace(".", "  ") for letter in "HANDLEMCP")
+    for row in range(5)
+]
 
 
 def fancy() -> bool:
@@ -46,29 +54,17 @@ def _show() -> Any:
 
 
 def _mix(step: int, steps: int) -> str:
-    """A color on the way from the sky blue to the button yellow."""
-    a, b = (
-        (int(BLUE[i : i + 2], 16) for i in (1, 3, 5)),
-        (int(YELLOW[i : i + 2], 16) for i in (1, 3, 5)),
-    )
+    """A color on the way from the deeper blue to the sky blue."""
+    a = [int(ACCENT[i : i + 2], 16) for i in (1, 3, 5)]
+    b = [int(BLUE[i : i + 2], 16) for i in (1, 3, 5)]
     return "#" + "".join(
         f"{round(x + (y - x) * step / steps):02x}" for x, y in zip(a, b, strict=True)
     )
 
 
 def logo_rows() -> list[str]:
-    """The logo as rich markup: the blocks fade from blue to yellow, the shadow edge is one blue."""
-    rows = []
-    for number, line in enumerate(LOGO):
-        fill, out, run, block = _mix(min(number, 4), 4), "", "", None
-        for char in line + "\0":  # the end mark closes the last run
-            kind = None if char == "\0" else char == "█"
-            if kind != block and run:
-                out += f"[{fill if block else ACCENT}]{run}[/]"
-                run = ""
-            block, run = kind, run + char if char != "\0" else ""
-        rows.append(out)
-    return rows
+    """The logo as rich markup: solid letters that fade from the deeper blue to the sky blue."""
+    return [f"[{_mix(number, len(LOGO) - 1)}]{line}[/]" for number, line in enumerate(LOGO)]
 
 
 def banner(store: str) -> None:
@@ -106,13 +102,18 @@ def frame(title: str, body: str, dim: tuple[str, ...] = (), hint: str = "") -> N
 def done(text: str) -> None:
     from rich.markup import escape
 
-    _show()(f" [green]✔[/] {escape(text)}\n")
+    _show()(f" [bold {ACCENT}]✔[/] {escape(text)}\n")
 
 
 def failed(text: str) -> None:
     from rich.markup import escape
 
     _show()(f" [red]✘[/] {escape(text)}\n")
+
+
+def edges(title: str) -> tuple[str, str, str]:
+    """The top of a frame, left and right of its title, and its bottom: all WIDTH + 4 wide."""
+    return "╭─ ", " " + "─" * (WIDTH - len(title) - 1) + "╮", "╰" + "─" * (WIDTH + 2) + "╯"
 
 
 def _ask(title: str, body: Any, hint: str, height: int, keys: Any = None) -> Any:
@@ -132,10 +133,10 @@ def _ask(title: str, body: Any, hint: str, height: int, keys: Any = None) -> Any
 
     keys = keys or KeyBindings()
     keys.add("c-c")(lambda event: event.app.exit(result=None))
-    top = [("class:edge", "┌ "), ("class:title", title)]
-    top.append(("class:edge", " " + "─" * (WIDTH - len(title) - 1) + "┐"))
+    left, right, under = edges(title)
+    top = [("class:edge", left), ("class:title", title), ("class:edge", right)]
     middle = VSplit([side(), Window(width=1), body, Window(width=1), side()])
-    bottom = [("class:edge", "└" + "─" * (WIDTH + 2) + "┘")]
+    bottom = [("class:edge", under)]
     rows = [line(top), middle, line(bottom), line([("class:hint", "  " + hint)])]
     style = Style.from_dict(
         {"edge": EDGE, "title": f"bold {ACCENT}", "hint": EDGE, "on": f"bold {ACCENT}", "off": EDGE}
@@ -146,8 +147,17 @@ def _ask(title: str, body: Any, hint: str, height: int, keys: Any = None) -> Any
         style=style,
         erase_when_done=True,
         output=create_output(stdout=sys.stderr),
+        color_depth=_depth(),
     )
     return app.run()
+
+
+def _depth() -> Any:
+    """Exact colors where the terminal says it has them; else what prompt_toolkit picks."""
+    from prompt_toolkit.output import ColorDepth
+
+    exact = os.environ.get("COLORTERM", "").lower() in ("truecolor", "24bit")
+    return ColorDepth.DEPTH_24_BIT if exact else None
 
 
 def _typed(title: str, hint: str, secret: bool) -> str:
@@ -197,7 +207,10 @@ def choose(title: str, choices: list[str], hint: str = "") -> str:
         out = []
         for number, choice in enumerate(choices):
             on = number == at[0]
-            out.append(("class:on" if on else "class:off", f"{'› ●' if on else '  ○'} {choice}\n"))
+            end = "" if number == len(choices) - 1 else "\n"
+            out.append(
+                ("class:on" if on else "class:off", f"{'› ●' if on else '  ○'} {choice}{end}")
+            )
         return out
 
     body = Window(FormattedTextControl(rows, focusable=True, show_cursor=False), width=WIDTH)

@@ -119,7 +119,7 @@ def _ask_telemetry(fancy: bool = False) -> None:
             names = tuple(name for name, _ in question.FACTS)
             body = question.question().split("\n", 3)[3].replace("\n  ", "\n")[2:].rstrip()
             tui.frame(question.TITLE, body, dim=names)
-            hint = "Pil op/ned vælger. Enter bekræfter. Enter alene er nej."
+            hint = "Pil op/ned vælger. Enter bekræfter."
             yes = tui.choose("Tæl med?", ["Nej tak", "Ja, tæl med"], hint) == "Ja, tæl med"
         else:
             _say(question.question(color=_color()))
