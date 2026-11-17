@@ -276,11 +276,15 @@ def choose(title: str, choices: list[str], hint: str = "", many: bool = False) -
             here = number == at[0]
             on = number in marked if many else here
             end = "" if number == len(choices) - 1 and not many else "\n"
-            line = f"{'›' if here else ' '} {'●' if on else '○'} {choice}{end}"
+            mark = ("[x]" if on else "[ ]") if many else ("●" if on else "○")
+            line = f"{'›' if here else ' '} {mark} {choice}{end}"
             out.append(("class:on" if on or here else "class:off", line))
-        if many:
-            here = at[0] == onward
-            out.append(("class:on" if here else "class:off", f"\n{'›' if here else ' '} Videre"))
+        if many:  # an empty row, then the row that goes on: it says what it goes on with
+            here, names = at[0] == onward, ", ".join(choices[n] for n in sorted(marked))
+            onward_text = f"Videre med {names}" if names else "Vælg mindst én"
+            out.append(
+                ("class:on" if here else "class:off", f"\n{'›' if here else ' '} {onward_text}")
+            )
         return out
 
     body = Window(FormattedTextControl(rows, focusable=True, show_cursor=False), width=WIDTH)

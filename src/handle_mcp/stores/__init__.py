@@ -230,3 +230,8 @@ STORES: dict[str, type[Store]] = {
     "bilkatogo": BilkaStore,
     "rema1000": Rema1000Store,
 }
+LABELS = {
+    "nemlig": "nemlig.com",
+    "bilkatogo": "BilkaToGo",
+    "rema1000": "REMA 1000",
+}  # as a human reads them
