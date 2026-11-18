@@ -61,21 +61,21 @@ Other stores, Claude Desktop, headless machines and AI agents (`--from-env`): [s
 
 ## Tools
 
-| Tool | Writes? | What |
-|---|---|---|
-| `search_products` | no | Price, price per kg/l, offers |
-| `search_recipes` | no | The store's recipes (nemlig) |
-| `list_recipes` | no | Featured recipes (BilkaToGo: the week's madplan), by tag (nemlig) or by category (BilkaToGo) |
-| `get_recipe` | no | The products to buy for a recipe, for any number of persons |
-| `list_offers` | no | This week's offers and free gifts |
-| `get_nutrition` | no | Nutrition per 100 g/ml from the label |
-| `compare_basket` | no | Prices a list in every store, fees included, cheapest first |
-| `get_cart` | no | Cart lines, fees, total, in one store or every store |
-| `set_cart_quantities` | **yes** | Sets quantities in the cart (REMA 1000: the list "handle-mcp"). Nothing else |
-| `add_recipe_to_cart` | **yes** | Puts a recipe's products in the cart, after your yes. Nothing else |
-| `get_delivery_info` | no | Chosen time, fees |
-| `list_delivery_slots` | no | Free times, cheapest first (REMA 1000: Køb & Hent times) |
-| `get_orders` / `get_order` | no | What you usually buy |
+| Tool | Writes? | nemlig | BilkaToGo | REMA 1000 | What |
+|---|---|:-:|:-:|:-:|---|
+| `search_products` | no | ✓ | ✓ | ✓ | Price, price per kg/l, offers |
+| `search_recipes` | no | ✓ |  |  | The store's recipes by dish |
+| `list_recipes` | no | ✓ | ✓ |  | Featured recipes (BilkaToGo: the week's madplan), by tag (nemlig) or by category |
+| `get_recipe` | no | ✓ | ✓ |  | The products to buy for a recipe, for any number of persons |
+| `list_offers` | no | ✓ | ✓ | ✓ | This week's offers and free gifts, also per category |
+| `get_nutrition` | no | ✓ | ✓ | ✓ | Nutrition per 100 g/ml from the label |
+| `compare_basket` | no | ✓ | ✓ | ✓ | Prices a list in every store, fees included, cheapest first |
+| `get_cart` | no | ✓ | ✓ | ✓ | Cart lines, fees, total, in one store or every store |
+| `set_cart_quantities` | **yes** | ✓ | ✓ | ✓ | Sets quantities in the cart (REMA 1000: the list "handle-mcp"). Nothing else |
+| `add_recipe_to_cart` | **yes** | ✓ | ✓ |  | Puts a recipe's products in the cart, after your yes. Nothing else |
+| `get_delivery_info` | no | ✓ | ✓ | ✓ | Chosen time, fees |
+| `list_delivery_slots` | no | ✓ | ✓ | ✓ | Free times, cheapest first (REMA 1000: Køb & Hent times) |
+| `get_orders` / `get_order` | no | ✓ | ✓ |  | What you usually buy |
 
 Full arguments and fields: [docs/tools.md](docs/tools.md).
 
