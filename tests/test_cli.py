@@ -343,7 +343,23 @@ def fancy(monkeypatch, terminal, memory_keychain):
     monkeypatch.setattr(cli.tui, "frame", lambda title, body, dim=(), hint="": shown.append(body))
     monkeypatch.setattr(cli.tui, "done", shown.append)
     monkeypatch.setattr(cli.tui, "failed", shown.append)
+    monkeypatch.setattr(cli.tui, "working", lambda _text: None)
     return shown
+
+
+def test_the_login_says_it_is_working_before_it_calls_the_store(
+    fancy, terminal, monkeypatch, capsys
+):
+    """A slow store must not look like a hang: the line comes before the first call."""
+    order: list[str] = []
+    monkeypatch.setattr(cli.tui, "working", order.append)
+    monkeypatch.setattr(cli, "_check", lambda *_, **__: order.append("the store") or SAVED)
+    assert cli.run(["login", "fake"]) == 0
+    assert order == ["Logger ind hos fake…", "the store"]
+    monkeypatch.setattr(cli.tui, "fancy", lambda: False)  # plain text says the same
+    terminal("a@example.com", "rigtig")
+    assert cli.run(["login", "fake"]) == 0
+    assert "Logger ind hos fake…" in capsys.readouterr().err
 
 
 def test_the_fancy_login_stops_at_an_empty_email(fancy, monkeypatch, capsys):
