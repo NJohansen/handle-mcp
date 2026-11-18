@@ -184,6 +184,21 @@ async def test_login_does_not_follow_cross_origin_redirect(store, fake):
     assert all(r.url.host != "attacker.invalid" for r in fake.requests)
 
 
+async def test_a_client_that_follows_redirects_still_sends_nothing_on(fake, caplog):
+    """The guard is on the request, not on how the client was made."""
+    follows = httpx.AsyncClient(transport=httpx.MockTransport(fake.handle), follow_redirects=True)
+    fake.scripted["/webapi/login"] = [
+        httpx.Response(307, headers={"Location": "https://attacker.invalid/collect?id=42"})
+    ]
+
+    with pytest.raises(StoreError, match="uventet redirect"):
+        await NemligStore(follows).get_cart()
+
+    assert all(r.url.host != "attacker.invalid" for r in fake.requests)
+    assert "/webapi/login -> 307, redirect to attacker.invalid refused" in caplog.text
+    assert "id=42" not in caplog.text and "hemmeligt" not in caplog.text
+
+
 @pytest.fixture
 def saved(monkeypatch, memory_keychain):
     """No env vars: the login comes from the keychain."""
