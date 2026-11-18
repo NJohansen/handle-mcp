@@ -128,6 +128,88 @@ def test_parse_size_and_item():
     assert parse_item("2 x letmælk 1 l") == (2, ["letmælk"], ("ml", Decimal(1000)))
     assert parse_item("æg 10 stk") == (1, ["æg"], ("stk", Decimal(10)))
     assert parse_item("hakket oksekød med fedt") == (1, ["hakket", "oksekød", "fedt"], None)
+    assert parse_item("peanutbutter uden sukker 350 g") == (
+        1,
+        ["peanutbutter"],
+        ("g", Decimal(350)),
+    )
+
+
+def test_explicit_negation_is_not_a_search_word_or_a_sure_match():
+    conflict = p("x", "s", "Peanutbutter med sukker", "20.00", "350 g")
+    free = p("x", "f", "Peanutbutter sukkerfri", "24.00", "350 g")
+
+    assert match.excluded_terms("peanutbutter uden sukker 350 g") == {"sukker"}
+    assert match.query("peanutbutter uden sukker 350 g") == "peanutbutter"
+
+    line = best_match("peanutbutter uden sukker 350 g", [conflict, free])
+    assert line.product.id == "f"
+    assert not line.sure
+    assert "ikke verificeret ud fra produktnavnet" in line.note
+
+    unknown = p("x", "u", "Peanutbutter", "18.00", "350 g")
+    line = best_match("peanutbutter uden sukker 350 g", [unknown])
+    assert line.product.id == "u"
+    assert not line.sure
+
+    line = best_match("peanutbutter uden sukker 350 g", [conflict])
+    assert line.product is None
+
+
+def test_conflicting_product_claim_overrides_free_label():
+    item = "peanutbutter uden sukker 350 g"
+    product = p("x", "c", "Peanutbutter sukkerfri med sukker", "20.00", "350 g")
+
+    assert match.constraint_status(item, product) == "conflict"
+    assert best_match(item, [product]).product is None
+
+
+def test_free_for_added_sugar_is_parsed_as_one_constraint():
+    item = "mælk fri for tilsat sukker 1 l"
+    product = p("x", "f", "Mælk sukkerfri", "20.00", "1 l")
+
+    assert match.excluded_terms(item) == {"sukker"}
+    assert parse_item(item)[1] == ["mælk"]
+    assert match.query(item) == "mælk"
+    assert match.constraint_status(item, product) == "free"
+    line = best_match(item, [product])
+    assert line.product.id == "f"
+    assert not line.sure
+    assert "Tjek varedeklarationen" in line.note
+
+
+def test_freedom_claim_alone_does_not_make_a_restricted_match_sure():
+    line = best_match(
+        "mælk uden laktose",
+        [p("x", "f", "Mælk laktosefri", "20.00", "1 l")],
+    )
+    assert line.product.id == "f"
+    assert not line.sure
+
+
+@pytest.mark.parametrize(
+    ("item", "product", "status"),
+    [
+        ("øl uden alkohol", "Øl alkoholfri", "free"),
+        ("mælk uden laktose", "Mælk laktosefri", "free"),
+        ("brød uden gluten", "Brød med gluten", "conflict"),
+        ("snack sukkerfri", "Snack med sukker", "conflict"),
+    ],
+)
+def test_common_explicit_constraints(item, product, status):
+    candidate = p("x", "c", product, "20.00")
+    assert match.constraint_status(item, candidate) == status
+
+
+def test_negation_does_not_read_a_fat_percentage_as_an_exclusion():
+    item = "hakket svinekød u. 8% fedt"
+    assert match.excluded_terms(item) == set()
+    assert parse_item(item)[1] == ["hakket", "svinekød", "8", "fedt"]
+
+
+def test_multiple_negated_terms_are_constraints():
+    item = "mælk uden sukker og laktose"
+    assert match.excluded_terms(item) == {"sukker", "laktose"}
 
 
 @pytest.mark.parametrize(

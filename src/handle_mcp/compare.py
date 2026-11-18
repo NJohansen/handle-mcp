@@ -27,6 +27,8 @@ from handle_mcp.match import (
     asked,
     brand_only,
     category_rank,
+    constraint_status,
+    excluded_terms,
     flavour_only,
     get,
     is_fresh,
@@ -109,6 +111,8 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
     for product in products:
         name_score = score(words, product, asked(item))
         if get(product, "available") and name_score >= 0.5:
+            if constraint_status(item, product) == "conflict":
+                continue
             n_packs = packs(size, quantity, product) or pieces(size, quantity, product)
             size_rank = 0 if n_packs or not size else 1
             count = n_packs or quantity
@@ -142,7 +146,10 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
     )
     over = size_rank == 0 and size is not None and too_much(size, quantity, count, product)
     is_mixed = fit[-1] == 1  # mixed() is always last in fit
-    sure = neg_score == -1.0 and size_rank == 0 and not over and not is_mixed
+    has_constraints = bool(excluded_terms(item))
+    sure = (
+        neg_score == -1.0 and size_rank == 0 and not over and not is_mixed and not has_constraints
+    )
     note = None
     if over:
         note = f"Anden størrelse: {count} x {get(product, 'size') or get(product, 'name')}."
@@ -167,6 +174,16 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
     until = get(product, "offer_until")
     if on and until and on > until and get(product, "before_price"):
         note = " ".join(filter(None, [note, f"Tilbuddet slutter {until:%d/%m}, før levering."]))
+    if has_constraints:
+        note = " ".join(
+            filter(
+                None,
+                [
+                    note,
+                    "Kravet er ikke verificeret ud fra produktnavnet. Tjek varedeklarationen.",
+                ],
+            )
+        )
     return BasketLine(item, count, product, line_cost, sure, note)
 
 
@@ -185,7 +202,10 @@ def _guess(
     ok = [
         x
         for x in products
-        if get(x, "available") and not flavour_only(words, x) and not brand_only(words, x)
+        if get(x, "available")
+        and constraint_status(item, x) != "conflict"
+        and not flavour_only(words, x)
+        and not brand_only(words, x)
     ]
     if size:
         sized = [(x, packs(size, quantity, x)) for x in ok]
@@ -198,6 +218,8 @@ def _guess(
     else:
         return BasketLine(item, quantity, None, Decimal(0), False, "Ikke fundet")
     note = "Butikkens bedste søgeresultat. Navnet matcher ikke. Tjek varen."
+    if excluded_terms(item):
+        note += " Kravet er ikke verificeret ud fra produktnavnet. Tjek varedeklarationen."
     return BasketLine(item, count, top, cost(top, count, on), False, note, guess=True)
 
 
