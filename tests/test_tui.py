@@ -81,11 +81,20 @@ def test_a_password_is_never_shown_and_never_its_real_length(keys, capsys):
 def test_the_banner_and_a_frame_go_to_stderr_only(capsys):
     tui.banner("nemlig")
     tui.frame(question.TITLE, question.body(), dim=tuple(n for n, _ in question.FACTS))
+    tui.working("Logger ind hos [nemlig]…")
     tui.done("Logget ind.")
     tui.failed("Login blev ikke gemt.")
     out = capsys.readouterr()
     assert out.out == ""  # stdout belongs to JSON-RPC
-    for words in ("HandleMCP", "nemlig", question.TITLE, "Slå fra", "✔ Logget ind.", "✘ Login"):
+    for words in (
+        "HandleMCP",
+        "nemlig",
+        question.TITLE,
+        "Slå fra",
+        "✔ Logget ind.",
+        "✘ Login",
+        "[nemlig]…",
+    ):
         assert words in out.err
     for line in question.body().splitlines():  # every word of the question is in the frame
         assert line in out.err

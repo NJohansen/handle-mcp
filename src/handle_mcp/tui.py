@@ -164,6 +164,11 @@ def failed(text: str) -> None:
     _result("[red]✘[/]", text)
 
 
+def working(text: str) -> None:
+    """One dim line before a wait: a slow store must not look like a hang."""
+    _show()("  " + text, style="dim", markup=False)
+
+
 def edges(title: str) -> tuple[str, str, str]:
     """The top of a frame, left and right of its title, and its bottom: all WIDTH + 4 wide."""
     return "╭─ ", " " + "─" * (WIDTH - len(title) - 1) + "╮", "╰" + "─" * (WIDTH + 2) + "╯"
