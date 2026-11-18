@@ -20,7 +20,12 @@ from decimal import Decimal
 from itertools import pairwise
 from typing import Any
 
-STOP_WORDS = {"og", "med", "i", "af", "en", "et", "til", "uden"}
+STOP_WORDS = {"og", "med", "i", "af", "en", "et", "til", "uden", "u", "fri", "for"}
+
+NEGATION_RE = re.compile(r"\b(?:uden|u\.(?!\s*\d))\s+", re.IGNORECASE)
+FREE_RE = re.compile(r"\b([a-zæøå]+?)(?:e)?fri(?:t|e)?\b", re.IGNORECASE)
+FREE_OF_RE = re.compile(r"\bfri\s+for\s+", re.IGNORECASE)
+CONSTRAINT_FILLERS = {"tilsat", "tilsatte", "indhold", "indholdet", "noget"}
 
 UNITS = {
     "g": ("g", 1), "gr": ("g", 1), "kg": ("g", 1000),
@@ -110,8 +115,67 @@ def parse_item(item: str) -> tuple[int, list[str], tuple[str, Decimal] | None]:
     if match := QTY_RE.match(item):
         quantity, item = int(match.group(1)), item[match.end() :]
     size = parse_size(item)
-    words = [w for w in _words(SIZE_RE.sub(" ", item)) if w not in STOP_WORDS]
+    excluded = excluded_terms(item)
+    words = [
+        w
+        for w in _words(SIZE_RE.sub(" ", item))
+        if w not in STOP_WORDS
+        and w not in excluded
+        and w not in CONSTRAINT_FILLERS
+        and not any(
+            w.endswith(suffix) and w[: -len(suffix)].removesuffix("e") in excluded
+            for suffix in ("fri", "frit", "frie")
+        )
+    ]
     return max(quantity, 1), words, size
+
+
+def excluded_terms(item: str) -> set[str]:
+    """Terms the item explicitly says must be absent."""
+    text = SIZE_RE.sub(" ", item).strip()
+    terms: set[str] = set()
+
+    for pattern in (NEGATION_RE, FREE_OF_RE):
+        for match in pattern.finditer(text):
+            rest = text[match.end() :]
+            rest = re.split(r"\bmen\b|[,;]", rest, maxsplit=1)[0]
+            terms.update(
+                w
+                for w in _words(rest)
+                if w.isalpha() and w not in STOP_WORDS and w not in CONSTRAINT_FILLERS
+            )
+
+    terms.update(match.group(1).lower() for match in FREE_RE.finditer(text))
+    return terms
+
+
+def constraint_status(item: str, product: Any) -> str:
+    """'free', 'unknown' or 'conflict' for explicit exclusions in an item."""
+    terms = excluded_terms(item)
+    if not terms:
+        return "free"
+    text = " ".join(str(get(product, key) or "") for key in ("name", "brand", "category")).lower()
+
+    verified_free = set()
+    for term in terms:
+        escaped = re.escape(term)
+        free_patterns = (
+            rf"\b{escaped}(?:e)?fri(?:t|e)?\b",
+            rf"\bfri\s+for\s+{escaped}\b",
+            rf"\bfrit\s+for\s+{escaped}\b",
+            rf"\buden\s+{escaped}\b",
+            rf"\bu\.\s*{escaped}\b",
+        )
+        remaining = text
+        explicit_free = False
+        for pattern in free_patterns:
+            remaining, count = re.subn(pattern, " ", remaining)
+            explicit_free = explicit_free or count > 0
+        if explicit_free:
+            verified_free.add(term)
+        if term in remaining:
+            return "conflict"
+    return "free" if verified_free == terms else "unknown"
 
 
 def query(item: str) -> str:
