@@ -113,7 +113,7 @@ class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
     cart_page = f"{BASE}/kurv"  # the page the human opens to see the cart and pay
 
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=20, follow_redirects=True)
+        self._client = client or httpx.AsyncClient(timeout=20, follow_redirects=False)
         self._bearer: str | None = None
         self._xsrf: str | None = None
         self._logged_in = False
@@ -145,6 +145,16 @@ class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
         resp = await request(
             self._client, method, url, "nemlig.com", headers=self._headers(), **kwargs
         )
+        if 300 <= resp.status_code < 400:
+            location = resp.headers.get("location")
+            if location:
+                try:
+                    host = httpx.URL(location).host.lower()
+                except httpx.InvalidURL:
+                    host = ""
+                if host == "queue-it.net" or host.endswith(".queue-it.net"):
+                    raise StoreError("nemlig.com har kø lige nu (queue-it). Prøv igen om lidt.")
+            raise StoreError("nemlig.com returnerede en uventet redirect.")
         host = resp.url.host
         if host == "queue-it.net" or host.endswith(".queue-it.net"):
             raise StoreError("nemlig.com har kø lige nu (queue-it). Prøv igen om lidt.")
