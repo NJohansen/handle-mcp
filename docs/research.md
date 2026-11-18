@@ -31,6 +31,7 @@ Skrevet før de første live kald. Punkter markeret **⚠ live** er stadig ikke 
 3. `POST /webapi/login` med XSRF + Bearer → cookie `.ASPXAUTH` (1 år).
 
 Konsekvens: gem kun cookies lokalt (`~/.config/handle-mcp/nemlig.json`, chmod 600). Hent ny Bearer ved 401. Log ind igen, kun hvis cookien er død.
+HTTP redirects følges ikke automatisk ved login eller API-kald. 3xx svarer med en kontrolleret fejl i stedet for at videresende credentials eller sessioner. Queue-it afvises som kø, aldrig omgået.
 
 Krævede headers: `Platform: web`, `Device-Size: desktop`, `Version: <app-version>`, `X-Correlation-Id: <uuid4>`. Versionen kan ændre sig. **⚠ live:** hvad sker der med en gammel `Version`?
 

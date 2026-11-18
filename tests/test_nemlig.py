@@ -48,6 +48,8 @@ class FakeNemlig:
             nxt = self.scripted[path].pop(0)
             if isinstance(nxt, Exception):
                 raise nxt
+            if isinstance(nxt, httpx.Response):
+                return nxt
             return httpx.Response(nxt)
         if request.url.host == "nemlig.queue-it.net":
             return httpx.Response(200, text="<html>Du er i kø</html>")
@@ -148,7 +150,7 @@ async def _no_sleep(_seconds):
 @pytest.fixture
 def store(fake):
     return NemligStore(
-        httpx.AsyncClient(transport=httpx.MockTransport(fake.handle), follow_redirects=True)
+        httpx.AsyncClient(transport=httpx.MockTransport(fake.handle), follow_redirects=False)
     )
 
 
@@ -166,6 +168,20 @@ async def test_login_flow_then_authorized_calls(store, fake):
     assert login.headers["X-XSRF-TOKEN"] == "xsrf-1"
     basket = fake.requests[-1]
     assert basket.headers["Authorization"] == "Bearer bearer-2"  # fresh token after login
+
+
+async def test_login_does_not_follow_cross_origin_redirect(store, fake):
+    fake.scripted["/webapi/login"] = [
+        httpx.Response(307, headers={"Location": "https://attacker.invalid/collect"})
+    ]
+
+    with pytest.raises(StoreError, match="uventet redirect"):
+        await store.get_cart()
+
+    logins = [r for r in fake.requests if r.url.path == "/webapi/login"]
+    assert len(logins) == 1
+    assert json.loads(logins[0].content)["Password"] == "hemmeligt"
+    assert all(r.url.host != "attacker.invalid" for r in fake.requests)
 
 
 @pytest.fixture
