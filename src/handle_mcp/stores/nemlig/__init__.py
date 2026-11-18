@@ -141,19 +141,32 @@ class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
         return headers
 
     async def _send(self, method: str, url: str, **kwargs: Any) -> Any:
-        """One request with retries on timeout/429/5xx. Returns parsed JSON."""
+        """One request with retries on timeout/429/5xx. Returns parsed JSON. A redirect is
+        never followed, whatever client the store was made with (ADR 0016)."""
         resp = await request(
-            self._client, method, url, "nemlig.com", headers=self._headers(), **kwargs
+            self._client,
+            method,
+            url,
+            "nemlig.com",
+            headers=self._headers(),
+            follow_redirects=False,
+            **kwargs,
         )
         if 300 <= resp.status_code < 400:
-            location = resp.headers.get("location")
-            if location:
-                try:
-                    host = httpx.URL(location).host.lower()
-                except httpx.InvalidURL:
-                    host = ""
-                if host == "queue-it.net" or host.endswith(".queue-it.net"):
-                    raise StoreError("nemlig.com har kø lige nu (queue-it). Prøv igen om lidt.")
+            try:
+                host = httpx.URL(resp.headers.get("location") or "").host.lower()
+            except httpx.InvalidURL:
+                host = ""
+            if host == "queue-it.net" or host.endswith(".queue-it.net"):
+                raise StoreError("nemlig.com har kø lige nu (queue-it). Prøv igen om lidt.")
+            # The URLs may hold ids: stderr only, the path and the new host, never a query.
+            log.warning(
+                "nemlig.com %s %s -> %s, redirect to %s refused",
+                method,
+                resp.url.path,
+                resp.status_code,
+                host or "an unknown host",
+            )
             raise StoreError("nemlig.com returnerede en uventet redirect.")
         host = resp.url.host
         if host == "queue-it.net" or host.endswith(".queue-it.net"):
