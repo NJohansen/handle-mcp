@@ -77,7 +77,7 @@ No change to `app.py` or the tools is needed.
 - Bilka: log in without a `cart` cookie, or the login replaces the cart.
 - Retry only on timeout, network errors (e.g. ReadError), 429 and 5xx. Safe because every write sets an absolute quantity.
 - nemlig: the front page and `?GetAsJson=1` land in queue-it. Use `/webapi/` and the productbff API. Never work around a queue or a bot check: raise a clear StoreError and let the human wait.
-- Matcher: explicit exclusions such as "uden sukker" and "laktosefri" are constraints, not ordinary search words. A conflicting product is excluded; a product-name claim alone never makes a constrained match sure.
+- Matcher: keep explicit exclusions in store searches; use them as constraints when matching. A conflicting product name is excluded; a product-name claim alone never makes a constrained match sure.
 - Fixtures are real captures with personal data replaced. `tests/fixtures/<store>/README.md` says what was captured and when, so a stale fixture is easy to spot.
 
 ## Test

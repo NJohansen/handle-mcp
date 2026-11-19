@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Any
 
 
 @dataclass
@@ -26,6 +27,34 @@ class Product:
     category: str | None = None  # the store's category path, e.g. "Frugt & grønt > Bananer"
     campaign: str | None = None  # the store's offer list, e.g. "Priskup", "Skarp pris", "Gratis"
     max_per_order: int | None = None  # offer limit, e.g. 1 for a free gift
+
+
+@dataclass
+class BasketLine:
+    item: str
+    quantity: int
+    product: Product | None
+    line_total: Decimal
+    sure: bool
+    note: str | None = None
+    guess: bool = False
+    candidates: list[dict[str, Any]] = field(default_factory=list)
+    oeko: bool = False
+
+
+@dataclass
+class BasketQuote:
+    store: str
+    lines: list[BasketLine]
+    missing: list[str]
+    products_total: Decimal
+    fees: dict[str, Decimal]
+    total: Decimal
+    minimum_order: Decimal | None
+    minimum_met: bool | None
+    notes: list[str] = field(default_factory=list)
+    delivery_mode: str | None = None
+    pickup_store: str | None = None
 
 
 @dataclass
