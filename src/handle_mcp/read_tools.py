@@ -179,8 +179,9 @@ async def compare_basket(
     the cost for the amount and flags: name_match, size_fits, prepared (cold cuts, smoked,
     breaded), processed (frost/konserves), blend, oeko. The suggestion is a guess by word rules:
     pick the candidate that fits the user, and ask when "sure" is false or none fits
-    (search_products finds more). Unknown facts and false flags are left out. Also total incl.
-    fees and minimum order met. Only reads: use set_cart_quantities with the chosen ids after."""
+    (search_products finds more). Unknown facts and false flags are left out. If any product is
+    only a guess, `products_total` and `total` are null and `minimum_met` is unknown; confirm the
+    products before relying on the total. Only reads: use set_cart_quantities with chosen ids after."""
     items = [i.strip() for i in items if i.strip()]
     if not items:
         raise ToolError("Indkøbslisten er tom.")
