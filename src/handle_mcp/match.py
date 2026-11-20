@@ -18,8 +18,6 @@ from decimal import Decimal
 from itertools import pairwise
 from typing import Any
 
-from handle_mcp.exclusions import excluded_terms, without_constraints
-
 STOP_WORDS = {"og", "med", "i", "af", "en", "et", "til", "uden", "u"}
 
 UNITS = {
@@ -74,6 +72,7 @@ QTY_RE = re.compile(r"^\s*(\d+)\s*[x×]\s+(?=\D)", re.IGNORECASE)
 ABBREVIATIONS = [(re.compile(r"\bhk\.\s*"), "hakket ")]
 
 OEKO_RE = re.compile(r"\b(?:øko|økologiske?|organic)\b", re.IGNORECASE)  # not "Økonomi"
+UNCERTAIN_ITEM_RE = re.compile(r"\b(?:uden|fri\s+for|[a-zæøå]+fri(?:t|e)?)\b", re.IGNORECASE)
 
 
 def get(product: Any, key: str) -> Any:
@@ -110,14 +109,12 @@ def parse_item(item: str) -> tuple[int, list[str], tuple[str, Decimal] | None]:
     if match := QTY_RE.match(item):
         quantity, item = int(match.group(1)), item[match.end() :]
     size = parse_size(item)
-    words = [w for w in _words(SIZE_RE.sub(" ", without_constraints(item))) if w not in STOP_WORDS]
+    words = [w for w in _words(SIZE_RE.sub(" ", item)) if w not in STOP_WORDS]
     return max(quantity, 1), words, size
 
 
 def query(item: str) -> str:
-    """Search words without amounts; keep an explicit exclusion in the store query."""
-    if excluded_terms(item):
-        return re.sub(r"\s+", " ", SIZE_RE.sub(" ", QTY_RE.sub("", item))).strip()
+    """What we send to the store's search: the words only."""
     return " ".join(parse_item(item)[1]) or item
 
 

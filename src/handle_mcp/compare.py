@@ -15,15 +15,16 @@ counted in `pricing`. This module picks the best product per item and compares t
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 from zoneinfo import ZoneInfo
 
 from handle_mcp.candidates import candidates
-from handle_mcp.exclusions import constraint_status, excluded_terms
 from handle_mcp.match import (
     PIECES,
+    UNCERTAIN_ITEM_RE,
     asked,
     brand_only,
     category_rank,
@@ -39,13 +40,41 @@ from handle_mcp.match import (
     query,
     score,
 )
-from handle_mcp.models import BasketLine, BasketQuote
+from handle_mcp.models import Product
 from handle_mcp.pricing import cost, multi_hint, packs, per_unit, pieces, too_much
 from handle_mcp.stores import StoreError
 
 SEARCH_LIMIT = 50  # cheap hits sit far down: tin 14 "hakkede tomater", chicken 30 "kyllingebryst"
 
 DK = ZoneInfo("Europe/Copenhagen")  # offers end on Danish days
+
+
+@dataclass
+class BasketLine:
+    item: str
+    quantity: int
+    product: Product | None
+    line_total: Decimal
+    sure: bool
+    note: str | None = None
+    guess: bool = False
+    candidates: list[dict[str, Any]] = field(default_factory=list)
+    oeko: bool = False
+
+
+@dataclass
+class BasketQuote:
+    store: str
+    lines: list[BasketLine]
+    missing: list[str]
+    products_total: Decimal
+    fees: dict[str, Decimal]
+    total: Decimal
+    minimum_order: Decimal | None
+    minimum_met: bool | None
+    notes: list[str] = field(default_factory=list)
+    delivery_mode: str | None = None
+    pickup_store: str | None = None
 
 
 def best_match(item: str, products: list[Any], on: date | None = None) -> BasketLine:
@@ -58,16 +87,9 @@ def best_match(item: str, products: list[Any], on: date | None = None) -> Basket
             continue
         alt = _best(item, [x], on)
         if alt.product is not None and not alt.guess:
-            others.append(
-                (
-                    constraint_status(item, x) != "free",
-                    -score(parse_item(item)[1], x, asked(item)),
-                    alt.line_total,
-                    alt,
-                )
-            )
-    others.sort(key=lambda o: o[:3])
-    line.candidates = candidates(item, line, [a for _c, _s, _t, a in others])
+            others.append((-score(parse_item(item)[1], x, asked(item)), alt.line_total, alt))
+    others.sort(key=lambda o: o[:2])
+    line.candidates = candidates(item, line, [a for _s, _t, a in others])
     line.oeko = line.product is not None and is_oeko(line.product)
     return line
 
@@ -76,7 +98,6 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
     """Best word match first, then a comparable size, then the lowest cost for the amount.
     `on` is the delivery day: offers that end before it do not count."""
     quantity, words, size = parse_item(item)
-    products = [p for p in products if constraint_status(item, p) != "conflict"]
     # The item is produce when the search found it fresh, by its full name: then canned or frozen
     # loses. Not "Spaghettisquash" for spaghetti.
     produce = any(get(x, "available") and is_fresh(x) and score(words, x) == 1 for x in products)
@@ -112,31 +133,17 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
                 if by_piece
                 else per_unit(product, quantity, count, on)
             )
-            ranked.append(
-                (
-                    constraint_status(item, product) != "free",
-                    -name_score,
-                    fit,
-                    size_rank,
-                    value,
-                    line_cost,
-                    -amount,
-                    count,
-                    product,
-                )
-            )
+            ranked.append((-name_score, fit, size_rank, value, line_cost, -amount, count, product))
     if not ranked:
         return _guess(item, quantity, size, products, words, on)
     # Same cost: more food wins, then fewer packs. Never the store's search order.
-    _claim, neg_score, fit, size_rank, _value, line_cost, _amount, count, product = min(
-        ranked, key=lambda r: r[:8]
+    neg_score, fit, size_rank, _value, line_cost, _amount, count, product = min(
+        ranked, key=lambda r: r[:7]
     )
     over = size_rank == 0 and size is not None and too_much(size, quantity, count, product)
     is_mixed = fit[-1] == 1  # mixed() is always last in fit
-    has_constraints = bool(excluded_terms(item))
-    sure = (
-        neg_score == -1.0 and size_rank == 0 and not over and not is_mixed and not has_constraints
-    )
+    sure = neg_score == -1.0 and size_rank == 0 and not over and not is_mixed
+    sure = sure and not UNCERTAIN_ITEM_RE.search(item)
     note = None
     if over:
         note = f"Anden størrelse: {count} x {get(product, 'size') or get(product, 'name')}."
@@ -161,8 +168,6 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
     until = get(product, "offer_until")
     if on and until and on > until and get(product, "before_price"):
         note = " ".join(filter(None, [note, f"Tilbuddet slutter {until:%d/%m}, før levering."]))
-    if has_constraints:
-        note = " ".join(filter(None, [note, "Kravet er ikke verificeret. Tjek varedeklarationen."]))
     return BasketLine(item, count, product, line_cost, sure, note)
 
 
@@ -194,8 +199,6 @@ def _guess(
     else:
         return BasketLine(item, quantity, None, Decimal(0), False, "Ikke fundet")
     note = "Butikkens bedste søgeresultat. Navnet matcher ikke. Tjek varen."
-    if excluded_terms(item):
-        note += " Kravet er ikke verificeret ud fra produktnavnet. Tjek varedeklarationen."
     return BasketLine(item, count, top, cost(top, count, on), False, note, guess=True)
 
 
