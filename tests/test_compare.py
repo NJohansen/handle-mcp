@@ -668,6 +668,49 @@ def test_c_and_k_and_short_plural():
     assert best_match("peberfrugt rød", [p("x", "p", "Peberfrugter røde", "20.00")]).sure
 
 
+def test_tortilla_wraps_prefer_tortillas_over_chips():
+    tortillas = p("rema1000", "102802", "TORTILLAS HVEDE", "10.70", "370 GR.")
+    chips = p("rema1000", "102791", "TORTILLA CHIPS OST", "7.91", "200 GR.")
+    organic = p("rema1000", "101356", "ØKO TORTILLA, MEDIUM", "15.95", "320 GR.")
+    wholegrain = p("rema1000", "102831", "FULDKORNSTORTILLAS", "12.45", "370 GR.")
+    wraps = p("x", "w", "Protein wraps", "9.00", "360 g")
+    line = best_match("tortilla wraps 6 stk", [chips, wraps, wholegrain, tortillas, organic])
+
+    assert line.product.id == "102802"
+    assert not line.sure and not line.guess
+    assert "Størrelsen kan ikke sammenlignes" in line.note
+    assert [candidate["id"] for candidate in line.candidates] == [
+        "102802",
+        "101356",
+        "w",
+        "102831",
+    ]
+    assert not best_match("tortilla wraps", [wraps]).sure
+
+
+def test_tortilla_and_wrap_plural_forms_match():
+    assert best_match("tortilla", [p("x", "t", "Tortillas hvede", "10.70")]).sure
+    assert best_match("tortillas", [p("x", "t", "Tortilla hvede", "10.70")]).sure
+    assert best_match("wrap", [p("x", "w", "Wraps", "10.70")]).sure
+    assert not best_match("ris", [p("x", "r", "Ri", "10.70")]).sure
+
+
+def test_chips_are_only_suggested_when_requested():
+    chips = p("x", "c", "Tortilla chips salt", "7.91", "200 g")
+    compound = p("x", "cc", "Tortillachips", "7.91", "200 g")
+    assert best_match("tortilla wraps", [chips]).product is None
+    assert best_match("wraps", [chips]).product is None
+    assert best_match("tortilla", [compound]).product is None
+    line = best_match("tortilla chips", [chips])
+    assert line.product.id == "c" and line.sure
+
+
+def test_filled_tortilla_wrap_is_unsure_unless_filling_was_requested():
+    filled = p("x", "filled", "Tortilla med kylling", "20.00")
+    assert not best_match("tortilla wraps", [filled]).sure
+    assert best_match("tortilla wraps med kylling", [filled]).sure
+
+
 def test_canned_loses_even_when_fresh_has_no_fitting_category():
     """Seen live at Bilka: the canned one sits in '... > Cherrytomater', the fresh one does not."""
     canned = p("x", "c", "Cherrytomater i tomatjuice", "10.95", "400 g")
