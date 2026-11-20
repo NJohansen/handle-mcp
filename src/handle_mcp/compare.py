@@ -67,9 +67,9 @@ class BasketQuote:
     store: str
     lines: list[BasketLine]
     missing: list[str]
-    products_total: Decimal | None
+    products_total: Decimal
     fees: dict[str, Decimal]
-    total: Decimal | None
+    total: Decimal
     minimum_order: Decimal | None
     minimum_met: bool | None
     notes: list[str] = field(default_factory=list)
@@ -225,14 +225,13 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
     terms = await store.terms()
     found = [ln for ln in lines if ln.product is not None]
     guesses = [ln for ln in found if ln.guess]
-    products_total = None if guesses else sum((ln.line_total for ln in found), Decimal(0))
+    products_total = sum((ln.line_total for ln in found), Decimal(0))
     fees = {k: v for k, v in {"levering": terms.delivery_fee, **terms.other_fees}.items() if v}
     notes = [note] if note else []
     if guesses:
         guessed_items = ", ".join(ln.item for ln in guesses)
         notes.append(
-            f"Ufuldstændig total: søgeresultatet er kun et gæt for {guessed_items}. "
-            "Bekræft varerne, før totalen bruges."
+            f"Søgeresultatet er et gæt for {guessed_items}. Bekræft varerne, før totalen bruges."
         )
     mode, pickup_store = get(terms, "delivery_mode"), get(terms, "pickup_store")
     if mode == "pickup" and pickup_store:
@@ -240,20 +239,17 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
     elif mode != "pickup" and not terms.home_delivery and not note:
         notes.append("Kurven er ikke sat til hjemlevering.")
     minimum = terms.minimum_order
-    if minimum is not None and products_total is not None and 0 < products_total < minimum:
+    if minimum is not None and 0 < products_total < minimum:  # in words, for the human
         notes.append(f"Under minimumskøb: {minimum - products_total} kr. mangler til {minimum} kr.")
-    fee_total = sum(fees.values(), Decimal(0))
     return BasketQuote(
         store=terms.store,
         lines=found,
         missing=[ln.item for ln in lines if ln.product is None],
         products_total=products_total,
         fees=fees,
-        total=None if products_total is None else products_total + fee_total,
+        total=products_total + sum(fees.values(), Decimal(0)),
         minimum_order=minimum,
-        minimum_met=(
-            None if minimum is None or products_total is None else products_total >= minimum
-        ),
+        minimum_met=None if minimum is None else products_total >= minimum,
         notes=notes,
         delivery_mode=mode,
         pickup_store=pickup_store,

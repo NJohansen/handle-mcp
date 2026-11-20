@@ -92,7 +92,7 @@
  },
  {
   "name": "compare_basket",
-  "description": "Price a shopping list in each store, e.g. [\"2 x letmælk 1 l\", \"rugbrød\", \"æg 10 stk\"].\nWrite the amount you need (\"fior di latte 300 g\"), not a pack size. Returns per item a\nsuggested product and up to 5 \"candidates\" (the suggestion first, one øko when found) with\nthe cost for the amount and flags: name_match, size_fits, prepared (cold cuts, smoked,\nbreaded), processed (frost/konserves), blend, oeko. The suggestion is a guess by word rules:\npick the candidate that fits the user, and ask when \"sure\" is false or none fits\n(search_products finds more). Unknown facts and false flags are left out. If any product is\nonly a guess, `products_total` and `total` are null and `minimum_met` is unknown; confirm the\nproducts before relying on the total. Only reads: use set_cart_quantities with chosen ids after.",
+  "description": "Price a shopping list in each store, e.g. [\"2 x letmælk 1 l\", \"rugbrød\", \"æg 10 stk\"].\nWrite the amount you need (\"fior di latte 300 g\"), not a pack size. Returns per item a\nsuggested product and up to 5 \"candidates\" (the suggestion first, one øko when found) with\nthe cost for the amount and flags: name_match, size_fits, prepared (cold cuts, smoked,\nbreaded), processed (frost/konserves), blend, oeko. The suggestion is a guess by word rules:\npick the candidate that fits the user, and ask when \"sure\" is false or none fits\n(search_products finds more). Unknown facts and false flags are left out. Also total incl.\nfees and minimum order met. Only reads: use set_cart_quantities with the chosen ids after.",
   "inputSchema": {
    "properties": {
     "items": {

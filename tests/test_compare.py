@@ -317,8 +317,8 @@ async def test_failing_delivery_info_keeps_the_prices(monkeypatch):
     ]
 
 
-@pytest.mark.parametrize("minimum", [None, Decimal(10), Decimal(20)])
-async def test_guess_makes_quote_totals_unknown(monkeypatch, minimum):
+@pytest.mark.parametrize("minimum", [None, Decimal(10), Decimal(20), Decimal(50)])
+async def test_guess_is_in_quote_totals_and_named_in_note(monkeypatch, minimum):
     monkeypatch.setattr(GuessStore, "terms_", StoreTerms("guess", True, Decimal(10), {}, minimum))
     monkeypatch.setattr(registry, "STORES", {"guess": GuessStore})
     result = await server.compare_basket(["rugbrød", "kyllingelår"])
@@ -326,12 +326,11 @@ async def test_guess_makes_quote_totals_unknown(monkeypatch, minimum):
 
     assert quote["lines"][1]["guess"] and not quote["lines"][1]["sure"]
     assert quote["lines"][1]["line_total"] == "30.00"
-    assert quote["products_total"] is None
-    assert quote["total"] is None
+    assert quote["products_total"] == "45.00"
+    assert quote["total"] == "55.00"
     assert quote["fees"] == {"levering": "10.00"}
-    assert quote["minimum_met"] is None
-    assert "kyllingelår" in quote["notes"][-1]
-    assert "gæt" in quote["notes"][-1]
+    assert quote["minimum_met"] is (None if minimum is None else Decimal(45) >= minimum)
+    assert any("kyllingelår" in note and "gæt" in note for note in quote["notes"])
 
 
 async def test_multiple_guesses_missing_item_and_store_comparison(monkeypatch):
@@ -339,8 +338,8 @@ async def test_multiple_guesses_missing_item_and_store_comparison(monkeypatch):
     result = await server.compare_basket(["rugbrød", "kyllingelår", "pasta", "selleri"])
     guess = result["stores"]["guess"]
 
-    assert guess["products_total"] is None and guess["total"] is None
-    assert guess["minimum_met"] is None
+    assert guess["products_total"] == "75.00" and guess["total"] == "85.00"
+    assert guess["minimum_met"] is True
     assert guess["missing"] == ["selleri"]
     assert [line["item"] for line in guess["lines"] if line["guess"]] == [
         "kyllingelår",
@@ -360,11 +359,11 @@ async def test_guess_in_every_store_has_no_winner(monkeypatch):
     monkeypatch.setattr(registry, "STORES", {"guess": GuessStore, "other": OtherGuess})
     result = await server.compare_basket(["kyllingelår"])
     assert result["cheapest"] is None
-    assert all(quote["total"] is None for quote in result["stores"].values())
+    assert all(quote["total"] is not None for quote in result["stores"].values())
     assert "Ingen vare blev fundet i alle butikker" in result["summary"]
 
 
-async def test_guess_total_is_null_over_mcp(monkeypatch):
+async def test_guess_total_is_numeric_over_mcp(monkeypatch):
     monkeypatch.setattr(registry, "STORES", {"guess": GuessStore})
     async with Client(server.mcp, mode="legacy") as client:
         result = await client.call_tool(
@@ -374,8 +373,8 @@ async def test_guess_total_is_null_over_mcp(monkeypatch):
     quote = json.loads("".join(c.text for c in result.content if c.type == "text"))["stores"][
         "guess"
     ]
-    assert quote["products_total"] is None and quote["total"] is None
-    assert quote["minimum_met"] is None
+    assert quote["products_total"] == "30.00" and quote["total"] == "40.00"
+    assert quote["minimum_met"] is True
     assert quote["lines"][0]["candidates"][0]["name_match"] == "none"
     assert quote["fees"] == {"levering": "10.00"}
     assert "kyllingelår" in quote["notes"][0]
