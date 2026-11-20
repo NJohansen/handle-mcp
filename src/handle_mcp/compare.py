@@ -51,15 +51,16 @@ DK = ZoneInfo("Europe/Copenhagen")  # offers end on Danish days
 
 @dataclass
 class BasketLine:
-    item: str
+    item: str  # the line from the shopping list
     quantity: int
     product: Product | None
     line_total: Decimal
     sure: bool
     note: str | None = None
-    guess: bool = False
+    guess: bool = False  # the store's top hit with no word match: left out of the verdict
+    # The suggested product and the next best, with flags: the caller picks (candidates.py).
     candidates: list[dict[str, Any]] = field(default_factory=list)
-    oeko: bool = False
+    oeko: bool = False  # the chosen product is øko
 
 
 @dataclass
@@ -73,7 +74,7 @@ class BasketQuote:
     minimum_order: Decimal | None
     minimum_met: bool | None
     notes: list[str] = field(default_factory=list)
-    delivery_mode: str | None = None
+    delivery_mode: str | None = None  # "home", "pickup" or None (docs/adr/0006)
     pickup_store: str | None = None
 
 

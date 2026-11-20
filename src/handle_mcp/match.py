@@ -5,8 +5,10 @@
 - A word only after "m.", "m", "med", "i", "u." ... is a flavour, not the product: "Yoghurt m. banan"
   is not a banana. Such products never win, unless the item asks for it: "makrel i tomat".
 - A word only in the brand counts half: "Fior di Frutta" jam is not "fior di latte".
-- Cuts and parts match: "makrelfilet" is makrel; "kyllingeoverlår" is kyllingelår.
-- Processed produce loses when fresh is found; canned fish and frozen meat do not.
+- "makrelfilet" and "makrelstykker" are makrel: a cut of the thing named first. Two cuts of one
+  thing are the same ("laksestykke" for "laksefilet"), and so is a part ("kyllingeoverlår").
+- Canned, preserved or frozen produce ("Hvidløg i krydderolie") loses when the search also found
+  it fresh. Canned fish and frozen meat do not lose: "Makrel i tomat" is a tin.
 - A blend ("m. 50% grønt") loses to the plain product and is never sure.
 - Danish: c ~ k, singular ~ plural, compounds name the thing last ("frilandsæg" is æg).
 """
@@ -18,7 +20,7 @@ from decimal import Decimal
 from itertools import pairwise
 from typing import Any
 
-STOP_WORDS = {"og", "med", "i", "af", "en", "et", "til", "uden", "u"}
+STOP_WORDS = {"og", "med", "i", "af", "en", "et", "til", "uden"}
 
 UNITS = {
     "g": ("g", 1), "gr": ("g", 1), "kg": ("g", 1000),
@@ -114,7 +116,7 @@ def parse_item(item: str) -> tuple[int, list[str], tuple[str, Decimal] | None]:
 
 
 def query(item: str) -> str:
-    """What we send to the store's search: the words only."""
+    """What we send to the store's search: the words only. '2 x letmælk 1 l' → 'letmælk'."""
     return " ".join(parse_item(item)[1]) or item
 
 
