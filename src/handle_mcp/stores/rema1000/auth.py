@@ -95,6 +95,7 @@ class RemaAuthMixin:
     _until: datetime
     _user: int | None
     _stores: str
+    _failed: str | None  # the refresh token whose renewal last got a 5xx
     _auth_lock: asyncio.Lock
 
     def _now(self) -> datetime:
@@ -175,7 +176,9 @@ class RemaAuthMixin:
 
     async def _renew(self) -> bool:
         """POST /api/auth/refresh with the cookies, as the webshop does. False when REMA
-        refuses. Never retried: a retry could burn a refresh token that was just rotated."""
+        refuses. Never retried: a retry could burn a refresh token that was just rotated.
+        REMA answers 500, not 401, for a session that is over. So the first 5xx says try
+        again, and a second one in a row for the same refresh token is a refusal."""
         complete = bool(self._cookies.get("api_session") and self._cookies.get("AWSALB"))
         jar = "; ".join(f"{k}={v}" for k, v in self._cookies.items())
         headers = HEADERS | {"Origin": SHOP, "Cookie": jar}
@@ -187,7 +190,11 @@ class RemaAuthMixin:
             raise StoreError(f"Kan ikke nå {NAME} ({type(exc).__name__}).") from exc
         self._auth.cookies.clear()  # the cookies live in self._cookies, nowhere else
         log.info("REMA 1000 renewal answered %s", resp.status_code)
-        if resp.status_code >= 500 and complete:
+        token = self._cookies.get("refresh_token")
+        if resp.status_code < 500:
+            self._failed = None
+        elif complete and self._failed != token:
+            self._failed = token
             raise StoreError(
                 f"REMA 1000 svarer {resp.status_code} ved fornyelse af login. Prøv igen om lidt. "
                 f"Sker det igen, så log ind på ny: handle-mcp login rema1000"
