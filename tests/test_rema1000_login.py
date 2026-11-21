@@ -231,6 +231,51 @@ async def test_renewal_5xx_is_a_store_error_and_not_retried(store, site):
     assert site.calls("/api/auth/refresh") == 1
 
 
+async def test_second_renewal_5xx_in_a_row_means_log_in_again(store, site):
+    """REMA answers 500, not 401, when the session is over. One call, one renewal: never two."""
+    site.access, site.refresh_status = jwt(NOW - timedelta(minutes=1)), 500
+    saved(site, store_ids="263")
+    with pytest.raises(StoreError, match="Prøv igen om lidt"):
+        await store.delivery_slots(7)
+    with pytest.raises(StoreError, match="udløbet.*handle-mcp login rema1000"):
+        await store.delivery_slots(7)
+    assert site.calls("/api/auth/refresh") == 2 and site.calls("/api/oauth2/login") == 0
+
+
+async def test_renewal_that_works_after_a_5xx_starts_the_count_again(store, site):
+    site.access, site.refresh_status = jwt(NOW - timedelta(minutes=1)), 503
+    saved(site, store_ids="263")
+    with pytest.raises(StoreError, match="Prøv igen om lidt"):
+        await store.delivery_slots(7)
+    site.refresh_status = 200
+    assert await store.delivery_slots(7)  # REMA was down for a moment: the session lives
+    store._now = lambda: NOW + timedelta(hours=3)
+    site.refresh_status, site.refresh_token = 500, "r2"
+    with pytest.raises(StoreError, match="Prøv igen om lidt"):
+        await store.delivery_slots(7)
+
+
+async def test_a_new_refresh_token_after_a_5xx_gets_its_own_try(store, site):
+    site.access, site.refresh_status = jwt(NOW - timedelta(minutes=1)), 500
+    saved(site, store_ids="263")
+    with pytest.raises(StoreError, match="Prøv igen om lidt"):
+        await store.delivery_slots(7)
+    site.refresh_token = "r9"
+    saved(site, refresh_token="r9")  # another process logged in again
+    with pytest.raises(StoreError, match="Prøv igen om lidt"):
+        await store.delivery_slots(7)
+
+
+async def test_second_renewal_5xx_with_a_password_logs_in_again(store, site, env_login):
+    await store.check_login()
+    store._now = lambda: NOW + timedelta(minutes=70)
+    site.refresh_status = 500
+    with pytest.raises(StoreError, match="Prøv igen om lidt"):
+        await store.check_login()
+    await store.check_login()
+    assert site.calls("/api/auth/refresh") == 2 and site.calls("/api/oauth2/login") == 2
+
+
 async def test_a_session_another_process_renewed_is_taken_not_renewed_again(site):
     """Claude Desktop and a test run share the saved session. REMA rotates the refresh token,
     so the one that renews second must take the saved session, not spend the old token."""
