@@ -144,6 +144,39 @@ def test_parse_size_and_item():
 
 
 @pytest.mark.parametrize(
+    ("item", "product_name"),
+    [
+        ("müsli uden sukker", "Müsli med sukker og chokolade"),
+        ("mælk uden laktose", "Mælk laktose"),
+        ("vaskemiddel uden parfume", "Vaskemiddel 0% parfume"),
+        ("mælk fri for laktose", "Mælk fri for laktose"),
+        ("sukkerfri cola", "Sukkerfri cola"),
+        ("pomfrit", "Pomfrit"),
+    ],
+)
+def test_free_from_wording_only_makes_match_uncertain(item, product_name):
+    line = best_match(item, [p("x", "p", product_name, "10.00")])
+    assert line.product.id == "p"
+    assert not line.sure
+
+
+def test_free_from_wording_does_not_change_search_or_matching():
+    assert match.parse_item("bacon uden nitrit i skiver")[1] == ["bacon", "nitrit", "skiver"]
+    assert match.query("bacon uden nitrit i skiver") == "bacon nitrit skiver"
+
+
+def test_product_claims_do_not_filter_or_rank_candidates():
+    item = "mælk uden laktose"
+    claim = p("x", "claim", "Mælk laktosefri", "15.00")
+    conflict = p("x", "conflict", "Mælk laktose", "5.00")
+
+    line = best_match(item, [claim, conflict])
+    assert line.product.id == "conflict"
+    assert {candidate["id"] for candidate in line.candidates} == {"claim", "conflict"}
+    assert not line.sure
+
+
+@pytest.mark.parametrize(
     ("text", "size"),
     [
         ("1/2 dl olie", ("ml", Decimal(50))),  # was 2 dl: the number after the slash won

@@ -77,6 +77,7 @@ No change to `app.py` or the tools is needed.
 - Bilka: log in without a `cart` cookie, or the login replaces the cart.
 - Retry only on timeout, network errors (e.g. ReadError), 429 and 5xx. Safe because every write sets an absolute quantity.
 - nemlig: the front page and `?GetAsJson=1` land in queue-it. Use `/webapi/` and the productbff API. Never work around a queue or a bot check: raise a clear StoreError and let the human wait.
+- Matcher: items containing `uden`, `fri for` or a word ending in `fri` (`frit`/`frie`, e.g. `pomfrit`) are never marked sure. Do not filter or rank candidates by these terms.
 - nemlig: never follow redirects automatically. Login bodies and store sessions must not be forwarded to another host. Queue-it redirects stop with a clear StoreError; unexpected 3xx responses stop too.
 - Fixtures are real captures with personal data replaced. `tests/fixtures/<store>/README.md` says what was captured and when, so a stale fixture is easy to spot.
 

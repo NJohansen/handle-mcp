@@ -24,6 +24,7 @@ from zoneinfo import ZoneInfo
 from handle_mcp.candidates import candidates
 from handle_mcp.match import (
     PIECES,
+    UNCERTAIN_ITEM_RE,
     asked,
     brand_only,
     category_rank,
@@ -143,6 +144,7 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
     over = size_rank == 0 and size is not None and too_much(size, quantity, count, product)
     is_mixed = fit[-1] == 1  # mixed() is always last in fit
     sure = neg_score == -1.0 and size_rank == 0 and not over and not is_mixed
+    sure = sure and not UNCERTAIN_ITEM_RE.search(item)
     note = None
     if over:
         note = f"Anden størrelse: {count} x {get(product, 'size') or get(product, 'name')}."

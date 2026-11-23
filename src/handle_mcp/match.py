@@ -74,6 +74,7 @@ QTY_RE = re.compile(r"^\s*(\d+)\s*[x×]\s+(?=\D)", re.IGNORECASE)
 ABBREVIATIONS = [(re.compile(r"\bhk\.\s*"), "hakket ")]
 
 OEKO_RE = re.compile(r"\b(?:øko|økologiske?|organic)\b", re.IGNORECASE)  # not "Økonomi"
+UNCERTAIN_ITEM_RE = re.compile(r"\b(?:uden|fri\s+for|[a-zæøå]+fri(?:t|e)?)\b", re.IGNORECASE)
 
 
 def get(product: Any, key: str) -> Any:
