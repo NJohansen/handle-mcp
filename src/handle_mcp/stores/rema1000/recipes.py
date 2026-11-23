@@ -143,7 +143,8 @@ class RemaRecipesMixin:
             time=_time(form),
             description=_text(form.get("preparationTextBefore")),
             image=_text((fields.get("image") or {}).get("url")),
-            ingredients=[line for r in rows if (line := _line(r))],
+            # salt and peber are in more parts of a recipe: the same line is said once
+            ingredients=list(dict.fromkeys(line for r in rows if (line := _line(r)))),
             ingredients_persons=own,
             method=[
                 RecipeSection(title=_text(g.get("name")), steps=steps)

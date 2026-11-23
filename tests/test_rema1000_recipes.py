@@ -105,7 +105,7 @@ async def test_recipe_has_products_text_and_method(store):
     assert recipe.ingredients_persons == recipe.min_persons == recipe.max_persons == 4
     assert recipe.image.startswith("https://") and recipe.time is None
     assert recipe.ingredients[:3] == ["400 g hakket oksekød", "1 stk løg", "2 fed hvidløg"]
-    assert "salt" in recipe.ingredients  # no amount: the name alone
+    assert recipe.ingredients.count("salt") == 1  # no amount: the name alone, said once
     assert [s.title for s in recipe.method] == ["Kødsauce", "Béchamelsauce", "Lasagne"]
     assert all(s.steps for s in recipe.method)
     beef = recipe.items[0]
