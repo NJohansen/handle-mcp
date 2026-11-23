@@ -145,6 +145,14 @@ async def test_first_write_creates_the_list_never_primary(store, api):
     assert cart.total == Decimal("15.90") + Decimal(35) and "betaler selv" in cart.warnings[0]
 
 
+async def test_a_primary_list_is_said_once_in_the_cart_not_on_every_line(store, api):
+    api.lists[10] = {"id": 10, "name": "handle-mcp", "primary": True, "items": []}
+    results = await store.set_quantities({"20302": 1, "100": 2})
+    assert all(r.ok and r.message is None for r in results)
+    warnings = (await store.get_cart()).warnings
+    assert sum("primær" in w for w in warnings) == 1
+
+
 async def test_never_touches_another_list(store, api):
     await store.set_quantities({"20302": 1})
     await store.set_quantities({"20302": 0, "100": 4})
