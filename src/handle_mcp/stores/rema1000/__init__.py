@@ -1,7 +1,7 @@
 """REMA 1000: the API behind shop.rema1000.dk. See docs/research.md and docs/adr/0007.
 
-Search, the weekly leaflet (Avisvare) and the store list are public: no login. Pickup times
-need one (auth.py, pickup.py). The webshop is pickup only (Køb & Hent).
+Search, the weekly leaflet (Avisvare), recipes (recipes.py) and the store list are public:
+no login. Pickup times need one (auth.py, pickup.py). The webshop is pickup only (Køb & Hent).
 REMA's own cart, store choice, pickup time and payment are never touched here (docs/adr/0001,
 docs/adr/0007). The cart is the shopping list "handle-mcp" (shopping_list.py).
 """
@@ -16,12 +16,13 @@ from typing import Any
 
 import httpx
 
-from handle_mcp.models import Order, Product, Recipe, RecipeDetails
+from handle_mcp.models import Order, Product
 from handle_mcp.stores import StoreError
 from handle_mcp.stores._http import request
 from handle_mcp.stores.rema1000.auth import API, HEADERS, NAME, SHOP, RemaAuthMixin
 from handle_mcp.stores.rema1000.nutrition import RemaNutritionMixin
 from handle_mcp.stores.rema1000.pickup import NOTE, RemaPickupMixin
+from handle_mcp.stores.rema1000.recipes import RemaRecipesMixin
 from handle_mcp.stores.rema1000.shopping_list import RemaListMixin
 
 log = logging.getLogger(__name__)
@@ -146,8 +147,11 @@ def _campaigns_first(products: list[Product]) -> list[Product]:
     return sorted(products, key=lambda p: p.offer_text == FIXED)  # stable: the store's order
 
 
-class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutritionMixin):
+class Rema1000Store(
+    RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutritionMixin, RemaRecipesMixin
+):
     name = "rema1000"
+    _product = staticmethod(product)  # for recipes.py: the same price rules as a search
     cart_page = SHOP  # the list lives in REMA's app and webshop; no page per list is known
 
     def __init__(
@@ -226,20 +230,6 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
         found = [f for f in found if not isinstance(f, BaseException)]
         unique = {p.id: p for products in found for p in products}
         return _campaigns_first(list(unique.values()))[:limit]
-
-    async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
-        raise NotImplementedError
-
-    async def recipe(self, recipe_id: str, persons: int | None = None) -> RecipeDetails:
-        raise NotImplementedError
-
-    async def featured_recipes(self, limit: int = 20) -> list[Recipe]:
-        raise NotImplementedError
-
-    async def recipes_by_tag(
-        self, tags: list[str], category: str | None = None, limit: int = 20
-    ) -> list[Recipe]:
-        raise NotImplementedError
 
     async def orders(self, limit: int = 10) -> list[Order]:
         raise NotImplementedError

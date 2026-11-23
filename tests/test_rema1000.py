@@ -198,13 +198,9 @@ async def test_pickup_only_terms(store):
     assert info.note == NOTE and "pakkegebyr" in NOTE
 
 
-@pytest.mark.parametrize(
-    "method,args",
-    [("orders", ()), ("recipes", ("suppe",))],
-)
-async def test_not_yet(store, method, args):
+async def test_not_yet(store):
     with pytest.raises(NotImplementedError):
-        await getattr(store, method)(*args)
+        await store.orders()
 
 
 async def test_compare_says_pickup_and_missing_fee(fake):

@@ -215,7 +215,8 @@ class RemaListMixin:
         for item in back["items"]:
             if (pid := _product(item)) and item.get("bought") is not True:
                 applied[pid] = applied.get(pid, 0) + _qty(item)
-        return applied, PRIMARY if back.get("primary") is True else cleanup
+        # A primary list is said once, in the cart's warnings (get_cart()): not on every line.
+        return applied, cleanup
 
     async def _reconcile(
         self, base: str, pid: str, n: int, lines: list[dict], failed: dict[str, str]

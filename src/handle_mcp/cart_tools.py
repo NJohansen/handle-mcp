@@ -112,7 +112,9 @@ async def add_recipe_to_cart(
     ingredients; `swap` maps an ingredient (or product id) to one of its alternatives' product
     ids. Names: ingredient or product id. Returns before/added/after per product, the skipped
     items and the new cart. Check `ok` per product: a store can refuse some lines; tell the
-    human which ones failed. BilkaToGo: one pack per product; `persons` is not used."""
+    human which ones failed. BilkaToGo: one pack per product; `persons` is not used.
+    REMA 1000: the cart is the shopping list "handle-mcp"; `persons` is not used, the packs are
+    for the recipe's own persons."""
     details = await _call(store, "recipe", recipe, _persons(persons))
     try:
         lines, skipped = recipe_cart.plan(details, skip, swap, include)

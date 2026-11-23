@@ -1,0 +1,1052 @@
+{
+ "data": [
+  {
+   "id": "3QrJcU3XYPvlK1kHsCordo",
+   "type": "recipe",
+   "fields": {
+    "title": "Lasagne",
+    "slug": "lasagne",
+    "image": {
+     "url": "https://downloads.ctfassets.net/r5zg1hgyl5kj/MpUiXIHOqa4UYp2jJIXDY/8720fd69d5b9492790c5f176ebf9a4b0/0100_Lasagne.jpg"
+    },
+    "customForm": {
+     "servings": {
+      "type": "person",
+      "amount": 4
+     },
+     "totalTime": 0,
+     "ingredientGroups": [
+      {
+       "name": "Kødsauce",
+       "ingredients": [
+        {
+         "ingredient": "hakket oksekød",
+         "unitOfContent": "g",
+         "digitalProduct": {
+          "id": 2409,
+          "title": "HK. OKSEKØD 15-18%",
+          "amount_of_content": 500,
+          "unit_of_content": "g",
+          "is_basic_ingredient": false,
+          "amount": 1,
+          "active_product": {
+           "id": 400176,
+           "name": "HK. OKSEKØD 15-18%",
+           "underline": "400 GR. / REMA 1000",
+           "labels": [
+            {
+             "id": 9001,
+             "name": "Avisvare"
+            },
+            {
+             "id": 70,
+             "name": "Dansk"
+            }
+           ],
+           "prices": [
+            {
+             "price": 29,
+             "price_over_max_quantity": 37.95,
+             "max_quantity": 6,
+             "is_advertised": true,
+             "is_campaign": true,
+             "starting_at": "2026-11-22T00:00:00+00:00",
+             "ending_at": "2026-11-28T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 72.5,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            },
+            {
+             "price": 37.95,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-11-29T00:00:00+00:00",
+             "ending_at": "2026-12-12T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 94.88,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 400,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "løg",
+         "unitOfContent": "stk",
+         "digitalProduct": {
+          "id": 2359,
+          "title": "LØG",
+          "amount_of_content": 1,
+          "unit_of_content": "kg",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 306960,
+           "name": "LØG",
+           "underline": "1 KG. / DANMARK KL. 1",
+           "labels": [
+            {
+             "id": 70,
+             "name": "Dansk"
+            }
+           ],
+           "prices": [
+            {
+             "price": 12,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2023-06-18T00:00:00+00:00",
+             "ending_at": "2026-12-16T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 12,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 1,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "hvidløg",
+         "unitOfContent": "fed",
+         "digitalProduct": {
+          "id": 2358,
+          "title": "ØKO. HVIDLØG",
+          "amount_of_content": 1,
+          "unit_of_content": "pcs",
+          "is_basic_ingredient": false,
+          "amount": 1,
+          "active_product": {
+           "id": 306950,
+           "name": "ØKO. HVIDLØG",
+           "underline": "1 STK. / LAND/KL.: SE VAREN",
+           "labels": [
+            {
+             "id": 5,
+             "name": "Økologi"
+            }
+           ],
+           "prices": [
+            {
+             "price": 4,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-11-08T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "stk",
+             "compare_unit_price": 4,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 2,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "hakkede tomater",
+         "unitOfContent": "dåse",
+         "digitalProduct": {
+          "id": 1227,
+          "title": "HAKKEDE TOMATER",
+          "amount_of_content": 400,
+          "unit_of_content": "g",
+          "is_basic_ingredient": false,
+          "amount": 1,
+          "active_product": {
+           "id": 110328,
+           "name": "HAKKEDE TOMATER",
+           "underline": "400 GR. / REMA 1000, ØKOLOGISKE",
+           "labels": [
+            {
+             "id": 9001,
+             "name": "Avisvare"
+            },
+            {
+             "id": 40,
+             "name": "Nøglehul"
+            },
+            {
+             "id": 5,
+             "name": "Økologi"
+            },
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 5,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": true,
+             "is_campaign": true,
+             "starting_at": "2026-11-22T00:00:00+00:00",
+             "ending_at": "2026-11-28T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 12.5,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            },
+            {
+             "price": 6.91,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-11-29T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 17.28,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 1,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "gulerødder (store)",
+         "unitOfContent": "stk",
+         "digitalProduct": {
+          "id": 2307,
+          "title": "GULERØDDER",
+          "amount_of_content": 1,
+          "unit_of_content": "kg",
+          "is_basic_ingredient": false,
+          "amount": 1,
+          "active_product": {
+           "id": 306520,
+           "name": "GULERØDDER",
+           "underline": "1 KG. / DANMARK KL. 1",
+           "labels": [
+            {
+             "id": 70,
+             "name": "Dansk"
+            }
+           ],
+           "prices": [
+            {
+             "price": 12,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-07-05T00:00:00+00:00",
+             "ending_at": "2026-12-12T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 12,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 3,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "tomatpure",
+         "unitOfContent": "dåse",
+         "digitalProduct": {
+          "id": 1247,
+          "title": "TOMAT PASTA",
+          "amount_of_content": 140,
+          "unit_of_content": "g",
+          "is_basic_ingredient": false,
+          "amount": 1,
+          "active_product": {
+           "id": 111408,
+           "name": "TOMAT PASTA",
+           "underline": "140 GR. / REMA 1000",
+           "labels": [
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 6.1,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-02-26T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 43.57,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 1,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "Oksebouillon",
+         "unitOfContent": "terning",
+         "digitalProduct": {
+          "id": 1039,
+          "title": "OKSEBOUILLON",
+          "amount_of_content": 100,
+          "unit_of_content": "g",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 100375,
+           "name": "OKSEBOUILLON",
+           "underline": "100 GR. / REMA 1000",
+           "labels": [
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 5.5,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-05-07T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 55,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 1,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "oregano",
+         "unitOfContent": "tsk",
+         "digitalProduct": {
+          "id": 4703,
+          "title": "OREGANO",
+          "amount_of_content": 25,
+          "unit_of_content": "g",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 91636,
+           "name": "OREGANO",
+           "underline": "15 GR.",
+           "labels": [],
+           "prices": [
+            {
+             "price": 4,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-11-12T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 266.67,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 1,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "basilikum",
+         "unitOfContent": "tsk",
+         "digitalProduct": {
+          "id": 4704,
+          "title": "BASILIKUM",
+          "amount_of_content": 25,
+          "unit_of_content": "g",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 90926,
+           "name": "BASILIKUM",
+           "underline": "25 GR. / REMA 1000",
+           "labels": [
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 4.95,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2019-06-27T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 198,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 1,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "salt",
+         "unitOfContent": "",
+         "digitalProduct": {
+          "id": 4767,
+          "title": "SALT M/ JOD",
+          "amount_of_content": 1,
+          "unit_of_content": "kg",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 93605,
+           "name": "SALT M/ JOD",
+           "underline": "1 KG. / SALINA, FINT",
+           "labels": [],
+           "prices": [
+            {
+             "price": 4.75,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2023-02-09T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 4.75,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 0,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "peber",
+         "unitOfContent": "",
+         "digitalProduct": {
+          "id": 4707,
+          "title": "SORT PEBER",
+          "amount_of_content": 50,
+          "unit_of_content": "g",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 90929,
+           "name": "SORT PEBER",
+           "underline": "50 GR. / REMA 1000",
+           "labels": [
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 10.67,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2025-10-30T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 213.4,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 0,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "olivenolie",
+         "unitOfContent": "",
+         "digitalProduct": {
+          "id": 1218,
+          "title": "EKS. JOMFRU OLIVENOLIE",
+          "amount_of_content": 750,
+          "unit_of_content": "ml",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 110155,
+           "name": "EKS. JOMFRU OLIVENOLIE",
+           "underline": "750 ML. / REMA 1000",
+           "labels": [
+            {
+             "id": 9001,
+             "name": "Avisvare"
+            },
+            {
+             "id": 40,
+             "name": "Nøglehul"
+            },
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 49.95,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": true,
+             "is_campaign": false,
+             "starting_at": "2026-11-22T00:00:00+00:00",
+             "ending_at": "2026-12-09T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "ltr",
+             "compare_unit_price": 66.6,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 0,
+         "isExcludedFromShoppingList": false
+        }
+       ]
+      },
+      {
+       "name": "Béchamelsauce",
+       "ingredients": [
+        {
+         "ingredient": "smør",
+         "unitOfContent": "g",
+         "digitalProduct": {
+          "id": 3915,
+          "title": "SMØR",
+          "amount_of_content": 250,
+          "unit_of_content": "g",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 25751,
+           "name": "SMØR",
+           "underline": "200 GR. / REMA 1000",
+           "labels": [
+            {
+             "id": 70,
+             "name": "Dansk"
+            },
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 7.96,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-05-07T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 39.8,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 50,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "hvedemel",
+         "unitOfContent": "g",
+         "digitalProduct": {
+          "id": 4637,
+          "title": "HVEDEMEL",
+          "amount_of_content": 2,
+          "unit_of_content": "kg",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 90166,
+           "name": "HVEDEMEL",
+           "underline": "2 KG. / REMA 1000",
+           "labels": [
+            {
+             "id": 70,
+             "name": "Dansk"
+            },
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 9.95,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-05-07T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 4.98,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 50,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "mælk",
+         "unitOfContent": "ml",
+         "digitalProduct": {
+          "id": 3795,
+          "title": "LETMÆLK 1,5% FEDT",
+          "amount_of_content": 1,
+          "unit_of_content": "l",
+          "is_basic_ingredient": false,
+          "amount": 1,
+          "active_product": {
+           "id": 20494,
+           "name": "LETMÆLK 1,5% FEDT",
+           "underline": "1 LTR. / REMA 1000",
+           "labels": [
+            {
+             "id": 201,
+             "name": "Bedre dyrevelfærd 1"
+            },
+            {
+             "id": 70,
+             "name": "Dansk"
+            },
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 10.95,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-01-29T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "ltr",
+             "compare_unit_price": 10.95,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 500,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "revet muskatnød",
+         "unitOfContent": "knivspids",
+         "digitalProduct": {
+          "id": 4701,
+          "title": "HEL MUSKATNØD",
+          "amount_of_content": 14,
+          "unit_of_content": "g",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 91643,
+           "name": "STØDT MUSKATNØD",
+           "underline": "40 GR.",
+           "labels": [],
+           "prices": [
+            {
+             "price": 9.95,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-10-16T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 248.75,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 1,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "salt",
+         "unitOfContent": "",
+         "digitalProduct": {
+          "id": 4767,
+          "title": "SALT M/ JOD",
+          "amount_of_content": 1,
+          "unit_of_content": "kg",
+          "is_basic_ingredient": true,
+          "amount": 0,
+          "active_product": {
+           "id": 93605,
+           "name": "SALT M/ JOD",
+           "underline": "1 KG. / SALINA, FINT",
+           "labels": [],
+           "prices": [
+            {
+             "price": 4.75,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2023-02-09T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 4.75,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 0,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "peber",
+         "unitOfContent": "",
+         "digitalProduct": {
+          "id": 4707,
+          "title": "SORT PEBER",
+          "amount_of_content": 50,
+          "unit_of_content": "g",
+          "is_basic_ingredient": true,
+          "amount": 0,
+          "active_product": {
+           "id": 90929,
+           "name": "SORT PEBER",
+           "underline": "50 GR. / REMA 1000",
+           "labels": [
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 10.67,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2025-10-30T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 213.4,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 0,
+         "isExcludedFromShoppingList": false
+        }
+       ]
+      },
+      {
+       "name": "Yderligere",
+       "ingredients": [
+        {
+         "ingredient": "lasagneplader",
+         "unitOfContent": "pakke",
+         "digitalProduct": {
+          "id": 4667,
+          "title": "LASAGNEPLADER",
+          "amount_of_content": 500,
+          "unit_of_content": "g",
+          "is_basic_ingredient": false,
+          "amount": 1,
+          "active_product": {
+           "id": 90357,
+           "name": "LASAGNEPLADER",
+           "underline": "500 GR. / REMA 1000",
+           "labels": [
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 9.95,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-05-07T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 19.9,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 1,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "Revet mozzarella ",
+         "unitOfContent": "g",
+         "digitalProduct": {
+          "id": 2973,
+          "title": "MOZZARELLA",
+          "amount_of_content": 200,
+          "unit_of_content": "g",
+          "is_basic_ingredient": false,
+          "amount": 1,
+          "active_product": {
+           "id": 455522,
+           "name": "MOZZARELLA",
+           "underline": "200 GR. / KAROLINES KØKKEN, REVET",
+           "labels": [
+            {
+             "id": 9001,
+             "name": "Avisvare"
+            },
+            {
+             "id": 40,
+             "name": "Nøglehul"
+            }
+           ],
+           "prices": [
+            {
+             "price": 10,
+             "price_over_max_quantity": 14.36,
+             "max_quantity": 6,
+             "is_advertised": true,
+             "is_campaign": true,
+             "starting_at": "2026-11-22T00:00:00+00:00",
+             "ending_at": "2026-11-28T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 50,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            },
+            {
+             "price": 14.36,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-11-29T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 71.8,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 200,
+         "isExcludedFromShoppingList": false
+        },
+        {
+         "ingredient": "rasp",
+         "unitOfContent": "",
+         "digitalProduct": {
+          "id": 4758,
+          "title": "RASP",
+          "amount_of_content": 500,
+          "unit_of_content": "g",
+          "is_basic_ingredient": true,
+          "amount": 1,
+          "active_product": {
+           "id": 92120,
+           "name": "RASP",
+           "underline": "500 GR. / REMA1000",
+           "labels": [
+            {
+             "id": 2,
+             "name": "REMA1000"
+            }
+           ],
+           "prices": [
+            {
+             "price": 7.5,
+             "price_over_max_quantity": null,
+             "max_quantity": null,
+             "is_advertised": false,
+             "is_campaign": false,
+             "starting_at": "2026-11-05T00:00:00+00:00",
+             "ending_at": "2099-12-31T00:00:00+00:00",
+             "deposit": null,
+             "compare_unit": "kg",
+             "compare_unit_price": 15,
+             "consumption_unit": null,
+             "consumption_quantity": null
+            }
+           ]
+          }
+         },
+         "amountOfContent": 0,
+         "isExcludedFromShoppingList": false
+        }
+       ]
+      }
+     ],
+     "preparationGroups": [
+      {
+       "name": "Kødsauce",
+       "steps": [
+        {
+         "step": "Varm en stor pande med lidt olivenolie. Tilføj hakket løg og steg, indtil de er gennemsigtige."
+        },
+        {
+         "step": "Tilføj hvidløg og hakket oksekød, og brun det, indtil kødet er godt gennemstegt."
+        },
+        {
+         "step": "Riv gulerødderne og tilsæt dem sammen med de hakkede tomater, tomatpuré, oksebouillon, oregano, og basilikum. Lad det simre under låg på lav varme i mindst 30 minutter. Smag til med salt og peber."
+        }
+       ]
+      },
+      {
+       "name": "Béchamelsauce",
+       "steps": [
+        {
+         "step": "Smelt smør i en gryde, tilføj mel og rør godt. Lad det simre et par minutter uden at tage farve."
+        },
+        {
+         "step": "Tilsæt gradvist mælken under konstant omrøring for at undgå klumper. Fortsæt med at røre, indtil saucen tykner og er glat."
+        },
+        {
+         "step": "Smag til med salt, peber og en knivspids muskatnød."
+        }
+       ]
+      },
+      {
+       "name": "Lasagne",
+       "steps": [
+        {
+         "step": "Forvarm ovnen til 180°C."
+        },
+        {
+         "step": "I et ovnfast fad, start med et lag kødsauce, derefter et lag lasagneplader, og et lag béchamelsauce. Gentag, indtil alle ingredienserne er brugt, og sørg for, at det øverste lag er béchamelsauce."
+        },
+        {
+         "step": "Drys med mozzarella og rasp på toppen."
+        },
+        {
+         "step": "Dæk fadet med aluminiumsfolie og bag i ovnen i 20 minutter. Fjern folien og bag yderligere 25-30 minutter, eller indtil overfladen er gylden og boblende. Lad lasagnen hvile i 10 minutter før servering. Dette gør det lettere at skære og servere."
+        }
+       ]
+      }
+     ],
+     "preparationTextAfter": "",
+     "preparationTextBefore": ""
+    },
+    "tags": [
+     {
+      "id": "6mjo9YHow8fdXyG4LhmHoK",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Aftensmad",
+       "slug": "aftensmad"
+      }
+     },
+     {
+      "id": "lw0hPueEJErVe4xopoDEy",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Mad for børn",
+       "slug": "mad-for-born"
+      }
+     },
+     {
+      "id": "1oTNXyZWW9ZmKVdmzu3JzJ",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Udenlandsk",
+       "slug": "udenlandsk"
+      }
+     }
+    ],
+    "popularity": 269,
+    "allProductsAvailable": true
+   },
+   "created_at": "2024-09-03T09:33:34.000000Z"
+  }
+ ],
+ "meta": {
+  "pagination": {
+   "current_page": 1,
+   "last_page": 1,
+   "per_page": 20,
+   "total": 1
+  }
+ }
+}

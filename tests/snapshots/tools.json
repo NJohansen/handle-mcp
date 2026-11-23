@@ -1,7 +1,7 @@
 [
  {
   "name": "add_recipe_to_cart",
-  "description": "Put a recipe's products in one store's cart, as get_recipe shows them.\nASK THE HUMAN FIRST: show the list from get_recipe and get a yes. Never orders or pays.\nAdds to what is already in the cart, so calling it twice adds twice.\n`have_at_home` items (salt, oil) are left out unless named in `include`. `skip` leaves out\ningredients; `swap` maps an ingredient (or product id) to one of its alternatives' product\nids. Names: ingredient or product id. Returns before/added/after per product, the skipped\nitems and the new cart. Check `ok` per product: a store can refuse some lines; tell the\nhuman which ones failed. BilkaToGo: one pack per product; `persons` is not used.",
+  "description": "Put a recipe's products in one store's cart, as get_recipe shows them.\nASK THE HUMAN FIRST: show the list from get_recipe and get a yes. Never orders or pays.\nAdds to what is already in the cart, so calling it twice adds twice.\n`have_at_home` items (salt, oil) are left out unless named in `include`. `skip` leaves out\ningredients; `swap` maps an ingredient (or product id) to one of its alternatives' product\nids. Names: ingredient or product id. Returns before/added/after per product, the skipped\nitems and the new cart. Check `ok` per product: a store can refuse some lines; tell the\nhuman which ones failed. BilkaToGo: one pack per product; `persons` is not used.\nREMA 1000: the cart is the shopping list \"handle-mcp\"; `persons` is not used, the packs are\nfor the recipe's own persons.",
   "inputSchema": {
    "properties": {
     "store": {
@@ -275,7 +275,7 @@
  },
  {
   "name": "get_recipe",
-  "description": "The products to buy for one of the store's recipes, as on its \"Se varer og læg i kurv\":\nper ingredient the store's product, packs for `persons` and alternatives. `have_at_home`\nitems (salt, oil) are what the store assumes you have: left out of `total`, ask first.\nAlso `image`, `description`, `method`, `tip`. Scale `ingredients` from `ingredients_persons`.\n`recipe` is the recipe's link or id from search_recipes or list_recipes. Put the products\nin the cart with add_recipe_to_cart after the human says yes.\nBilkaToGo: one pack per product, no alternatives; `persons` is fixed (null for pieces).\n`missing`: product ids not sold at the address: say so to the human.",
+  "description": "The products to buy for one of the store's recipes, as on its \"Se varer og læg i kurv\":\nper ingredient the store's product, packs for `persons` and alternatives. `have_at_home`\nitems (salt, oil) are what the store assumes you have: left out of `total`, ask first.\nAlso `image`, `description`, `method`, `tip`. Scale `ingredients` from `ingredients_persons`.\n`recipe` is the recipe's link or id from search_recipes or list_recipes. Put the products\nin the cart with add_recipe_to_cart after the human says yes.\nBilkaToGo: one pack per product, no alternatives; `persons` is fixed (null for pieces).\nREMA 1000: no login needed; packs for the recipe's own persons, `persons` is not used; no\nalternatives; an ingredient REMA has no product for is in `ingredients` only.\n`missing`: product ids not sold at the address: say so to the human.",
   "inputSchema": {
    "properties": {
     "store": {
@@ -411,7 +411,7 @@
  },
  {
   "name": "list_recipes",
-  "description": "Browse the store's recipes, with link, when the human has no dish in mind (for a dish by\nname, use search_recipes). No tags or category: this week's featured\nrecipes (nemlig: \"Ugens udvalgte\"). With `tags`: recipes that have every tag, e.g.\n[\"Familievenlig\", \"Budgetvenlig\"] or [\"Under 30 min\", \"Kylling\"]. nemlig's tags include\nUnder 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,\nKylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.\n`category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...).\nBilkaToGo: no tags; no category is this week's \"Madplan\" (7 dinners); `category` is a path\nlike aftensmad or aftensmad/pastaretter, an unknown one answers with the list. Use get_recipe.",
+  "description": "Browse the store's recipes, with link, when the human has no dish in mind (for a dish by\nname, use search_recipes). No tags or category: this week's featured\nrecipes (nemlig: \"Ugens udvalgte\"). With `tags`: recipes that have every tag, e.g.\n[\"Familievenlig\", \"Budgetvenlig\"] or [\"Under 30 min\", \"Kylling\"]. nemlig's tags include\nUnder 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,\nKylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.\n`category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...).\nBilkaToGo: no tags; no category is this week's \"Madplan\" (7 dinners); `category` is a path\nlike aftensmad or aftensmad/pastaretter, an unknown one answers with the list.\nREMA 1000: no tags or category is \"Avisopskrifter\" (dinners from this week's leaflet);\ntags are REMA's own, e.g. Aftensmad, Mad for børn, Nem hverdagsmad, Kødfri, Fisk & skaldyr,\nand `category` is one more tag; an unknown tag answers with the list. With two or more\ntags only the first tag's 100 most popular are checked: few or none can mean \"try one tag\".\nUse get_recipe.",
   "inputSchema": {
    "properties": {
     "stores": {
@@ -533,7 +533,7 @@
  },
  {
   "name": "search_recipes",
-  "description": "Find the stores' own recipes, e.g. \"kylling karry\". Returns name and link.\nUse it when the human names a dish; to browse by tag or category, use list_recipes.\nUse get_recipe for time, persons and the products to buy.\nnemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there.",
+  "description": "Find the stores' own recipes, e.g. \"kylling karry\". Returns name and link.\nUse it when the human names a dish; to browse by tag or category, use list_recipes.\nUse get_recipe for time, persons and the products to buy.\nnemlig and REMA 1000: BilkaToGo has no recipe search, use list_recipes with `category`\nthere.",
   "inputSchema": {
    "properties": {
     "query": {

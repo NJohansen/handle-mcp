@@ -55,7 +55,8 @@ async def search_recipes(
     """Find the stores' own recipes, e.g. "kylling karry". Returns name and link.
     Use it when the human names a dish; to browse by tag or category, use list_recipes.
     Use get_recipe for time, persons and the products to buy.
-    nemlig only: BilkaToGo has no recipe search, use list_recipes with `category` there."""
+    nemlig and REMA 1000: BilkaToGo has no recipe search, use list_recipes with `category`
+    there."""
     limit = max(1, min(limit, MAX_RESULTS))
     return _out(await _each(_names(stores), lambda s: s.recipes(query, limit)))
 
@@ -77,6 +78,8 @@ async def get_recipe(
     `recipe` is the recipe's link or id from search_recipes or list_recipes. Put the products
     in the cart with add_recipe_to_cart after the human says yes.
     BilkaToGo: one pack per product, no alternatives; `persons` is fixed (null for pieces).
+    REMA 1000: no login needed; packs for the recipe's own persons, `persons` is not used; no
+    alternatives; an ingredient REMA has no product for is in `ingredients` only.
     `missing`: product ids not sold at the address: say so to the human."""
     return _out(await _call(store, "recipe", recipe, _persons(persons)))
 
@@ -100,7 +103,12 @@ async def list_recipes(
     Kylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.
     `category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...).
     BilkaToGo: no tags; no category is this week's "Madplan" (7 dinners); `category` is a path
-    like aftensmad or aftensmad/pastaretter, an unknown one answers with the list. Use get_recipe."""
+    like aftensmad or aftensmad/pastaretter, an unknown one answers with the list.
+    REMA 1000: no tags or category is "Avisopskrifter" (dinners from this week's leaflet);
+    tags are REMA's own, e.g. Aftensmad, Mad for børn, Nem hverdagsmad, Kødfri, Fisk & skaldyr,
+    and `category` is one more tag; an unknown tag answers with the list. With two or more
+    tags only the first tag's 100 most popular are checked: few or none can mean "try one tag".
+    Use get_recipe."""
     limit = max(1, min(limit, MAX_RESULTS))
     if not tags and not category:
         return _out(await _each(_names(stores), lambda s: s.featured_recipes(limit)))

@@ -1,0 +1,110 @@
+{
+ "data": [
+  {
+   "id": "3QrJcU3XYPvlK1kHsCordo",
+   "type": "recipe",
+   "fields": {
+    "title": "Lasagne",
+    "slug": "lasagne",
+    "image": {
+     "url": "https://downloads.ctfassets.net/r5zg1hgyl5kj/MpUiXIHOqa4UYp2jJIXDY/8720fd69d5b9492790c5f176ebf9a4b0/0100_Lasagne.jpg"
+    },
+    "customForm": {
+     "servings": {
+      "type": "person",
+      "amount": 4
+     },
+     "totalTime": 0,
+     "preparationTextAfter": "",
+     "preparationTextBefore": ""
+    },
+    "tags": [
+     {
+      "id": "6mjo9YHow8fdXyG4LhmHoK",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Aftensmad",
+       "slug": "aftensmad"
+      }
+     },
+     {
+      "id": "lw0hPueEJErVe4xopoDEy",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Mad for børn",
+       "slug": "mad-for-born"
+      }
+     },
+     {
+      "id": "1oTNXyZWW9ZmKVdmzu3JzJ",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Udenlandsk",
+       "slug": "udenlandsk"
+      }
+     }
+    ],
+    "popularity": 269,
+    "allProductsAvailable": true
+   },
+   "created_at": "2024-09-03T09:33:34+00:00"
+  },
+  {
+   "id": "6AuJwv4oL1Hw5kdKRcIXPz",
+   "type": "recipe",
+   "fields": {
+    "title": "Glutenfri lasagne",
+    "slug": "glutenfri-lasagne",
+    "image": {
+     "url": "https://images.ctfassets.net/r5zg1hgyl5kj/7HcDIWrL88jtMgsy3tCEUq/0967e9d40ce44f4342a2cc2b335eb8b2/0083_Glutenfri_lasagne.jpg"
+    },
+    "customForm": {
+     "servings": {
+      "type": null,
+      "amount": 0
+     },
+     "totalTime": 0,
+     "preparationTextAfter": "",
+     "preparationTextBefore": ""
+    },
+    "tags": [
+     {
+      "id": "6mjo9YHow8fdXyG4LhmHoK",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Aftensmad",
+       "slug": "aftensmad"
+      }
+     },
+     {
+      "id": "1RCnmZMsWBa1PRWB6fU54I",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Glutenfri",
+       "slug": "glutenfri"
+      }
+     },
+     {
+      "id": "lw0hPueEJErVe4xopoDEy",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Mad for børn",
+       "slug": "mad-for-born"
+      }
+     }
+    ],
+    "popularity": 73,
+    "allProductsAvailable": false
+   },
+   "created_at": "2024-11-11T08:42:24+00:00"
+  }
+ ],
+ "meta": {
+  "pagination": {
+   "current_page": 1,
+   "last_page": 3,
+   "per_page": 2,
+   "total": 5
+  }
+ }
+}

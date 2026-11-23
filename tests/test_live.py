@@ -168,6 +168,21 @@ async def test_bilkatogo_recipes_by_category():
     assert len({r.group for r in recipes}) > 3  # mixed across sub-categories
 
 
+async def test_rema1000_recipes():
+    rema = STORES["rema1000"]()  # public: no login
+    found = await rema.recipes("lasagne", limit=3)
+    week = await rema.featured_recipes(limit=5)
+    kids = await rema.recipes_by_tag(["Mad for børn"], "aftensmad", limit=5)
+    recipe = await rema.recipe(week[0].url)
+    print(f"\n[rema1000] {week[0].group}: {[r.name for r in week]}")
+    print(f"[rema1000] {recipe.name} | {recipe.persons} pers. | {recipe.total} kr")
+    for item in recipe.items:
+        print(f"  {item.product.id}: {item.product.name} x{item.product.quantity}")
+    assert found and week and kids
+    assert all(r.url.startswith("https://shop.rema1000.dk/opskrifter/") for r in found + week)
+    assert recipe.ingredients and recipe.method and recipe.items and recipe.total > 0
+
+
 async def test_nemlig_recipes_by_tag():
     recipes = await STORES["nemlig"]().recipes_by_tag(["Familievenlig", "Under 30 min"], limit=5)
     for r in recipes:
