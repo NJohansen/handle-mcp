@@ -162,6 +162,7 @@ class Rema1000Store(RemaAuthMixin, RemaPickupMixin, RemaListMixin, RemaNutrition
         self._user: int | None = None  # the user id in the token, for the list
         self._stores = ""  # the chosen store ids, comma-separated (pickup.py)
         self._gate = None
+        self._failed: str | None = None  # the refresh token whose renewal got a 5xx (auth.py)
         self._auth_lock = asyncio.Lock()
         self._write_lock = asyncio.Lock()  # one list write at a time (shopping_list.py)
 

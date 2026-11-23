@@ -113,7 +113,7 @@ class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
     cart_page = f"{BASE}/kurv"  # the page the human opens to see the cart and pay
 
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=20, follow_redirects=True)
+        self._client = client or httpx.AsyncClient(timeout=20, follow_redirects=False)
         self._bearer: str | None = None
         self._xsrf: str | None = None
         self._logged_in = False
@@ -141,10 +141,33 @@ class NemligStore(RecipesMixin, OffersMixin, DeliveryMixin, NutritionMixin):
         return headers
 
     async def _send(self, method: str, url: str, **kwargs: Any) -> Any:
-        """One request with retries on timeout/429/5xx. Returns parsed JSON."""
+        """One request with retries on timeout/429/5xx. Returns parsed JSON. A redirect is
+        never followed, whatever client the store was made with (ADR 0016)."""
         resp = await request(
-            self._client, method, url, "nemlig.com", headers=self._headers(), **kwargs
+            self._client,
+            method,
+            url,
+            "nemlig.com",
+            headers=self._headers(),
+            follow_redirects=False,
+            **kwargs,
         )
+        if 300 <= resp.status_code < 400:
+            try:
+                host = httpx.URL(resp.headers.get("location") or "").host.lower()
+            except httpx.InvalidURL:
+                host = ""
+            if host == "queue-it.net" or host.endswith(".queue-it.net"):
+                raise StoreError("nemlig.com har kø lige nu (queue-it). Prøv igen om lidt.")
+            # The URLs may hold ids: stderr only, the path and the new host, never a query.
+            log.warning(
+                "nemlig.com %s %s -> %s, redirect to %s refused",
+                method,
+                resp.url.path,
+                resp.status_code,
+                host or "an unknown host",
+            )
+            raise StoreError("nemlig.com returnerede en uventet redirect.")
         host = resp.url.host
         if host == "queue-it.net" or host.endswith(".queue-it.net"):
             raise StoreError("nemlig.com har kø lige nu (queue-it). Prøv igen om lidt.")

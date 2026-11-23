@@ -8,6 +8,7 @@ from typing import ClassVar
 
 import httpx
 import pytest
+from mcp import Client
 
 from handle_mcp import compare, match, server
 from handle_mcp import stores as registry
@@ -113,6 +114,18 @@ class Nemlig(CatalogStore):
 class Bilka(CatalogStore):
     catalog = BILKA
     terms_ = StoreTerms("bilkatogo", True, Decimal(39), {"pakkeservice": Decimal(39)}, Decimal(500))
+
+
+class GuessStore(CatalogStore):
+    name = "guess"
+    terms_ = StoreTerms("guess", True, Decimal(10), {}, Decimal(20))
+
+    async def search(self, query, limit=10):
+        if "rugbrød" in query:
+            return [p("guess", "bread", "Rugbrød", "15.00")]
+        if "selleri" in query:
+            return []
+        return [p("guess", "chocolate", "Chokolade", "30.00")]
 
 
 @pytest.fixture
@@ -335,6 +348,69 @@ async def test_failing_delivery_info_keeps_the_prices(monkeypatch):
     assert result["stores"]["nemlig"]["notes"] == [
         "Under minimumskøb: 278.00 kr. mangler til 300 kr."
     ]
+
+
+@pytest.mark.parametrize("minimum", [None, Decimal(10), Decimal(20), Decimal(50)])
+async def test_guess_is_in_quote_totals_and_named_in_note(monkeypatch, minimum):
+    monkeypatch.setattr(GuessStore, "terms_", StoreTerms("guess", True, Decimal(10), {}, minimum))
+    monkeypatch.setattr(registry, "STORES", {"guess": GuessStore})
+    result = await server.compare_basket(["rugbrød", "kyllingelår"])
+    quote = result["stores"]["guess"]
+
+    assert quote["lines"][1]["guess"] and not quote["lines"][1]["sure"]
+    assert quote["lines"][1]["line_total"] == "30.00"
+    assert quote["products_total"] == "45.00"
+    assert quote["total"] == "55.00"
+    assert quote["fees"] == {"levering": "10.00"}
+    assert quote["minimum_met"] is (None if minimum is None else Decimal(45) >= minimum)
+    assert any("kyllingelår" in note and "gæt" in note for note in quote["notes"])
+
+
+async def test_multiple_guesses_missing_item_and_store_comparison(monkeypatch):
+    monkeypatch.setattr(registry, "STORES", {"guess": GuessStore, "bilkatogo": Bilka})
+    result = await server.compare_basket(["rugbrød", "kyllingelår", "pasta", "selleri"])
+    guess = result["stores"]["guess"]
+
+    assert guess["products_total"] == "75.00" and guess["total"] == "85.00"
+    assert guess["minimum_met"] is True
+    assert guess["missing"] == ["selleri"]
+    assert [line["item"] for line in guess["lines"] if line["guess"]] == [
+        "kyllingelår",
+        "pasta",
+    ]
+    assert all(item in guess["notes"][0] for item in ("kyllingelår", "pasta"))
+    assert result["comparable_totals"] == {"guess": "25.00", "bilkatogo": "96.00"}
+    assert result["cheapest"] == "guess"
+    assert "1 varer" in result["summary"] and "usikre" in result["summary"]
+
+
+async def test_guess_in_every_store_has_no_winner(monkeypatch):
+    class OtherGuess(GuessStore):
+        name = "other"
+        terms_ = StoreTerms("other", True)
+
+    monkeypatch.setattr(registry, "STORES", {"guess": GuessStore, "other": OtherGuess})
+    result = await server.compare_basket(["kyllingelår"])
+    assert result["cheapest"] is None
+    assert all(quote["total"] is not None for quote in result["stores"].values())
+    assert "Ingen vare blev fundet i alle butikker" in result["summary"]
+
+
+async def test_guess_total_is_numeric_over_mcp(monkeypatch):
+    monkeypatch.setattr(registry, "STORES", {"guess": GuessStore})
+    async with Client(server.mcp, mode="legacy") as client:
+        result = await client.call_tool(
+            "compare_basket", {"items": ["kyllingelår"], "stores": ["guess"]}
+        )
+    assert not result.is_error
+    quote = json.loads("".join(c.text for c in result.content if c.type == "text"))["stores"][
+        "guess"
+    ]
+    assert quote["products_total"] == "30.00" and quote["total"] == "40.00"
+    assert quote["minimum_met"] is True
+    assert quote["lines"][0]["candidates"][0]["name_match"] == "none"
+    assert quote["fees"] == {"levering": "10.00"}
+    assert "kyllingelår" in quote["notes"][0]
 
 
 def test_singular_and_plural_match():

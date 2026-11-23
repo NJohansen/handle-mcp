@@ -124,6 +124,7 @@ def _login(store: str, fancy: bool) -> int:
     if not email or not password:
         _say("Email og kodeord skal udfyldes. Intet er gemt.")
         return LEFT
+    (tui.working if fancy else _say)(f"Logger ind hos {store}…")  # the store can be slow
     try:  # log in first, save after: a failed login never touches a saved one
         session = _check(store, email, password, choose=True)
     except registry.StoreError as exc:

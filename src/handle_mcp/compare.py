@@ -226,9 +226,15 @@ async def quote(store: Any, items: list[str]) -> BasketQuote:
     lines = [best_match(item, await store.search(query(item), SEARCH_LIMIT), on) for item in items]
     terms = await store.terms()
     found = [ln for ln in lines if ln.product is not None]
+    guesses = [ln for ln in found if ln.guess]
     products_total = sum((ln.line_total for ln in found), Decimal(0))
     fees = {k: v for k, v in {"levering": terms.delivery_fee, **terms.other_fees}.items() if v}
     notes = [note] if note else []
+    if guesses:
+        guessed_items = ", ".join(ln.item for ln in guesses)
+        notes.append(
+            f"Søgeresultatet er et gæt for {guessed_items}. Bekræft varerne, før totalen bruges."
+        )
     mode, pickup_store = get(terms, "delivery_mode"), get(terms, "pickup_store")
     if mode == "pickup" and pickup_store:
         notes.append(f"Afhentning i {pickup_store}: du henter selv varerne.")
