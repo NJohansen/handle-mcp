@@ -106,7 +106,9 @@ async def list_recipes(
     like aftensmad or aftensmad/pastaretter, an unknown one answers with the list.
     REMA 1000: no tags or category is "Avisopskrifter" (dinners from this week's leaflet);
     tags are REMA's own, e.g. Aftensmad, Mad for børn, Nem hverdagsmad, Kødfri, Fisk & skaldyr,
-    and `category` is one more tag; an unknown tag answers with the list. Use get_recipe."""
+    and `category` is one more tag; an unknown tag answers with the list. With two or more
+    tags only the first tag's 100 most popular are checked: few or none can mean "try one tag".
+    Use get_recipe."""
     limit = max(1, min(limit, MAX_RESULTS))
     if not tags and not category:
         return _out(await _each(_names(stores), lambda s: s.featured_recipes(limit)))

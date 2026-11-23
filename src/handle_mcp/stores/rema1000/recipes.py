@@ -203,7 +203,8 @@ class RemaRecipesMixin:
     ) -> list[Recipe]:
         """REMA's recipes with every tag, the most popular first. REMA has tags only, so a
         `category` is one more tag ("Aftensmad", "Frokost"). Matched on REMA's own list, by
-        title or slug. The call filters on one tag; the others are checked in the answer."""
+        title or slug. The call filters on one tag; the others are checked in the answer, at
+        most MAX_PAGES pages deep: a rare mix can come back short (the tool says so)."""
         known = await self._recipe_tags()
         ids = []
         for tag in [*tags, *([category] if category else [])]:
