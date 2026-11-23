@@ -1,0 +1,111 @@
+{
+ "data": [
+  {
+   "id": "2XbALF3c4jJxxlx8wxoKjt",
+   "type": "recipe",
+   "fields": {
+    "title": "Medister med kartofler og appelsinsalat. Hertil favoritsauce",
+    "slug": "medister-med-kartofler-og-appelsinsalat-hertil-favoritsauce",
+    "image": {
+     "url": "https://images.ctfassets.net/r5zg1hgyl5kj/4GefET4gexhD1Mvc3ahl04/386b74d663f89d7046f5a894bef21a47/Medister_med_sovs_og_kartofler.jpg"
+    },
+    "customForm": {
+     "servings": {
+      "type": "person",
+      "amount": 4
+     },
+     "totalTime": 0,
+     "preparationTextAfter": "",
+     "preparationTextBefore": "Denne opskrift indeholder udvalgte varer fra avis uge 48: Medisterpølse, favoritsauce, appelsin, agurk"
+    },
+    "tags": [
+     {
+      "id": "5Q5t9rpmNk4jp1ygKZDEHx",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Avisopskrifter",
+       "slug": "ugens-avisopskrifter"
+      }
+     }
+    ],
+    "popularity": 26,
+    "allProductsAvailable": true
+   },
+   "created_at": "2026-11-18T09:55:59.000000Z"
+  },
+  {
+   "id": "3ij6csE5ulmv6r1PYAQWvZ",
+   "type": "recipe",
+   "fields": {
+    "title": "Mexicansk bønnesuppe med majs og creme fraiche. Hertil tortillachips",
+    "slug": "mexicansk-bonnesuppe-med-majs-og-creme-fraiche-hertil-tortillachips",
+    "image": {
+     "url": "https://images.ctfassets.net/r5zg1hgyl5kj/5RgvapUBPMhIrT2ScS15Wn/db02388fa3df8459d0274cfe0ac85f7a/Mexicansk_boennesuppe_med_tacochips.jpg"
+    },
+    "customForm": {
+     "servings": {
+      "type": "person",
+      "amount": 4
+     },
+     "totalTime": 0,
+     "preparationTextAfter": "For ekstra smag: Top med friske koriander og lidt friskhakket chili eller chiliolie.",
+     "preparationTextBefore": "Denne opskrift indeholder udvalgte varer fra avis uge 48: Kidneybønner, tortillachips, hakkede tomater, fajita spice mix"
+    },
+    "tags": [
+     {
+      "id": "5Q5t9rpmNk4jp1ygKZDEHx",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Avisopskrifter",
+       "slug": "ugens-avisopskrifter"
+      }
+     }
+    ],
+    "popularity": 32,
+    "allProductsAvailable": true
+   },
+   "created_at": "2026-11-18T09:51:30.000000Z"
+  },
+  {
+   "id": "3hhhMMtAFJxehyXRNTMxED",
+   "type": "recipe",
+   "fields": {
+    "title": "Chili con carne med ris og avocado - til to dage",
+    "slug": "chili-con-carne-med-ris-og-avocado-til-to-dage",
+    "image": {
+     "url": "https://images.ctfassets.net/r5zg1hgyl5kj/7hgAepOT9uCWaw932uSSfz/1ad2f13ef4d9c45f0d5403c5adb2491c/Chili_con_carne_til_to_dage.jpg"
+    },
+    "customForm": {
+     "servings": {
+      "type": "person",
+      "amount": 4
+     },
+     "totalTime": 0,
+     "preparationTextAfter": "For ekstra smag: Top med frisk eller tørret chili.",
+     "preparationTextBefore": "Denne opskrift indeholder udvalgte varer fra avis uge 48: Tortillachips, agurk, cherrytomater, hakket oksekød, hakkede tomater , chili con carne blanding, kidneybønner"
+    },
+    "tags": [
+     {
+      "id": "5Q5t9rpmNk4jp1ygKZDEHx",
+      "type": "recipeTag",
+      "fields": {
+       "title": "Avisopskrifter",
+       "slug": "ugens-avisopskrifter"
+      }
+     }
+    ],
+    "popularity": 66,
+    "allProductsAvailable": false
+   },
+   "created_at": "2026-11-18T09:23:53.000000Z"
+  }
+ ],
+ "meta": {
+  "pagination": {
+   "current_page": 1,
+   "last_page": 5,
+   "per_page": 3,
+   "total": 13
+  }
+ }
+}

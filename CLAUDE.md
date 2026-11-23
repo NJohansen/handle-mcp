@@ -38,7 +38,7 @@ src/handle_mcp/
   stores/<store>/__init__.py  one folder per store; its class: login, calls and parsing
   stores/<store>/<topic>.py   the store's mixins: nemlig/{offers,recipes,delivery,nutrition},
                               bilkatogo/{recipes,nutrition,algolia (the shared Algolia keys)},
-                              rema1000/{auth,pickup,shopping_list,nutrition}
+                              rema1000/{auth,pickup,shopping_list,nutrition,recipes}
 tests/             no network, no logins
 tests/snapshots/tools.json  every tool as the model sees it (name, description, args)
 docs/adr/          one short file per hard decision

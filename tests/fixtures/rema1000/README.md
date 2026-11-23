@@ -56,3 +56,32 @@ login, trimmed to `id`, `name`, `underline`, `prices` and `nutrition_info`. The 
 `{name, value}`: "Energi" = "318 KJ / 75 kcal", "Fedt" = "< 0,5", values without a unit. The
 oksekød has `nutrition_info: []`. An unknown id answers 404 `{"error_type": "NotFound"}`.
 Public product data, nothing personal.
+
+## Recipes
+
+Captured 2026-11-23 with GET only, logged out. Public: nothing personal in them.
+
+| File | Call | Kept |
+|---|---|---|
+| `recipes_search.json` | `search/recipes?query=lasagne&per_page=2` | the 2 recipes, without ingredients and steps. "Glutenfri lasagne" has `servings.amount` 0 |
+| `recipe_lasagne.json` | `rema1000dk/entities?filter[type]=recipe&filter[slug]=lasagne` | the whole recipe: 3 ingredient groups, 3 groups of steps |
+| `recipe_tags.json` | `rema1000dk/entities?filter[type]=recipeTag&per_page=100` | all 30 tags: `id`, `type`, title and slug |
+| `recipes_by_tag.json` | `rema1000dk/entities?filter[type]=recipe&filter[tags.sys.id]=5Q5t9rpmNk4jp1ygKZDEHx&per_page=3&sort=-created_at` (the tag "Avisopskrifter") | the 3 newest of 13, without ingredients and steps |
+
+Trimmed: a recipe keeps `id`, `type`, `created_at`, title, slug, the image's `url`, `customForm`
+(without `relatedProducts`), its tags (`id`, `type`, title, slug), `popularity` and
+`allProductsAvailable`. An ingredient's `digitalProduct` keeps `id`, `title`,
+`amount_of_content`, `unit_of_content`, `is_basic_ingredient`, `amount` and `active_product`
+(`id`, `name`, `underline`, `labels`, `prices`). `meta.pagination` keeps the page numbers only.
+
+- The search answers with whole recipes, like the entity call. It has no tag filter:
+  `filter[tags]`, `filter[tag]`, `tags=` and eight more spellings are ignored (708 recipes
+  every time). The tag filter is `filter[tags.sys.id]=<tag id>` on `rema1000dk/entities`, as the
+  website's own tag pages ask. `filter[tags]` there answers 400. Two ids with a comma find
+  nothing, so more tags are checked in the answer.
+- `sort=-popularity` and `sort=-created_at` work on both calls.
+- `digitalProduct.amount` is packs for the recipe's own persons. Salt in a second ingredient
+  group has `amount` 0. The sum of `price * amount` for products that are not
+  `is_basic_ingredient` is the `price` REMA shows for the recipe (lasagne: 87).
+- `totalTime` was 0 in all 23 recipes read. 20 of 289 ingredients had no `active_product`,
+  15 had no `digitalProduct`.
