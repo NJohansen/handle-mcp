@@ -38,7 +38,6 @@ from handle_mcp.match import (
     processed_rank,
     query,
     score,
-    tortilla_chips_mismatch,
 )
 from handle_mcp.models import Product
 from handle_mcp.pricing import cost, multi_hint, packs, per_unit, pieces, too_much
@@ -99,7 +98,6 @@ def _best(item: str, products: list[Any], on: date | None = None) -> BasketLine:
     """Best word match first, then a comparable size, then the lowest cost for the amount.
     `on` is the delivery day: offers that end before it do not count."""
     quantity, words, size = parse_item(item)
-    products = [p for p in products if not tortilla_chips_mismatch(words, p)]
     # The item is produce when the search found it fresh, by its full name: then canned or frozen
     # loses. Not "Spaghettisquash" for spaghetti.
     produce = any(get(x, "available") and is_fresh(x) and score(words, x) == 1 for x in products)

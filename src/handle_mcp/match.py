@@ -53,9 +53,6 @@ LIMBS = ("lår",)  # only before these: never "kartoverofler"
 # A cut of the thing named first: "makrelfilet" and "makrelstykker" are makrel.
 CUTS = ("filet", "fileter", "stykke", "stykker", "strimler", "tern")
 
-TORTILLA_WORDS = frozenset({"tortilla", "tortillas"})
-WRAP_WORDS = frozenset({"wrap", "wraps"})
-
 # Frozen or canned. Never the default for fresh food: "blåbær" is fresh, "frosne blåbær" is not.
 # "Cherrytomater i tomatjuice", Bilka "Kolonial > Konserves". nemlig puts jars in plain "Kolonial":
 # "Appetit agurker" is pickled, never a fresh agurk.
@@ -139,16 +136,12 @@ def score(words: list[str], product: Any, asked: set[str] | frozenset[str] = fro
     name ('Yoghurt m. banan'), unless the item asks for it there (`asked`: 'makrel i tomat')."""
     # c and k are the same sound in Danish shop names: "Clementiner" ~ "klementiner".
     words = [w.replace("c", "k") for w in words]
-    tortilla_wraps = bool(set(words) & TORTILLA_WORDS) and bool(set(words) & WRAP_WORDS)
-    if tortilla_wraps:
-        words = [w for w in words if w not in WRAP_WORDS]
     asked = {w.replace("c", "k") for w in asked}
     name = (get(product, "name") or "").replace("C", "K").replace("c", "k").lower()
     for short, full in ABBREVIATIONS:
         name = short.sub(full, name)
     brand = (get(product, "brand") or "").replace("C", "K").replace("c", "k").lower()
-    parts = FLAVOUR_RE.split(name, maxsplit=1)
-    head = parts[0]
+    head = FLAVOUR_RE.split(name)[0]
     head_words = _words(head)
     # A compound split in two: "Cherry tomater" is "cherrytomater".
     tokens = set(head_words) | {a + b for a, b in pairwise(head_words)}
@@ -158,8 +151,6 @@ def score(words: list[str], product: Any, asked: set[str] | frozenset[str] = fro
     for w in words:
         if w in tokens or any(_plural(w, t) or _described(w, t) for t in tokens):
             hits.append(1.0)
-        elif tortilla_wraps and w in TORTILLA_WORDS and WRAP_WORDS & tokens:
-            hits.append(0.75)
         elif any(_compound(w, t) for t in tokens):
             hits.append(0.75)  # 'frilandsæg' for 'æg': better than a word inside, below whole
         elif w in head or _stem_hit(w, tokens) or w in brand_tokens or _stem_hit(w, brand_tokens):
@@ -168,32 +159,13 @@ def score(words: list[str], product: Any, asked: set[str] | frozenset[str] = fro
             hits.append(1.0 if w in asked else 0.25)
         else:
             hits.append(0.25 if w in name else 0.0)
-    result = sum(hits) / len(hits) if hits else 0.0
-    if tortilla_wraps and len(parts) > 1:
-        unasked = set(_words(parts[1])) - set(words) - asked - STOP_WORDS
-        if unasked:
-            result = min(result, 0.75)
-    return result
+    return sum(hits) / len(hits) if hits else 0.0
 
 
 def _plural(word: str, token: str) -> bool:
-    """Danish singular and plural are the same product: 'pære' ~ 'pærer', 'banan' ~ 'bananer'."""
+    """Danish singular and plural match: 'pære' ~ 'pærer', 'banan' ~ 'bananer', 'wrap' ~ 'wraps'."""
     short, long_ = sorted((word, token), key=len)
-    special_plural = short != long_ and any(
-        short in forms and long_ in forms for forms in (TORTILLA_WORDS, WRAP_WORDS)
-    )
-    return special_plural or (len(short) >= 3 and long_ in (short + "r", short + "er", short + "e"))
-
-
-def tortilla_chips_mismatch(words: list[str], product: Any) -> bool:
-    """Chips are not tortilla wraps unless the list explicitly asks for chips."""
-    requested = set(words)
-    name = set(_words(get(product, "name") or ""))
-    return (
-        bool(requested & (TORTILLA_WORDS | WRAP_WORDS))
-        and "chips" not in requested
-        and any(token.endswith("chips") for token in name)
-    )
+    return len(short) >= 3 and long_ in (short + "r", short + "er", short + "e", short + "s")
 
 
 def _described(word: str, token: str) -> bool:
@@ -252,8 +224,6 @@ def is_oeko(product: Any) -> bool:
 def _compound(word: str, token: str) -> bool:
     """Danish compound words name the thing last: 'frilandsæg' is æg, 'splitlinser' is linser.
     The token needs 3 more letters, so 'post' is not 'ost'."""
-    if word in TORTILLA_WORDS:
-        return any(token.endswith(form) and len(token) >= len(form) + 3 for form in TORTILLA_WORDS)
     return len(token) >= len(word) + 3 and token.endswith(word)
 
 
