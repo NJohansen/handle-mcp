@@ -18,12 +18,13 @@
 
 Money is a string in kroner with two decimals (`"12.95"`, `"39.00"`) in every store. Dates are ISO. A fact the store does not give is `null`, never left out.
 
-Every product from `search_products` and `list_offers` has the same fields. Two of them are often `null`:
+Every product from `search_products` and `list_offers` has the same fields. Three of them are often `null`:
 
 | Field | nemlig | BilkaToGo | REMA 1000 |
 |---|---|---|---|
 | `before_price` (the price without the offer) | when nemlig shows a crossed-out price; a "Skarp pris" without one has `null` | when the offer has a normal price | the price after the offer week |
 | `offer_until` (last day of the offer, ISO date) | from `search_products`; nemlig's offer lists (`list_offers`) do not say, so `null` | always `null`: BilkaToGo does not say | always, from the price period |
+| `price_over_limit` (price per pack above `max_per_order`) | `null` | `null` | when REMA states a price above the offer limit |
 
 `compare_basket` candidates list only the facts that are known, to stay short.
 

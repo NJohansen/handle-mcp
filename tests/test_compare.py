@@ -835,6 +835,12 @@ def test_offer_limit_counts_extra_packs_at_the_normal_price():
     assert best_match("2 x rosinboller 6 stk", [gift]).line_total == Decimal("20.45")
 
 
+def test_offer_limit_accepts_zero_as_the_over_limit_price():
+    offer = p("x", "o", "Bananer", "10", "1 stk")
+    offer.max_per_order, offer.before_price, offer.price_over_limit = 1, Decimal(20), Decimal(0)
+    assert best_match("2 x bananer", [offer]).line_total == Decimal(10)
+
+
 def test_an_oeko_choice_is_always_shown():
     plain = [p("x", f"m{i}", "Fior di latte", f"{20 + i}.00", "200 g") for i in range(4)]
     eco = p("x", "eco", "Øko fior di latte", "40.00", "200 g")
