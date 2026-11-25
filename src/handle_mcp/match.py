@@ -164,9 +164,9 @@ def score(words: list[str], product: Any, asked: set[str] | frozenset[str] = fro
 
 
 def _plural(word: str, token: str) -> bool:
-    """Danish singular and plural are the same product: 'pære' ~ 'pærer', 'banan' ~ 'bananer'."""
+    """Danish singular and plural match: 'pære' ~ 'pærer', 'banan' ~ 'bananer', 'wrap' ~ 'wraps'."""
     short, long_ = sorted((word, token), key=len)
-    return len(short) >= 3 and long_ in (short + "r", short + "er", short + "e")
+    return len(short) >= 3 and long_ in (short + "r", short + "er", short + "e", short + "s")
 
 
 def _described(word: str, token: str) -> bool:

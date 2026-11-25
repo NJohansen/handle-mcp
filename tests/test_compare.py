@@ -701,6 +701,28 @@ def test_c_and_k_and_short_plural():
     assert best_match("peberfrugt rød", [p("x", "p", "Peberfrugter røde", "20.00")]).sure
 
 
+def test_tortilla_wraps_include_rema_tortillas_and_chips_as_unsure_candidates():
+    tortillas = p("rema1000", "102802", "TORTILLAS HVEDE", "10.70", "370 GR.")
+    chips = p("rema1000", "102791", "TORTILLA CHIPS OST", "7.91", "200 GR.")
+    organic = p("rema1000", "101356", "ØKO TORTILLA, MEDIUM", "15.95", "320 GR.")
+    wholegrain = p("rema1000", "102831", "FULDKORNSTORTILLAS", "12.45", "370 GR.")
+    wraps = p("x", "w", "Protein wraps", "9.00", "360 g")
+    line = best_match("tortilla wraps 6 stk", [chips, wraps, wholegrain, tortillas, organic])
+
+    assert not line.sure and not line.guess
+    assert {"102802", "102791"} <= {candidate["id"] for candidate in line.candidates}
+    words = parse_item("tortilla wraps 6 stk")[1]
+    assert score(words, tortillas) == score(words, chips) == 0.5
+
+
+def test_english_singular_and_plural_forms_match():
+    assert best_match("tortilla", [p("x", "t", "Tortillas hvede", "10.70")]).sure
+    assert best_match("tortillas", [p("x", "t", "Tortilla hvede", "10.70")]).sure
+    assert best_match("wrap", [p("x", "w", "Wraps", "10.70")]).sure
+    assert best_match("pita", [p("x", "p", "Pitas", "10.70")]).sure
+    assert not best_match("ris", [p("x", "r", "Ri", "10.70")]).sure
+
+
 def test_canned_loses_even_when_fresh_has_no_fitting_category():
     """Seen live at Bilka: the canned one sits in '... > Cherrytomater', the fresh one does not."""
     canned = p("x", "c", "Cherrytomater i tomatjuice", "10.95", "400 g")
