@@ -147,13 +147,15 @@ class OffersMixin:
             params["timeslotId"] = slot  # sic: the page call spells it so, the dialog not
         return await self._public("GET", f"{BFF}/page", params=params) or {}
 
-    async def offers(self, limit: int = 25, category: str | None = None) -> list[Product]:
+    async def offers(
+        self, limit: int = 25, category: str | None = None, offset: int = 0
+    ) -> list[Product]:
         """Without `category`: every product on nemlig's offer lists (/tilbud): Skarp pris,
         Priskup, Dagstilbud, Undgå madspild and gifts; `limit` is per list. With one: every
         offer on the category's sub-pages, at most `limit`. Read only. Works without a login:
         the offers are public; with one, they fit the household's delivery time."""
         if category:
-            return await self._category_offers(category, limit)
+            return await self._category_offers(category, limit, offset)
         page, gifts, extra = await asyncio.gather(
             self._page("/tilbud"), self._gift_search(), self._gift_pages()
         )
@@ -182,7 +184,7 @@ class OffersMixin:
             products.setdefault(gift.id, gift)
         return list(products.values())
 
-    async def _category_offers(self, category: str, limit: int) -> list[Product]:
+    async def _category_offers(self, category: str, limit: int, offset: int = 0) -> list[Product]:
         pages = await asyncio.gather(
             *(self._page(f"/tilbud/{slug}") for slug in CATEGORY_PAGES[category]),
             return_exceptions=True,
@@ -205,7 +207,7 @@ class OffersMixin:
                 products.setdefault(product.id, product)
         if blocks and not products:
             raise StoreError("nemligs tilbudslister har ændret format.")
-        return list(products.values())[:limit]
+        return list(products.values())[offset : offset + limit]
 
     def _gifts(self, blocks: list[tuple[str, str, list[dict]]]) -> list[Product]:
         found = []

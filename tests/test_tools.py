@@ -125,6 +125,17 @@ async def test_offers_in_a_category_reach_the_store_with_a_wider_limit():
     assert app._store("fake").offer_calls[-2:] == [(60, "frugt og grønt"), (100, "pålæg")]
 
 
+async def test_offers_in_a_category_can_skip_the_first_ones():
+    await server.list_offers(stores=["fake"], category="pålæg", limit=10, offset=20)
+    await server.list_offers(stores=["fake"], category="pålæg", offset=5000)
+    assert app._store("fake").offer_calls[-2:] == [(10, "pålæg", 20), (60, "pålæg", 900)]
+
+
+async def test_an_offset_without_a_category_is_an_error():
+    with pytest.raises(ToolError, match="offset kræver en category"):
+        await server.list_offers(stores=["fake"], offset=10)
+
+
 async def test_an_unknown_offer_category_names_the_known_ones():
     with pytest.raises(ToolError, match="Ukendt kategori 'slik'. Vælg en af: frugt og grønt, "):
         await server.list_offers(category="slik")

@@ -703,6 +703,15 @@ async def test_offers_in_a_category_read_its_sub_page(store, fake):
     assert offers["5603155"].campaign == "Skarp pris" and not offers["5603155"].available
 
 
+async def test_offers_in_a_category_can_be_read_a_page_at_a_time(store):
+    everything = [p.id for p in await store.offers(100, "mejeri og æg")]
+    assert len(everything) > 4
+    first = [p.id for p in await store.offers(3, "mejeri og æg")]
+    second = [p.id for p in await store.offers(3, "mejeri og æg", 3)]
+    assert first + second == everything[:6]
+    assert await store.offers(3, "mejeri og æg", len(everything)) == []
+
+
 async def test_a_campaign_block_names_the_campaign(store):
     offers = {p.id: p for p in await store.offers(25, "mejeri og æg")}
     assert offers["5038613"].campaign == offers["104373"].campaign == "Lurpak kun 12 kr."

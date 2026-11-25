@@ -213,7 +213,9 @@ class Rema1000Store(
     async def search(self, query: str, limit: int = 10) -> list[Product]:
         return await self._products({"query": query}, limit)
 
-    async def offers(self, limit: int = 25, category: str | None = None) -> list[Product]:
+    async def offers(
+        self, limit: int = 25, category: str | None = None, offset: int = 0
+    ) -> list[Product]:
         """The leaflet (Avisvarer). With `category`: the leaflet in its departments, one call
         per department at once."""
         params = {"filter[labels]": LEAFLET, "sort": "department"}
@@ -221,7 +223,9 @@ class Rema1000Store(
             return await self._products(params, limit, offers_only=True)
         found = await asyncio.gather(
             *(
-                self._products(params | {"filter[departments]": dept}, limit, offers_only=True)
+                self._products(
+                    params | {"filter[departments]": dept}, limit + offset, offers_only=True
+                )
                 for dept in DEPARTMENTS[category]
             ),
             return_exceptions=True,
@@ -232,7 +236,7 @@ class Rema1000Store(
             log.warning("REMA 1000: %d afdelinger fejlede: %r", len(failed), failed[0])
         found = [f for f in found if not isinstance(f, BaseException)]
         unique = {p.id: p for products in found for p in products}
-        return _campaigns_first(list(unique.values()))[:limit]
+        return _campaigns_first(list(unique.values()))[offset : offset + limit]
 
     async def orders(self, limit: int = 10) -> list[Order]:
         raise NotImplementedError

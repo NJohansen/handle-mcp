@@ -259,10 +259,15 @@ class BilkaStore(BilkaRecipesMixin, BilkaNutritionMixin):
     async def search(self, query: str, limit: int = 10) -> list[Product]:
         return await self._algolia(query, limit)
 
-    async def offers(self, limit: int = 25, category: str | None = None) -> list[Product]:
+    async def offers(
+        self, limit: int = 25, category: str | None = None, offset: int = 0
+    ) -> list[Product]:
         """Products on offer in our store: Skarp pris, leaflet offers and mix offers. Without
-        `category` the first `limit` of every offer in the store, clothes and toys too."""
-        return await self._algolia("", limit, offers=True, category=category)
+        `category` the first `limit` of every offer in the store, clothes and toys too. The
+        `offset` first are skipped: Algolia is asked for them too, so a page is `offset` + `limit`
+        hits."""
+        found = await self._algolia("", limit + offset, offers=True, category=category)
+        return found[offset : offset + limit]
 
     async def _algolia(
         self,
