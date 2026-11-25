@@ -140,6 +140,9 @@ def product(hit: dict, now: datetime | None = None, advertised: bool = False) ->
         category=" > ".join(x for x in (dept, cat) if x) or None,
         campaign="Avisvare" if on_offer and LEAFLET in labels else None,
         max_per_order=most if on_offer and isinstance(most, int) and most > 0 else None,
+        price_over_limit=_money(period.get("price_over_max_quantity"))
+        if on_offer and isinstance(most, int) and most > 0
+        else None,
     )
 
 

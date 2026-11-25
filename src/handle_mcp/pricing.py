@@ -5,7 +5,7 @@
 - "6 x bananer" with no size means 6 bananas: a 4-pack is bought twice.
 - An offer is gone after its last day, so prices are for the delivery day.
 - A multi-buy offer ("3 for 48 kr") counts for the packs we need, also in the price per kg.
-  Packs over the offer's limit ("max 1 stk.") cost the normal price.
+  Packs over the offer's limit ("max 1 stk.") cost the over-limit price when known.
 - No size in the item: price per kg, l or piece, so packs of different sizes compare.
 """
 
@@ -46,11 +46,14 @@ def _multi(product: Any, on: date | None) -> tuple[int, Decimal] | None:
 
 def cost(product: Any, count: int, on: date | None) -> Decimal:
     """Price for `count` packs, with a multi-buy offer like '4 for 50 kr' when it is still on.
-    Packs over the offer's limit ('max 1 stk.', e.g. a free gift) cost the normal price."""
+    Packs over the offer's limit ('max 1 stk.', e.g. a free gift) cost the over-limit price."""
     price = _price(product, on)
     limit, before = get(product, "max_per_order"), get(product, "before_price")
-    offered = min(count, limit) if limit else count  # the limit caps multi-buys too
-    normal = Decimal(before) if before else price
+    until, over = get(product, "offer_until"), get(product, "price_over_limit")
+    expired = on is not None and until is not None and on > until
+    offered = min(count, limit) if limit and not expired else count
+    normal = over if over is not None else before
+    normal = Decimal(normal) if normal is not None else price
     if offer := _multi(product, on):
         size, total = offer
         cost = (offered // size) * total + (offered % size) * price

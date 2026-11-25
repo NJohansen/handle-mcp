@@ -7,8 +7,11 @@ from pathlib import Path
 
 import httpx
 import pytest
+from mcp import Client
 
-from handle_mcp import compare
+from handle_mcp import compare, server
+from handle_mcp import stores as registry
+from handle_mcp.models import DeliveryInfo
 
 # STORES is the real dict: conftest swaps in fakes later
 from handle_mcp.stores import OFFER_CATEGORIES, STORES, StoreError
@@ -85,12 +88,81 @@ def test_offer_fields():
     assert bread.price == Decimal(10) and bread.before_price == Decimal("22.5")
     assert bread.offer_until == date(2026, 11, 14)
     assert bread.max_per_order == 6
+    assert bread.price_over_limit == Decimal("22.50")
     assert bread.offer_text == "Avisvare, maks 6 stk. (derefter 22,50 kr)"
 
 
 def test_offer_ended_uses_the_next_period():
     bread = product(fixture("offers")["data"][0], datetime(2026, 11, 16, tzinfo=UTC))
     assert not bread.on_offer and bread.price == Decimal("22.5") and bread.offer_until is None
+    assert bread.price_over_limit is None
+
+
+def test_offer_limit_is_priced_without_a_later_period():
+    hit = fixture("offers")["data"][0]
+    hit["prices"] = hit["prices"][:1]
+    bread = product(hit, NOW)
+    assert bread.before_price is None
+    line = compare.best_match("7 x rugbrød", [bread])
+    assert (line.quantity, line.line_total) == (7, Decimal("82.50"))
+    assert server._out(line)["product"]["price_over_limit"] == "22.50"
+
+
+def test_offer_limit_price_is_distinct_from_the_price_after_the_offer():
+    hit = fixture("offers")["data"][0]
+    hit["prices"][1]["price"] = 25
+    bread = product(hit, NOW)
+    assert (bread.price_over_limit, bread.before_price) == (Decimal("22.50"), Decimal(25))
+    assert compare.best_match("6 x rugbrød", [bread], date(2026, 11, 14)).line_total == Decimal(60)
+    assert compare.best_match("7 x rugbrød", [bread], date(2026, 11, 14)).line_total == Decimal(
+        "82.50"
+    )
+    assert compare.best_match("7 x rugbrød", [bread], date(2026, 11, 15)).line_total == Decimal(175)
+
+
+@pytest.mark.parametrize(
+    ("quantity", "delivery_day", "total"),
+    [
+        (1, None, "20.00"),
+        (6, date(2026, 11, 14), "120.00"),
+        (7, date(2026, 11, 14), "157.95"),
+        (9, None, "233.85"),
+        (7, date(2026, 11, 15), "315.00"),
+    ],
+)
+async def test_offer_limit_through_mcp(store, fake, monkeypatch, quantity, delivery_day, total):
+    answer = fixture("offers")
+    answer["data"] = answer["data"][:1]
+    answer["meta"]["pagination"]["last_page"] = 1
+    prices = answer["data"][0]["prices"]
+    prices[0]["price"] = 20
+    prices[0]["price_over_max_quantity"] = 37.95
+    prices[1]["price"] = 45
+    fake.answers["rugbrød"] = httpx.Response(200, json=answer)
+
+    async def delivery_info():
+        return DeliveryInfo("rema1000", next_available=delivery_day)
+
+    monkeypatch.setattr(store, "delivery_info", delivery_info)
+    monkeypatch.setattr(registry, "STORES", {"rema1000": lambda: store})
+    async with Client(server.mcp, mode="legacy") as client:
+        result = await client.call_tool(
+            "compare_basket", {"items": [f"{quantity} x rugbrød"], "stores": ["rema1000"]}
+        )
+    assert not result.is_error
+    quote = json.loads("".join(c.text for c in result.content if c.type == "text"))["stores"][
+        "rema1000"
+    ]
+    line = quote["lines"][0]
+    assert (line["quantity"], line["line_total"], quote["products_total"]) == (
+        quantity,
+        total,
+        total,
+    )
+    assert (line["product"]["price_over_limit"], line["product"]["before_price"]) == (
+        "37.95",
+        "45.00",
+    )
 
 
 def test_no_price_is_skipped():
