@@ -200,6 +200,12 @@ async def test_offers_in_a_category_ask_per_department(store, fake):
     assert not milk.on_offer
 
 
+async def test_offers_in_a_category_can_be_read_a_page_at_a_time(store):
+    everything = [p.id for p in await store.offers(25, "mejeri og æg")]
+    assert [p.id for p in await store.offers(2, "mejeri og æg", 1)] == everything[1:3]
+    assert await store.offers(2, "mejeri og æg", len(everything)) == []
+
+
 async def test_one_failing_department_does_not_hide_the_others(fake):
     def handle(request):
         if request.url.params.get("filter[departments]") in ("60", "50"):

@@ -458,6 +458,14 @@ async def test_offers_in_a_category_filter_on_the_category(store, fake):
     assert all(p.category.startswith("Frugt & grønt") for p in offers.values())
 
 
+async def test_offers_in_a_category_ask_for_the_hits_before_the_offset_too(store, fake):
+    everything = [p.id for p in await store.offers(25, "frugt og grønt")]
+    page = await store.offers(2, "frugt og grønt", 1)
+    call = [r for r in fake.requests if r.url.path == "/1/indexes/*/queries"][-1]
+    assert parse_qs(json.loads(call.content)["requests"][0]["params"])["hitsPerPage"] == ["3"]
+    assert [p.id for p in page] == everything[1:3]  # the fake sends all six whatever is asked
+
+
 def test_a_category_can_be_more_than_one_bilka_category():
     assert category_filter("kolonial") == (
         '(consumerFacingHierarchy.lvl0:"Kolonial"'

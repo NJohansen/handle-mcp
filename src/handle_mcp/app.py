@@ -27,6 +27,7 @@ MAX_ITEMS = 50  # per set_cart_quantities or compare_basket call
 MAX_QUANTITY = 50  # per product
 MAX_RESULTS = 25
 CATEGORY_RESULTS, MAX_CATEGORY_RESULTS = 60, 100  # list_offers with a category, per store
+MAX_OFFSET = 900  # a page after it; with the largest limit that is the 1,000 hits Algolia gives
 MAX_DAYS = 14
 MIN_PERSONS, MAX_PERSONS = 2, 12  # nemlig: 2-12
 

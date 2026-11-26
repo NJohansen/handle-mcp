@@ -14,6 +14,7 @@ from handle_mcp.app import (
     CATEGORY_RESULTS,
     MAX_CATEGORY_RESULTS,
     MAX_ITEMS,
+    MAX_OFFSET,
     MAX_RESULTS,
     READ,
     StoreName,
@@ -131,18 +132,29 @@ async def list_offers(
         str | None,
         Field(description="One category: " + ", ".join(f'"{c}"' for c in OFFER_CATEGORIES) + "."),
     ] = None,
+    offset: Annotated[
+        int | None,
+        Field(
+            description="With `category`: skip this many products per store, to read the next "
+            f"page (default 0, up to {MAX_OFFSET})."
+        ),
+    ] = None,
 ) -> dict:
     """List this week's offers in each store, also items you would not search for. For one
     named product, use search_products.
     Without `category`, a first look only: nemlig's Skarp pris, Priskup, Dagstilbud, Undgå
     madspild and gifts; the first of BilkaToGo's offers; REMA 1000's leaflet (Avisvarer). For a
     meal plan or a shopping list, call once per `category` you buy from: every offer in it, in
-    each store.
+    each store. A category can hold more than `limit` offers: ask again with `offset` raised
+    by `limit` until a store gives fewer than `limit`.
     Each product has price, before_price and offer_until (null when the store does not say),
     offer_text (multi-buy, max per customer) and campaign (the store's name for the offer). A
     product on two lists is shown once. A list the store fails to send is left out (see the
     server log). Free gifts have price 0, max_per_order and their own product id, and are not
     cut by `limit`."""
+    if offset and category is None:
+        raise ToolError("offset kræver en category.")
+    offset = max(0, min(offset or 0, MAX_OFFSET))
     if category is not None:
         category = category.strip().lower()
         if category not in OFFER_CATEGORIES:
@@ -151,7 +163,7 @@ async def list_offers(
         limit = max(1, min(limit or CATEGORY_RESULTS, MAX_CATEGORY_RESULTS))
     else:
         limit = max(1, min(limit or MAX_RESULTS, MAX_RESULTS))
-    return _out(await _each(_names(stores), lambda s: s.offers(limit, category)))
+    return _out(await _each(_names(stores), lambda s: s.offers(limit, category, offset)))
 
 
 @_tool(READ)
