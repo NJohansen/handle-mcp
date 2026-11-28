@@ -10,7 +10,9 @@ other persons and no ingredient has alternatives. Read only.
 
 from __future__ import annotations
 
+import asyncio
 import re
+import time
 from collections.abc import Callable
 from decimal import Decimal
 from typing import Any
@@ -21,8 +23,10 @@ from handle_mcp.stores.rema1000.auth import SHOP
 
 SLUG = re.compile(r"^[a-z0-9-]+$")
 FEATURED = "ugens-avisopskrifter"  # "Avisopskrifter": dinners made from this week's leaflet
-PAGE = 20  # recipes per page, as the website asks
-MAX_PAGES = 5  # pages read to find recipes that have every tag
+PAGE, MAX_PAGE = 20, 100  # recipes per page: as the website asks, and the most asked for
+MAX_PAGES = 8  # pages of MAX_PAGE read for a mix of tags: more than all of REMA's recipes
+KEEP = 600  # seconds a mix of tags is kept, so its next page reads nothing again
+PLAN = "madplan"  # REMA has no week plan: its dinners from this week's leaflet are the nearest
 CHANGED = "REMA 1000 har ændret sine opskrifter. handle-mcp skal opdateres."
 
 
@@ -71,6 +75,11 @@ def _summary(entity: dict, group: str | None = None) -> Recipe | None:
         time=_time(form),
         persons=_persons(form),
         group=group,
+        tags=[
+            title
+            for t in fields.get("tags") or []
+            if isinstance(t, dict) and (title := _text((t.get("fields") or {}).get("title")))
+        ],
     )
 
 
@@ -90,6 +99,10 @@ def _line(row: dict) -> str | None:
     return " ".join(p for p in parts if p) if parts[0] else name
 
 
+def _last_page(data: dict) -> int:
+    return ((data.get("meta") or {}).get("pagination") or {}).get("last_page") or 1
+
+
 def _tag_ids(entity: dict) -> set[str]:
     tags = (entity.get("fields") or {}).get("tags") or []
     return {str(t.get("id")) for t in tags if isinstance(t, dict)}
@@ -103,6 +116,7 @@ class RemaRecipesMixin:
     _product: Callable[[dict], Any]
     _recipe_tag_ids: dict[str, str]
     _recipe_tag_names: dict[str, str]
+    _mixes: dict[tuple[str, ...], tuple[float, list[Recipe]]]
 
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
         data = await self._get("search/recipes", {"query": query, "per_page": limit, "page": 1})
@@ -199,12 +213,15 @@ class RemaRecipesMixin:
         tags: list[str],
         category: str | None = None,
         limit: int = 20,
+        offset: int = 0,
         sort: str = "-popularity",
     ) -> list[Recipe]:
-        """REMA's recipes with every tag, the most popular first. REMA has tags only, so a
-        `category` is one more tag ("Aftensmad", "Frokost"). Matched on REMA's own list, by
-        title or slug. The call filters on one tag; the others are checked in the answer, at
-        most MAX_PAGES pages deep: a rare mix can come back short (the tool says so)."""
+        """REMA's recipes with every tag, the most popular first, `limit` of them after the
+        first `offset`. REMA has tags only, so a `category` is one more tag ("Aftensmad",
+        "Frokost"); "madplan" is the leaflet's dinners, the newest first. Matched on REMA's own
+        list, by title or slug."""
+        if category and category.strip().lower() == PLAN:
+            category, sort = FEATURED, "-created_at"
         known = await self._recipe_tags()
         ids = []
         for tag in [*tags, *([category] if category else [])]:
@@ -212,26 +229,51 @@ class RemaRecipesMixin:
             if not tag_id:
                 names = "; ".join(sorted(self._recipe_tag_names.values()))
                 raise StoreError(f"REMA 1000 kender ikke tagget {tag!r}. Brug et af: {names}.")
-            ids.append(tag_id)
+            if tag_id not in ids:
+                ids.append(tag_id)
         group = " + ".join(self._recipe_tag_names[i] for i in ids)
-        params = {
-            "filter[type]": "recipe",
-            "filter[tags.sys.id]": ids[0],
-            "sort": sort,
-            "per_page": PAGE,
-        }
+        if len(ids) > 1:
+            return (await self._mix(ids, sort, group))[offset : offset + limit]
+        size = min(MAX_PAGE, max(PAGE, limit))
+        page, skip = offset // size + 1, offset % size
+        found: list[Recipe] = []
+        while True:
+            data = await self._tag_page(ids[0], sort, size, page)
+            found += [r for e in data["data"] if isinstance(e, dict) and (r := _summary(e, group))]
+            if len(found) >= skip + limit or page >= _last_page(data) or not data["data"]:
+                return found[skip : skip + limit]
+            page += 1
+
+    async def _tag_page(self, tag_id: str, sort: str, size: int, page: int) -> dict:
+        params = {"filter[type]": "recipe", "filter[tags.sys.id]": tag_id, "sort": sort}
+        return await self._get("rema1000dk/entities", params | {"per_page": size, "page": page})
+
+    async def _mix(self, ids: list[str], sort: str, group: str) -> list[Recipe]:
+        """Every recipe that has all the tags. The call filters on one tag only, so the tag
+        with the fewest recipes is read to its end and the other tags are checked in the
+        answer. Kept for KEEP seconds: the next page of the same mix asks REMA nothing."""
+        if not hasattr(self, "_mixes"):
+            self._mixes = {}
+        kept = self._mixes.get((*ids, sort))
+        if kept and kept[0] > time.monotonic():
+            return kept[1]
+        firsts = await asyncio.gather(*(self._tag_page(i, sort, 1, 1) for i in ids))
+        totals = [((d.get("meta") or {}).get("pagination") or {}).get("total") for d in firsts]
+        if not all(isinstance(t, int) for t in totals):
+            raise StoreError(CHANGED)
+        fewest = ids[totals.index(min(totals))]
         found: list[Recipe] = []
         for page in range(1, MAX_PAGES + 1):
-            data = await self._get("rema1000dk/entities", params | {"page": page})
+            data = await self._tag_page(fewest, sort, MAX_PAGE, page)
             found += [
                 r
                 for e in data["data"]
                 if isinstance(e, dict) and set(ids) <= _tag_ids(e) and (r := _summary(e, group))
             ]
-            last = ((data.get("meta") or {}).get("pagination") or {}).get("last_page") or 1
-            if len(found) >= limit or page >= last or not data["data"]:
+            if page >= _last_page(data) or not data["data"]:
                 break
-        return found[:limit]
+        self._mixes[(*ids, sort)] = (time.monotonic() + KEEP, found)
+        return found
 
     async def _recipe_tags(self) -> dict[str, str]:
         """REMA's tags, by lower-case title and by slug → id. Cached: they rarely change."""

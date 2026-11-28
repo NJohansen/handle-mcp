@@ -38,6 +38,7 @@ class Recipe:
     time: str | None = None  # as the store writes it, e.g. "30 min"
     persons: int | None = None
     group: str | None = None  # the store's theme, e.g. "Mad i fad" in nemlig's "Ugens udvalgte"
+    tags: list[str] = field(default_factory=list)  # the store's own, e.g. "Under 30 min"
 
 
 @dataclass

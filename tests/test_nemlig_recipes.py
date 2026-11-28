@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import pytest
 
-from handle_mcp import server
+from handle_mcp import app, server
 from handle_mcp.stores import StoreError
 from handle_mcp.stores.nemlig.recipes import category_path, recipe_slug
 from tests import test_nemlig
@@ -195,6 +195,17 @@ async def test_list_recipes_tool_picks_featured_or_tags():
     assert tagged["fake"][0]["group"] == "Aftensmad"
 
 
+async def test_list_recipes_tool_reads_the_next_page():
+    await server.list_recipes(["fake"], tags=["Kylling"], limit=500, offset=100)
+    await server.list_recipes(["fake"], category="madplan", offset=-5)
+    assert app._store("fake").recipe_calls[-2:] == [
+        (["Kylling"], None, 100, 100),  # at most 100 per call
+        ([], "madplan", 20, 0),
+    ]
+    featured = await server.list_recipes(["fake"], limit=1, offset=1)
+    assert [r["id"] for r in featured["fake"]] == ["r2"]  # the fake has r1, r2, r3
+
+
 async def test_recipe_search_gives_new_links(store, fake):
     recipes = await store.recipes("kylling karry", limit=3)
     assert [r.id for r in recipes] == [
@@ -230,7 +241,83 @@ def test_category_with_spaces_and_danish_letters():
     assert category_path("Mad til flere dage") == "mad-til-flere-dage"
     assert category_path("Måltidskasse") == "maaltidskasse"
     with pytest.raises(StoreError, match="Kender ikke kategorien"):
-        category_path("aftens/mad")
+        category_path("aftens?mad")
+
+
+TREE = [
+    {
+        "title": "Jul",
+        "categoryPath": "juleopskrifter",
+        "subCategories": [{"title": "Julefrokost", "categoryPath": "julefrokost"}],
+    },
+    {
+        "title": "Madpakke",
+        "categoryPath": "madpakke",
+        "subCategories": [{"title": "Sandwich", "categoryPath": "sandwich"}],
+    },
+    {
+        "title": "Frokost",
+        "categoryPath": "frokost",
+        "subCategories": [{"title": "Sandwich", "categoryPath": "sandwich"}],
+    },
+]
+
+
+@pytest.mark.parametrize(
+    "given",
+    [
+        "julefrokost",
+        "Julefrokost",
+        "Jul/Julefrokost",
+        "juleopskrifter/julefrokost",
+        "jul / julefrokost",
+    ],
+)
+def test_a_sub_category_is_asked_for_with_its_parent(given):
+    assert category_path(given, TREE) == "juleopskrifter/julefrokost"
+    assert category_path("Jul", TREE) == "juleopskrifter"
+
+
+def test_a_sub_category_in_two_places_names_both():
+    with pytest.raises(StoreError, match="flere steder.*madpakke/sandwich, frokost/sandwich"):
+        category_path("sandwich", TREE)
+    assert category_path("frokost/sandwich", TREE) == "frokost/sandwich"
+
+
+def test_an_unknown_category_answers_with_nemligs_own():
+    with pytest.raises(StoreError, match="'pizza'.*juleopskrifter, madpakke, frokost, madplan"):
+        category_path("pizza", TREE)
+    with pytest.raises(StoreError, match="'jul/pizza'.*en af: juleopskrifter/julefrokost\\."):
+        category_path("jul/pizza", TREE)
+
+
+async def test_a_sub_category_reaches_nemlig_with_its_parent(store, fake):
+    await store.recipes_by_tag([], category="mad i fad")
+    call = [r for r in fake.requests if r.url.path.endswith("/meals/allRecipes")][-1]
+    assert call.url.params["categoryPath"] == "aftensmad/mad-i-fad"
+
+
+async def test_the_next_page_skips_the_first_ones(store, fake):
+    await store.recipes_by_tag(["Familievenlig"], limit=50, offset=100)
+    call = [r for r in fake.requests if r.url.path.endswith("/meals/allRecipes")][-1]
+    assert (call.url.params["skip"], call.url.params["take"]) == ("100", "50")
+
+
+async def test_a_recipe_in_a_list_has_nemligs_tags(store):
+    recipes = await store.recipes_by_tag(["Familievenlig", "Budgetvenlig"], limit=5)
+    assert recipes[0].tags == ["Familievenlig", "Budgetvenlig"]
+    assert (recipes[0].time, recipes[0].persons) == (None, None)  # not in nemlig's lists
+
+
+async def test_madplan_is_nemligs_page_of_week_plans(store, fake):
+    plans = await store.recipes_by_tag([], category="Madplan", limit=5, offset=2)
+    page = [r for r in fake.requests if r.url.path.endswith("/page")][-1]
+    assert page.url.params["path"] == "/maaltider/madplan"
+    assert len(plans) == 5 and plans[0].group and plans[0].id
+    everything = await store.recipes_by_tag([], category="madplan", limit=100)
+    assert [r.id for r in plans] == [r.id for r in everything[2:7]]
+    with pytest.raises(StoreError, match="kan ikke filtreres på tags"):
+        await store.recipes_by_tag(["Familievenlig"], category="madplan")
 
 
 async def test_no_tags_from_nemlig_is_a_format_change(store, monkeypatch):

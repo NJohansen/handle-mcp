@@ -18,6 +18,7 @@ from handle_mcp.stores import StoreError
 SITE = "https://www.nemlig.com"
 BFF = "https://webapi.prod.knl.nemlig.it/productbff/api/web"
 SLUG = re.compile(r"^[a-z0-9-]+$")
+PLAN = "madplan"  # /maaltider/madplan: "Ugens madplan", earlier weeks, "Mad til flere dage"
 
 
 def recipe_slug(recipe: str) -> str:
@@ -29,14 +30,65 @@ def recipe_slug(recipe: str) -> str:
     return slug
 
 
-def category_path(category: str) -> str:
-    """'Mad til flere dage' or 'måltidskasse' → nemlig's path: 'mad-til-flere-dage'."""
-    path = category.strip().lower().replace(" ", "-")
+def _key(text: Any) -> str:
+    """'Mad i fad' → 'mad-i-fad', 'Måltidskasse' → 'maaltidskasse': how nemlig spells a path."""
+    key = str(text or "").strip().lower().replace(" ", "-")
     for a, b in (("æ", "ae"), ("ø", "oe"), ("å", "aa")):
-        path = path.replace(a, b)
-    if not SLUG.match(path):
-        raise StoreError(f"Kender ikke kategorien {category!r}. Brug fx aftensmad eller frokost.")
-    return path
+        key = key.replace(a, b)
+    return key
+
+
+def category_path(category: str, tree: list[dict] | None = None) -> str:
+    """'Madpakke', 'Jul/Julefrokost' or just 'julefrokost' → nemlig's path: 'madpakke',
+    'juleopskrifter/julefrokost'. `tree` is nemlig's own list of categories, each with its
+    sub-categories, matched by title or path. A sub-category is asked for with its parent in
+    front: alone, nemlig answers 500 (live, 2026-11-28). An unknown one answers with the list."""
+    wanted = "/".join(_key(part) for part in category.split("/") if part.strip())
+    known: dict[str, list[str]] = {}
+    tops: dict[str, list[str]] = {}
+    for top in tree or []:
+        path, subs = top.get("categoryPath"), top.get("subCategories") or []
+        if not path:
+            continue
+        names = {_key(top.get("title")), path}
+        tops[path] = [f"{path}/{s['categoryPath']}" for s in subs if s.get("categoryPath")]
+        for name in names:
+            known.setdefault(name, []).append(path)
+        for sub in subs:
+            if not sub.get("categoryPath"):
+                continue
+            full = f"{path}/{sub['categoryPath']}"
+            for own in {_key(sub.get("title")), sub["categoryPath"]}:
+                for key in (own, *(f"{name}/{own}" for name in names)):
+                    if full not in known.setdefault(key, []):
+                        known[key].append(full)
+    if not tops:  # nemlig sent no list: send the words as a path, as before
+        if not SLUG.match(wanted):
+            raise StoreError(f"Kender ikke kategorien {category!r}. Brug fx aftensmad.")
+        return wanted
+    found = known.get(wanted) or []
+    if len(found) == 1:
+        return found[0]
+    if found:
+        raise StoreError(f"nemlig har {category!r} flere steder. Brug en af: {', '.join(found)}.")
+    top = next((t for t in known.get(wanted.split("/")[0]) or [] if t in tops), None)
+    names = ", ".join(tops[top] if top and tops[top] else [*tops, PLAN])
+    raise StoreError(f"nemlig kender ikke kategorien {category!r}. Brug en af: {names}.")
+
+
+def _row(store: str, row: dict, group: str | None) -> Recipe:
+    """One recipe in a list. nemlig's lists have no time and no persons: its tags on the
+    recipe ("Under 30 min", "Familievenlig") are what it says there."""
+    marks = [*(row.get("highlightedFilters") or []), *(row.get("generalFilters") or [])]
+    tags = [t for f in marks if isinstance(f, dict) and (t := _text(f.get("title")))]
+    return Recipe(
+        store=store,
+        id=row["id"],
+        name=row.get("title", ""),
+        url=f"{SITE}/maaltider/opskrift/{row['id']}",
+        group=group,
+        tags=list(dict.fromkeys(tags)),
+    )
 
 
 def _product(item: dict) -> RecipeProduct:
@@ -108,6 +160,7 @@ class RecipesMixin:
     _timeslot_id: Any
     _tags: dict[str, str]
     _tag_names: list[str]
+    _categories: list[dict]
 
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
         """nemlig's recipe search, as on the website. The old search (searchgateway) also finds
@@ -180,29 +233,35 @@ class RecipesMixin:
 
     async def featured_recipes(self, limit: int = 20) -> list[Recipe]:
         """nemlig's "Ugens udvalgte" (/maaltider), grouped by theme."""
-        page = await self._api("GET", f"{BFF}/page", params={"path": "/maaltider"}) or {}
-        blocks = [b for b in page.get("pageContent") or [] if "recipes" in b]
+        return (await self._page_recipes("/maaltider", "Ugens udvalgte"))[:limit]
+
+    async def _page_recipes(self, path: str, title: str) -> list[Recipe]:
+        """Every recipe on one of nemlig's recipe pages, in page order. A block's heading
+        ("Mad i fad", "Madplanen fra uge 46") is the recipe's group."""
+        page = await self._api("GET", f"{BFF}/page", params={"path": path}) or {}
+        blocks = [b for b in page.get("pageContent") or [] if isinstance(b.get("recipes"), list)]
         if not blocks:
-            raise StoreError("Fandt ingen opskrifter i nemligs 'Ugens udvalgte'.")
+            raise StoreError(f"Fandt ingen opskrifter i nemligs '{title}'.")
         return [
-            Recipe(
-                store=self.name,
-                id=r["id"],
-                name=r.get("title", ""),
-                url=f"{SITE}/maaltider/opskrift/{r['id']}",
-                group=(b.get("header") or {}).get("title"),
-            )
+            _row(self.name, r, _text((b.get("header") or {}).get("title")))
             for b in blocks
-            for r in b["recipes"] or []
-            if r.get("id")
-        ][:limit]
+            for r in b["recipes"]
+            if isinstance(r, dict) and r.get("id")
+        ]
 
     async def recipes_by_tag(
-        self, tags: list[str], category: str | None = None, limit: int = 20
+        self, tags: list[str], category: str | None = None, limit: int = 20, offset: int = 0
     ) -> list[Recipe]:
-        """All of nemlig's recipes with every tag, e.g. ["Familievenlig", "Under 30 min"].
-        Tags are matched on nemlig's own list, by title or path. Category defaults to
-        nemlig's "aftensmad"."""
+        """All of nemlig's recipes with every tag, e.g. ["Familievenlig", "Under 30 min"],
+        `limit` of them after the first `offset`. Tags are matched on nemlig's own list, by
+        title or path. Category defaults to nemlig's "aftensmad"; "madplan" is nemlig's page
+        of week plans, which has no tags to ask by."""
+        if category and _key(category) == PLAN:
+            if tags:
+                raise StoreError("nemligs madplan kan ikke filtreres på tags. Udelad tags.")
+            return (await self._page_recipes(f"/maaltider/{PLAN}", "Madplan"))[
+                offset : offset + limit
+            ]
         known = await self._recipe_tags()
         paths = []
         for tag in tags:
@@ -211,27 +270,22 @@ class RecipesMixin:
                 names = ", ".join(self._tag_names)
                 raise StoreError(f"nemlig kender ikke tagget {tag!r}. Brug et af: {names}.")
             paths.append(path)
-        params: dict[str, Any] = {"skip": 0, "take": limit, "filters": paths}
+        params: dict[str, Any] = {"skip": offset, "take": limit, "filters": paths}
         if category:
-            params["categoryPath"] = category_path(category)
+            params["categoryPath"] = category_path(category, self._categories)
         data = await self._api("GET", f"{BFF}/meals/allRecipes", params=params) or {}
         found = data.get("requestedCategory") or {}
         if not isinstance(found.get("recipes"), list):
             raise StoreError("nemlig-opskrifter har ændret format.")
         return [
-            Recipe(
-                store=self.name,
-                id=r["id"],
-                name=r.get("title", ""),
-                url=f"{SITE}/maaltider/opskrift/{r['id']}",
-                group=found.get("title"),
-            )
+            _row(self.name, r, found.get("title"))
             for r in found["recipes"]
-            if r.get("id")
+            if isinstance(r, dict) and r.get("id")
         ][:limit]
 
     async def _recipe_tags(self) -> dict[str, str]:
-        """nemlig's tags, by lower-case title and by path → path. Cached: they rarely change."""
+        """nemlig's tags, by lower-case title and by path → path. The same answer has nemlig's
+        categories. Cached: they rarely change."""
         if not getattr(self, "_tags", None):
             data = await self._api("GET", f"{BFF}/meals/allRecipes", params={"skip": 0, "take": 1})
             found = [
@@ -242,6 +296,8 @@ class RecipesMixin:
             ]
             if not found:
                 raise StoreError("nemlig-opskrifter har ændret format: ingen tags.")
+            categories = (data or {}).get("categories")
+            self._categories = categories if isinstance(categories, list) else []
             self._tag_names = [str(f.get("title") or f["path"]).strip() for f in found]
             self._tags = {
                 key.strip().lower(): f["path"]

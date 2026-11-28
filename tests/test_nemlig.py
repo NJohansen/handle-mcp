@@ -88,6 +88,7 @@ class FakeNemlig:
         if path == "/productbff/api/web/page":
             page = {
                 "/maaltider": "meals_page",
+                "/maaltider/madplan": "meals_page",  # no capture yet: the same call and shape
                 "/tilbud": "offers_page",
                 "/tilbud/frugt-og-groent": "offers_page_frugt-og-groent",
                 "/tilbud/mejeri-og-aeg": "offers_page_mejeri-og-aeg",

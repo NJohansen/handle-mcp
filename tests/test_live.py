@@ -190,6 +190,38 @@ async def test_nemlig_recipes_by_tag():
     assert recipes and all(r.url.startswith("https://www.nemlig.com/maaltider/") for r in recipes)
 
 
+async def test_nemlig_recipes_in_a_sub_category_and_the_next_page():
+    nemlig = STORES["nemlig"]()
+    lunch = await nemlig.recipes_by_tag([], "julefrokost", limit=5)  # juleopskrifter/julefrokost
+    first = await nemlig.recipes_by_tag([], "aftensmad", limit=10)
+    second = await nemlig.recipes_by_tag([], "aftensmad", limit=10, offset=10)
+    print(f"\n[nemlig] {lunch[0].group}: {[r.name for r in lunch]}")
+    print(f"[nemlig] side 2: {[r.name for r in second]} | tags: {first[0].tags}")
+    assert lunch and len(first) == len(second) == 10
+    assert not {r.id for r in first} & {r.id for r in second}
+
+
+async def test_week_plans_in_every_store():
+    """`madplan`: nemlig's page of week plans, BilkaToGo's weeks, REMA's leaflet recipes."""
+    for name in ("nemlig", "bilkatogo", "rema1000"):
+        plans = await STORES[name]().recipes_by_tag([], "madplan", limit=100)
+        groups = list(dict.fromkeys(r.group for r in plans))
+        print(f"\n[{name}] {len(plans)} opskrifter: {groups}")
+        assert plans and all(r.id and r.name and r.group for r in plans)
+        assert name == "rema1000" or len(groups) > 1  # this week and earlier weeks
+
+
+async def test_rema1000_two_tags_and_the_next_page():
+    rema = STORES["rema1000"]()
+    both = await rema.recipes_by_tag(["Aftensmad", "Mad for børn"], limit=100)
+    first = await rema.recipes_by_tag(["Kødfri"], limit=20)
+    second = await rema.recipes_by_tag(["Kødfri"], limit=20, offset=20)
+    print(f"\n[rema1000] Aftensmad + Mad for børn: {len(both)} opskrifter")
+    assert len(both) > 50 and all({"Aftensmad", "Mad for børn"} <= set(r.tags) for r in both)
+    assert len(first) == len(second) == 20
+    assert not {r.id for r in first} & {r.id for r in second}
+
+
 @not_yet_skips
 async def test_orders(store):
     orders = await store.orders(limit=2)

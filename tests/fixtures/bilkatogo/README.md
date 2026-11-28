@@ -58,6 +58,9 @@ for `""` (opskrifter), `madplaner` (week 46), `aftensmad`, `aftensmad/danske-ret
 `aftensmad/danske-retter/karbonader` and `aftensmad/pastaretter/carbonara`, saved as they came.
 `unknown-page.html` is what the site answers for a page it does not know
 (`/inspiration/opskrifter/nope/`): HTTP 200, the website's HTML with the build id.
+`tidligere-madplaner.payload.js` is `madplaner/tidligere-madplaner` from 2026-11-28 (build
+1795759630), cut to its first three weeks (48, 47, 46) and written back as JSON: the page has
+14 weeks and is 1 MB.
 No personal data: the pages are public. The only name is the recipes' author.
 In `test_bilkatogo_recipes.py` the Algolia hits for the recipe's products are
 `algolia_products.json` hits with `objectID` changed by hand to karbonader's item numbers.

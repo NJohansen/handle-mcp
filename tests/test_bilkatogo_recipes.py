@@ -18,6 +18,7 @@ BUILD = "1793920097"
 PAGES = {  # payload path → fixture
     "": "opskrifter",
     "madplaner": "madplaner",
+    "madplaner/tidligere-madplaner": "tidligere-madplaner",
     "aftensmad": "aftensmad",
     "aftensmad/danske-retter": "danske-retter",
     "aftensmad/danske-retter/karbonader": "karbonader",
@@ -163,6 +164,26 @@ async def test_category_with_sub_categories_mixes_them(store, site):
     found = await store.recipes_by_tag([], None, limit=5)  # aftensmad: 15 sub-categories
     assert len(found) == 5 and found[0].url.startswith("https://www.bilkatogo.dk/inspiration/")
     assert any(p.endswith("/aftensmad/suppe/payload.js") for p in site.paths)  # the last one
+
+
+async def test_madplan_is_this_week_and_the_weeks_before_in_page_order(store):
+    plans = await store.recipes_by_tag([], "madplan", limit=100)
+    weeks = [r.group for r in plans]
+    # this week's page is from 2026-11-06 (week 46), the earlier weeks' from 2026-11-28
+    assert weeks[:7] == ["Madplan til uge 46"] * 7 and weeks[7:14] == ["Madplan til uge 48"] * 7
+    assert weeks[14:21] == ["Madplan til uge 47"] * 7 and len(plans) == 28  # 7 dinners each
+    assert plans[1].id == plans[22].id  # a dish in two plans is said in both
+    earlier = await store.recipes_by_tag([], "madplaner/tidligere-madplaner", limit=100)
+    assert len(earlier) == 21 and earlier[0].name == "Fyldte peberfrugter"
+    assert [r.name for r in earlier if "uge 47" in r.group][1] == "Karbonader med kartofler"
+
+
+async def test_the_next_page_of_a_category_reads_no_page_again(store, site):
+    first = await store.recipes_by_tag([], "aftensmad/danske-retter", limit=10)
+    read = len(site.paths)
+    rest = await store.recipes_by_tag([], "aftensmad/danske-retter", limit=10, offset=10)
+    assert len(first) == 10 and len(rest) == 5 and len(site.paths) == read
+    assert not {r.id for r in first} & {r.id for r in rest}
 
 
 async def test_unknown_category_lists_the_real_ones(store):
