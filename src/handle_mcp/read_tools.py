@@ -136,7 +136,8 @@ async def list_recipes(
     without it. Offer that to the human as "fits if we leave out ..."; after a yes,
     add_recipe_to_cart has `skip` and `swap`. `without` is a safety net for that: it removes
     nothing, and gives each recipe `hits`, its name and the lines that hold one of the words
-    (inside longer words too: "løg" also hits "hvidløg"). No store has such a filter itself.
+    (inside longer words too: "løg" also hits "hvidløg"); `hits` null = the lines were not
+    read, so nothing was checked. No store has such a filter itself.
     `category` "madplan" is the store's own week plans, the week in `group`: nemlig's "Ugens
     madplan", earlier weeks and "Mad til flere dage" (dinners and lunch boxes in one pack; no
     tags with it); BilkaToGo's plan for this week and the weeks before, 7 dinners each; REMA
