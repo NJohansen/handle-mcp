@@ -98,7 +98,13 @@ async def list_recipes(
             "(the store's week plans). Leave out for the default."
         ),
     ] = None,
-    limit: Annotated[int, Field(description=f"Recipes per store, 1-{MAX_RECIPES}.")] = 20,
+    limit: Annotated[
+        int,
+        Field(
+            description=f"Recipes per store, 1-{MAX_RECIPES}; with `ingredients` or `without` "
+            f"1-{MAX_RESULTS}, a higher one is cut to {MAX_RESULTS}."
+        ),
+    ] = 20,
     offset: Annotated[
         int | None,
         Field(description="Skip this many recipes per store, to read the next page (default 0)."),
