@@ -411,7 +411,7 @@
  },
  {
   "name": "list_recipes",
-  "description": "Browse the store's recipes, with link, when the human has no dish in mind (for a dish by\nname, use search_recipes). No tags or category: this week's featured\nrecipes (nemlig: \"Ugens udvalgte\"). With `tags`: recipes that have every tag, e.g.\n[\"Familievenlig\", \"Budgetvenlig\"] or [\"Under 30 min\", \"Kylling\"]. nemlig's tags include\nUnder 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,\nKylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.\n`category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...; a\nsub-category by name or with its parent, e.g. \"julefrokost\" or\n\"juleopskrifter/julefrokost\"; an unknown one answers with nemlig's list).\nTo read every recipe in a tag or category: ask again with `offset` raised by `limit`, the\nsame `limit` each time, until a store gives fewer than `limit`.\n`category` \"madplan\" is the store's own week plans, the week in `group`: nemlig's \"Ugens\nmadplan\", earlier weeks and \"Mad til flere dage\" (dinners and lunch boxes in one pack; no\ntags with it); BilkaToGo's plan for this week and the weeks before, 7 dinners each; REMA\n1000 has no week plan and answers with its \"Avisopskrifter\".\nBilkaToGo: no tags; no category is this week's \"Madplan\" (7 dinners); `category` is a path\nlike aftensmad or aftensmad/pastaretter, an unknown one answers with the list.\nREMA 1000: no tags or category is \"Avisopskrifter\" (dinners from this week's leaflet);\ntags are REMA's own, e.g. Aftensmad, Mad for børn, Nem hverdagsmad, Kødfri, Fisk & skaldyr,\nand `category` is one more tag; an unknown tag answers with the list.\nEach recipe has the store's own `tags` (BilkaToGo has none), and `time` and `persons` when\nthe store's list says them (REMA 1000; else null: get_recipe has them).\nUse get_recipe.",
+  "description": "Browse the store's recipes, with link, when the human has no dish in mind (for a dish by\nname, use search_recipes). No tags or category: this week's featured\nrecipes (nemlig: \"Ugens udvalgte\"). With `tags`: recipes that have every tag, e.g.\n[\"Familievenlig\", \"Budgetvenlig\"] or [\"Under 30 min\", \"Kylling\"]. nemlig's tags include\nUnder 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,\nKylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.\n`category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...; a\nsub-category by name or with its parent, e.g. \"julefrokost\" or\n\"juleopskrifter/julefrokost\"; an unknown one answers with nemlig's list).\nTo read every recipe in a tag or category: ask again with `offset` raised by `limit`, the\nsame `limit` each time, until a store gives fewer than `limit`.\nTo pick by what is in the dish (what the household does not eat, what is in the fridge, few\ningredients): `ingredients` true gives each recipe its ingredient lines, as the store\nwrote them (null with `ingredients_reason` when the store did not give them). You judge:\nsalmon is fish; a dish with one unwanted line (\"1 tsk oregano\") can often be cooked\nwithout it. Offer that to the human as \"fits if we leave out ...\"; after a yes,\nadd_recipe_to_cart has `skip` and `swap`. `without` is a safety net for that: it removes\nnothing, and gives each recipe `hits`, its name and the lines that hold one of the words\n(inside longer words too: \"løg\" also hits \"hvidløg\"); `hits` null = the lines were not\nread, so nothing was checked. No store has such a filter itself.\n`category` \"madplan\" is the store's own week plans, the week in `group`: nemlig's \"Ugens\nmadplan\", earlier weeks and \"Mad til flere dage\" (dinners and lunch boxes in one pack; no\ntags with it); BilkaToGo's plan for this week and the weeks before, 7 dinners each; REMA\n1000 has no week plan and answers with its \"Avisopskrifter\".\nBilkaToGo: no tags; no category is this week's \"Madplan\" (7 dinners); `category` is a path\nlike aftensmad or aftensmad/pastaretter, an unknown one answers with the list.\nREMA 1000: no tags or category is \"Avisopskrifter\" (dinners from this week's leaflet);\ntags are REMA's own, e.g. Aftensmad, Mad for børn, Nem hverdagsmad, Kødfri, Fisk & skaldyr,\nand `category` is one more tag; an unknown tag answers with the list.\nEach recipe has the store's own `tags` (BilkaToGo has none), and `time` and `persons` when\nthe store's list says them (REMA 1000; else null: get_recipe has them).\nUse get_recipe.",
   "inputSchema": {
    "properties": {
     "stores": {
@@ -461,7 +461,7 @@
     },
     "limit": {
      "default": 20,
-     "description": "Recipes per store, 1-100.",
+     "description": "Recipes per store, 1-100; with `ingredients` or `without` 1-25, a higher one is cut to 25.",
      "title": "Limit",
      "type": "integer"
     },
@@ -477,6 +477,28 @@
      "default": null,
      "description": "Skip this many recipes per store, to read the next page (default 0).",
      "title": "Offset"
+    },
+    "ingredients": {
+     "default": false,
+     "description": "true: each recipe comes with its ingredient lines. With it, at most 25 recipes per call.",
+     "title": "Ingredients",
+     "type": "boolean"
+    },
+    "without": {
+     "anyOf": [
+      {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Words the household does not eat, e.g. [\"oregano\", \"fisk\"]: each recipe gets `hits`, its name and ingredient lines that hold one. Removes nothing.",
+     "title": "Without"
     }
    },
    "type": "object",

@@ -130,6 +130,16 @@ def _int(value: Any) -> int | None:
         return None
 
 
+def _lines(details: dict) -> list[str]:
+    """recipeDetails `ingredients`: the recipe's own text, e.g. "2 stk. rødløg"."""
+    return [
+        i["text"]
+        for group in details.get("ingredients") or []
+        for i in group.get("ingredients") or []
+        if i.get("text")
+    ]
+
+
 def _method(details: dict) -> list[RecipeSection]:
     """recipeDetails `instructions`: sections ("Kebabfad", "Salat") with steps in order."""
     sections = []
@@ -161,6 +171,7 @@ class RecipesMixin:
     _tags: dict[str, str]
     _tag_names: list[str]
     _categories: list[dict]
+    _ingredients: dict[str, list[str]]
 
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
         """nemlig's recipe search, as on the website. The old search (searchgateway) also finds
@@ -213,12 +224,7 @@ class RecipesMixin:
             time=f"{minutes} min" if minutes else None,
             description=_text(details.get("description")),
             image=_image(details),
-            ingredients=[
-                i["text"]
-                for group in details.get("ingredients") or []
-                for i in group.get("ingredients") or []
-                if i.get("text")
-            ],
+            ingredients=_lines(details),
             # recipeDetails has no servings parameter: its text is always for the recipe's own
             # servings, while the products follow `persons` (live, 2026-11-05).
             ingredients_persons=_int(details.get("servings")),
@@ -230,6 +236,18 @@ class RecipesMixin:
                 Decimal(0),
             ),
         )
+
+    async def recipe_ingredients(self, recipe_id: str) -> list[str]:
+        """The recipe's ingredient text only: one call, no products. Kept: it rarely changes."""
+        slug = recipe_slug(recipe_id)
+        if not hasattr(self, "_ingredients"):
+            self._ingredients = {}
+        if slug not in self._ingredients:
+            details = await self._api("GET", f"{BFF}/meals/recipeDetails/{slug}") or {}
+            if not isinstance(details.get("ingredients"), list):
+                raise StoreError("nemlig-opskriften har ændret format.")
+            self._ingredients[slug] = _lines(details)
+        return self._ingredients[slug]
 
     async def featured_recipes(self, limit: int = 20) -> list[Recipe]:
         """nemlig's "Ugens udvalgte" (/maaltider), grouped by theme."""

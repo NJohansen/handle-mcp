@@ -259,7 +259,42 @@ async def test_an_unknown_tag_answers_with_remas_list(store):
         await store.recipes_by_tag(["Mexicansk"])
 
 
+async def test_a_tag_page_without_its_list_is_a_clear_error(store, fake):
+    fake.listing = {"meta": {}}
+    with pytest.raises(StoreError, match="har ændret sit svar"):
+        await store.recipes_by_tag(["Avisopskrifter"])
+
+
+async def test_one_recipe_without_its_list_is_a_clear_error(store, fake):
+    fake.recipe = {"meta": {}}  # `_get` checks `data` for every call: no KeyError further in
+    with pytest.raises(StoreError, match="har ændret sit svar"):
+        await store.recipe_ingredients("lasagne")
+
+
 async def test_a_queue_page_is_a_clear_error(store, fake):
     fake.status = 503
     with pytest.raises(StoreError, match="REMA 1000 svarer 503"):
         await store.recipes("lasagne")
+
+
+async def test_the_ingredient_text_comes_with_remas_list(store, fake):
+    whole = copy.deepcopy(fake.listing)  # the real list has each recipe whole
+    whole["data"][0]["fields"]["customForm"]["ingredientGroups"] = fake.recipe["data"][0]["fields"][
+        "customForm"
+    ]["ingredientGroups"]
+    fake.listing = whole
+    (first, *_) = await store.recipes_by_tag(["Avisopskrifter"], limit=3)
+    asked = len(fake.requests)
+    lines = await store.recipe_ingredients(first.id)
+    assert lines == (await store.recipe("lasagne")).ingredients
+    assert len(fake.requests) == asked + 1  # only the lasagne call just above
+
+
+async def test_the_ingredient_text_of_one_recipe_is_one_call(store, fake):
+    lines = await store.recipe_ingredients("https://shop.rema1000.dk/opskrifter/lasagne")
+    assert "400 g hakket oksekød" in lines or any("oksekød" in ln for ln in lines)
+    asked = len(fake.requests)
+    await store.recipe_ingredients("lasagne")
+    assert len(fake.requests) == asked
+    with pytest.raises(StoreError, match="ingen opskrift 'findes-ikke'"):
+        await store.recipe_ingredients("findes-ikke")

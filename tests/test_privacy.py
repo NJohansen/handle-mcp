@@ -17,6 +17,7 @@ CALLS = [
     ("get_recipe", {"store": "fake", "recipe": "r1", "persons": 6}),
     ("list_recipes", {"stores": ["fake"]}),
     ("list_recipes", {"stores": ["fake"], "tags": ["Familievenlig"]}),
+    ("list_recipes", {"stores": ["fake"], "ingredients": True, "without": ["oregano"]}),
     ("get_nutrition", {"store": "fake", "product_ids": ["1"]}),
     ("compare_basket", {"items": ["mælk 1 l", "2 x rugbrød"], "stores": ["fake"]}),
     ("get_cart", {"store": "fake"}),

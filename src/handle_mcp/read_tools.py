@@ -9,7 +9,7 @@ from typing import Annotated, Any, Literal
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import Field
 
-from handle_mcp import compare
+from handle_mcp import compare, recipe_lines
 from handle_mcp.app import (
     CATEGORY_RESULTS,
     MAX_CATEGORY_RESULTS,
@@ -98,10 +98,30 @@ async def list_recipes(
             "(the store's week plans). Leave out for the default."
         ),
     ] = None,
-    limit: Annotated[int, Field(description=f"Recipes per store, 1-{MAX_RECIPES}.")] = 20,
+    limit: Annotated[
+        int,
+        Field(
+            description=f"Recipes per store, 1-{MAX_RECIPES}; with `ingredients` or `without` "
+            f"1-{MAX_RESULTS}, a higher one is cut to {MAX_RESULTS}."
+        ),
+    ] = 20,
     offset: Annotated[
         int | None,
         Field(description="Skip this many recipes per store, to read the next page (default 0)."),
+    ] = None,
+    ingredients: Annotated[
+        bool,
+        Field(
+            description="true: each recipe comes with its ingredient lines. With it, at most "
+            f"{MAX_RESULTS} recipes per call."
+        ),
+    ] = False,
+    without: Annotated[
+        list[str] | None,
+        Field(
+            description='Words the household does not eat, e.g. ["oregano", "fisk"]: each '
+            "recipe gets `hits`, its name and ingredient lines that hold one. Removes nothing."
+        ),
     ] = None,
 ) -> dict:
     """Browse the store's recipes, with link, when the human has no dish in mind (for a dish by
@@ -115,6 +135,15 @@ async def list_recipes(
     "juleopskrifter/julefrokost"; an unknown one answers with nemlig's list).
     To read every recipe in a tag or category: ask again with `offset` raised by `limit`, the
     same `limit` each time, until a store gives fewer than `limit`.
+    To pick by what is in the dish (what the household does not eat, what is in the fridge, few
+    ingredients): `ingredients` true gives each recipe its ingredient lines, as the store
+    wrote them (null with `ingredients_reason` when the store did not give them). You judge:
+    salmon is fish; a dish with one unwanted line ("1 tsk oregano") can often be cooked
+    without it. Offer that to the human as "fits if we leave out ..."; after a yes,
+    add_recipe_to_cart has `skip` and `swap`. `without` is a safety net for that: it removes
+    nothing, and gives each recipe `hits`, its name and the lines that hold one of the words
+    (inside longer words too: "løg" also hits "hvidløg"); `hits` null = the lines were not
+    read, so nothing was checked. No store has such a filter itself.
     `category` "madplan" is the store's own week plans, the week in `group`: nemlig's "Ugens
     madplan", earlier weeks and "Mad til flere dage" (dinners and lunch boxes in one pack; no
     tags with it); BilkaToGo's plan for this week and the weeks before, 7 dinners each; REMA
@@ -127,16 +156,19 @@ async def list_recipes(
     Each recipe has the store's own `tags` (BilkaToGo has none), and `time` and `persons` when
     the store's list says them (REMA 1000; else null: get_recipe has them).
     Use get_recipe."""
-    limit, offset = max(1, min(limit, MAX_RECIPES)), max(0, offset or 0)
-    if not tags and not category:
+    words = [w for w in without or [] if w.strip()]
+    lines = ingredients or bool(words)
+    limit = max(1, min(limit, MAX_RESULTS if lines else MAX_RECIPES))
+    offset = max(0, offset or 0)
 
-        async def featured(store: Any) -> list:
-            return (await store.featured_recipes(offset + limit))[offset:]
+    async def page(store: Any) -> Any:
+        if not tags and not category:
+            found = (await store.featured_recipes(offset + limit))[offset:]
+        else:
+            found = await store.recipes_by_tag(tags or [], category, limit, offset)
+        return await recipe_lines.with_ingredients(store, found, words) if lines else found
 
-        return _out(await _each(_names(stores), featured))
-    return _out(
-        await _each(_names(stores), lambda s: s.recipes_by_tag(tags or [], category, limit, offset))
-    )
+    return _out(await _each(_names(stores), page))
 
 
 @_tool(READ)

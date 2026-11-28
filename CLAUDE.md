@@ -26,6 +26,7 @@ src/handle_mcp/
   pricing.py       kroner: packs for the amount, offers, delivery day
   nutrition.py     get_nutrition: read a Danish nutrition label ("0,13 g", "329 kJ / 78 Kcal")
   recipe_cart.py   add_recipe_to_cart: a recipe's products as absolute cart counts
+  recipe_lines.py  list_recipes `ingredients` and `without`: each recipe in a list with its ingredient lines
   links.py         with_utm(): UTM tags on every cart link the human clicks
   telemetry.py     anonymous counts (server_started, first_tool_call, login_ok, cart_filled, list_filled); off until a yes (`handle-mcp telemetry on`, ADR 0014)
   question.py      the Danish question before any count: who, why, what, where, how to say no

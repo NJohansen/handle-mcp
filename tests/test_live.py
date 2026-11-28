@@ -10,7 +10,7 @@ import os
 
 import pytest
 
-from handle_mcp import app, compare, recipe_cart
+from handle_mcp import app, compare, recipe_cart, recipe_lines
 from handle_mcp.stores import OFFER_CATEGORIES, STORES
 from handle_mcp.stores.rema1000.pickup import GateClosed
 
@@ -221,6 +221,19 @@ async def test_rema1000_two_tags_and_the_next_page():
     assert len(both) > 50 and all({"Aftensmad", "Mad for børn"} <= set(r.tags) for r in both)
     assert len(first) == len(second) == 20
     assert not {r.id for r in first} & {r.id for r in second}
+
+
+async def test_recipes_with_ingredients_in_every_store():
+    """`ingredients` and `without`: the ingredient text of each recipe on one small page."""
+    for name in ("nemlig", "bilkatogo", "rema1000"):
+        store = STORES[name]()
+        page = await store.recipes_by_tag([], "aftensmad", limit=10)
+        rows = await recipe_lines.with_ingredients(store, page, ["løg"])
+        marked = [r for r in rows if r["hits"]]
+        print(f"\n[{name}] {len(marked)} af {len(rows)} har løg: {[r['hits'] for r in marked]}")
+        assert [r["id"] for r in rows] == [r.id for r in page]  # nothing is removed
+        assert all(r["ingredients"] for r in rows)
+        assert marked and all("løg" in h.lower() for r in marked for h in r["hits"])
 
 
 @not_yet_skips

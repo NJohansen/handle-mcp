@@ -236,3 +236,40 @@ async def test_store_error_in_a_many_store_answer_is_scrubbed(monkeypatch):
     monkeypatch.setattr(BrokenStore, "search", refuse)
     result = await server.search_products("mælk", stores=["broken"])
     assert "98765432" not in json.dumps(result)
+
+
+async def test_recipes_come_with_their_ingredient_lines_when_asked():
+    plain = await server.list_recipes(["fake"])
+    assert [r["id"] for r in plain["fake"]] == ["r1", "r2", "r3"]
+    assert "ingredients" not in plain["fake"][0]
+    answer = await server.list_recipes(["fake"], ingredients=True)
+    first, _, third = answer["fake"]  # the same recipes, in the same order: nothing is removed
+    assert first["ingredients"] == ["2 dl havregryn", "1 tsk. Oregano"]
+    assert (first["id"], first["group"], "hits" in first) == ("r1", "Morgen", False)
+    # r3's ingredients could not be read: null with the reason, not a guess
+    assert third["ingredients"] is None and "kø" in third["ingredients_reason"]
+
+
+async def test_without_marks_the_name_and_the_lines_and_removes_nothing():
+    answer = await server.list_recipes(["fake"], without=["oregano", " "])
+    assert [r["id"] for r in answer["fake"]] == ["r1", "r2", "r3"]
+    assert [r["hits"] for r in answer["fake"]] == [["1 tsk. Oregano"], [], None]
+    assert answer["fake"][0]["ingredients"]  # `without` brings the lines too
+    tagged = await server.list_recipes(["fake"], tags=["x"], without=["PASTA"])
+    assert tagged["fake"][0]["hits"] == ["Pasta", "400 g pasta"]  # the name first
+
+
+async def test_recipes_with_ingredients_are_read_a_small_page_at_a_time():
+    await server.list_recipes(["fake"], tags=["x"], limit=100, without=["fisk"])
+    await server.list_recipes(["fake"], tags=["x"], limit=100, ingredients=True)
+    await server.list_recipes(["fake"], tags=["x"], limit=100)
+    assert [c[2] for c in app._store("fake").recipe_calls[-3:]] == [25, 25, 100]
+
+
+async def test_every_recipe_failing_is_the_stores_error(monkeypatch):
+    async def queue(_recipe_id):
+        raise registry.StoreError("fake har kø lige nu.")
+
+    monkeypatch.setattr(app._store("fake"), "recipe_ingredients", queue)
+    answer = await server.list_recipes(["fake"], ingredients=True)
+    assert answer == {"fake": {"error": "fake: fake har kø lige nu."}}
