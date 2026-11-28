@@ -32,8 +32,8 @@ def hits(words: list[str], name: str, lines: list[str]) -> list[str]:
 
 async def with_ingredients(store: Any, recipes: list[Recipe], words: list[str]) -> list[dict]:
     """Each recipe as in the list, plus `ingredients` (null with `ingredients_reason` when the
-    store did not give them) and, with `words`, `hits` (null when the lines are missing). Every recipe failing (a queue, a format
-    change) raises the first error."""
+    store did not give them) and, with `words`, `hits` (null when the lines are missing).
+    Every recipe failing (a queue, a format change) raises the first error."""
     gate = asyncio.Semaphore(AT_ONCE)
 
     async def lines(recipe: Recipe) -> list[str]:
