@@ -96,6 +96,7 @@ token as `/webapi/` (`GET /webapi/Token`). `tracking` and `dataLayerTracking` re
 | `recipes_by_tag.json` | `GET .../meals/allRecipes?skip=0&take=8&categoryPath=aftensmad&filters=familievenlig&filters=budgetvenlig`: `filters[]` is nemlig's tag list (groups of `{path, title}`), `requestedCategory.recipes[]` the hits (tags combine with AND; no `categoryPath` = aftensmad) |
 | `recipe_search.json` | `GET .../search/recipes?query=kylling karry&take=5&skip=0`: `searchResult.items[]` with `id` (the slug), `title`, no time or persons. The old searchgateway `Recipes` also has recipes the new API answers 500 for |
 | `meals_page.json` | `GET .../page?path=/maaltider`: "Ugens udvalgte", `pageContent[].recipes[]` |
+| `madplan_page.json` | `GET .../page?path=/maaltider/madplan` (2026-11-28): the blocks' `contentType`, `header` and order as they came. "Ugens madplan" is a `FeatureGrid`: 2 of its 7 `items` (title "Mandag: ...", `url` to the recipe, `description`), as they came. The `FeatureSplit` as it came. The `RecipeList` blocks have 2 recipes each, taken from `meals_page.json`: the same row shape |
 
 Also seen in the website's code, not used: `meals/filters/{path}` (one tag, all categories),
 `meals/purchased` ("Mine opskrifter", 401 without login) and

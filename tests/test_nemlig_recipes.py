@@ -313,9 +313,22 @@ async def test_madplan_is_nemligs_page_of_week_plans(store, fake):
     plans = await store.recipes_by_tag([], category="Madplan", limit=5, offset=2)
     page = [r for r in fake.requests if r.url.path.endswith("/page")][-1]
     assert page.url.params["path"] == "/maaltider/madplan"
-    assert len(plans) == 5 and plans[0].group and plans[0].id
+    assert len(plans) == 5 and plans[0].group == "Ugens madplan"
     everything = await store.recipes_by_tag([], category="madplan", limit=100)
     assert [r.id for r in plans] == [r.id for r in everything[2:7]]
+    assert list(dict.fromkeys(r.group for r in everything)) == [
+        "Mad til flere dage",
+        "Ugens madplan",  # a grid of cards, not a list of recipes
+        "Madplanen fra uge 46",
+        "Madplanen fra uge 47",
+        "Madplanen fra uge 48",
+        "Vores mest populære opskrifter",
+    ]
+    monday = plans[0]
+    assert (monday.id, monday.name) == ("marry-me-i-fad-98004470", "Mandag: Marry me chicken")
+    assert monday.url == "https://www.nemlig.com/maaltider/opskrift/marry-me-i-fad-98004470"
+    assert monday.tags == ["⚡ Klar på 30 min"]
+    assert "Byg din egen madplan" not in [r.name for r in everything]  # a banner, no recipe
     with pytest.raises(StoreError, match="kan ikke filtreres på tags"):
         await store.recipes_by_tag(["Familievenlig"], category="madplan")
 

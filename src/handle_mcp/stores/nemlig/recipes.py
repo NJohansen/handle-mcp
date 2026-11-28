@@ -237,17 +237,35 @@ class RecipesMixin:
 
     async def _page_recipes(self, path: str, title: str) -> list[Recipe]:
         """Every recipe on one of nemlig's recipe pages, in page order. A block's heading
-        ("Mad i fad", "Madplanen fra uge 46") is the recipe's group."""
+        ("Mad i fad", "Madplanen fra uge 46") is the recipe's group. Two kinds of block: a
+        list of recipes, and a grid of cards that link to one ("Ugens madplan": "Mandag:
+        Marry me chicken", with nemlig's line under it, "⚡ Klar på 30 min", as its tag)."""
         page = await self._api("GET", f"{BFF}/page", params={"path": path}) or {}
-        blocks = [b for b in page.get("pageContent") or [] if isinstance(b.get("recipes"), list)]
-        if not blocks:
+        found: list[Recipe] = []
+        for block in page.get("pageContent") or []:
+            group = _text((block.get("header") or {}).get("title"))
+            for row in block.get("recipes") or []:
+                if isinstance(row, dict) and row.get("id"):
+                    found.append(_row(self.name, row, group))
+            for card in block.get("items") or []:
+                link = _text(card.get("url")) if isinstance(card, dict) else None
+                slug = (link or "").rsplit("/", 1)[-1]
+                if not link or "/maaltider/opskrift/" not in link or not SLUG.match(slug):
+                    continue
+                mark = _text(card.get("description"))
+                found.append(
+                    Recipe(
+                        store=self.name,
+                        id=slug,
+                        name=_text(card.get("title")) or "",
+                        url=f"{SITE}/maaltider/opskrift/{slug}",
+                        group=group,
+                        tags=[mark] if mark else [],
+                    )
+                )
+        if not found:
             raise StoreError(f"Fandt ingen opskrifter i nemligs '{title}'.")
-        return [
-            _row(self.name, r, _text((b.get("header") or {}).get("title")))
-            for b in blocks
-            for r in b["recipes"]
-            if isinstance(r, dict) and r.get("id")
-        ]
+        return found
 
     async def recipes_by_tag(
         self, tags: list[str], category: str | None = None, limit: int = 20, offset: int = 0

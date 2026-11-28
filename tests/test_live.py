@@ -209,6 +209,7 @@ async def test_week_plans_in_every_store():
         print(f"\n[{name}] {len(plans)} opskrifter: {groups}")
         assert plans and all(r.id and r.name and r.group for r in plans)
         assert name == "rema1000" or len(groups) > 1  # this week and earlier weeks
+        assert name != "nemlig" or "Ugens madplan" in groups  # a grid of cards on the page
 
 
 async def test_rema1000_two_tags_and_the_next_page():
