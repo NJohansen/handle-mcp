@@ -238,40 +238,32 @@ async def test_store_error_in_a_many_store_answer_is_scrubbed(monkeypatch):
     assert "98765432" not in json.dumps(result)
 
 
-async def test_recipes_without_a_word_are_dropped_and_the_answer_says_why():
+async def test_recipes_come_with_their_ingredient_lines_when_asked():
     plain = await server.list_recipes(["fake"])
-    assert [r["id"] for r in plain["fake"]] == ["r1", "r2", "r3"] and "dropped" not in plain
+    assert [r["id"] for r in plain["fake"]] == ["r1", "r2", "r3"]
+    assert "ingredients" not in plain["fake"][0]
+    answer = await server.list_recipes(["fake"], ingredients=True)
+    first, _, third = answer["fake"]  # the same recipes, in the same order: nothing is removed
+    assert first["ingredients"] == ["2 dl havregryn", "1 tsk. Oregano"]
+    assert (first["id"], first["group"], "hits" in first) == ("r1", "Morgen", False)
+    # r3's ingredients could not be read: null with the reason, not a guess
+    assert third["ingredients"] is None and "kø" in third["ingredients_reason"]
+
+
+async def test_without_marks_the_name_and_the_lines_and_removes_nothing():
     answer = await server.list_recipes(["fake"], without=["oregano", " "])
-    assert [r["id"] for r in answer["fake"]] == ["r2", "r3"]
-    assert answer["dropped"] == {
-        "fake": [
-            {
-                "id": "r1",
-                "name": "Grød",
-                "url": "https://example.com/r1",
-                "in_name": False,  # one line away from fitting: the human decides
-                "because": ["1 tsk. Oregano"],
-            }
-        ]
-    }
-    # r3's ingredients could not be read: it is kept, and the answer says so
-    assert [u["url"] for u in answer["unchecked"]["fake"]] == ["https://example.com/r3"]
-    assert "kø" in answer["unchecked"]["fake"][0]["reason"]
+    assert [r["id"] for r in answer["fake"]] == ["r1", "r2", "r3"]
+    assert [r["hits"] for r in answer["fake"]] == [["1 tsk. Oregano"], [], []]
+    assert answer["fake"][0]["ingredients"]  # `without` brings the lines too
+    tagged = await server.list_recipes(["fake"], tags=["x"], without=["PASTA"])
+    assert tagged["fake"][0]["hits"] == ["Pasta", "400 g pasta"]  # the name first
 
 
-async def test_a_word_in_the_name_drops_the_recipe_and_nothing_dropped_is_an_empty_list():
-    answer = await server.list_recipes(["fake"], tags=["x"], without=["PASTA"])
-    assert answer["fake"] == [] and answer["dropped"]["fake"][0]["in_name"] is True
-    assert answer["dropped"]["fake"][0]["because"] == ["Pasta", "400 g pasta"]  # every hit
-    clean = await server.list_recipes(["fake"], tags=["x"], without=["rosiner"])
-    assert [r["id"] for r in clean["fake"]] == ["r2"]
-    assert clean["dropped"] == {"fake": []} and clean["unchecked"] == {"fake": []}
-
-
-async def test_recipes_without_a_word_are_checked_a_small_page_at_a_time():
+async def test_recipes_with_ingredients_are_read_a_small_page_at_a_time():
     await server.list_recipes(["fake"], tags=["x"], limit=100, without=["fisk"])
+    await server.list_recipes(["fake"], tags=["x"], limit=100, ingredients=True)
     await server.list_recipes(["fake"], tags=["x"], limit=100)
-    assert [c[2] for c in app._store("fake").recipe_calls[-2:]] == [25, 100]
+    assert [c[2] for c in app._store("fake").recipe_calls[-3:]] == [25, 25, 100]
 
 
 async def test_every_recipe_failing_is_the_stores_error(monkeypatch):
@@ -279,6 +271,5 @@ async def test_every_recipe_failing_is_the_stores_error(monkeypatch):
         raise registry.StoreError("fake har kø lige nu.")
 
     monkeypatch.setattr(app._store("fake"), "recipe_ingredients", queue)
-    answer = await server.list_recipes(["fake"], without=["fisk"])
-    assert answer["fake"] == {"error": "fake: fake har kø lige nu."}
-    assert answer["dropped"] == {} and answer["unchecked"] == {}
+    answer = await server.list_recipes(["fake"], ingredients=True)
+    assert answer == {"fake": {"error": "fake: fake har kø lige nu."}}

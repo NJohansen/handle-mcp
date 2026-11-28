@@ -9,7 +9,7 @@ from typing import Annotated, Any, Literal
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import Field
 
-from handle_mcp import compare, recipe_filter
+from handle_mcp import compare, recipe_lines
 from handle_mcp.app import (
     CATEGORY_RESULTS,
     MAX_CATEGORY_RESULTS,
@@ -103,11 +103,18 @@ async def list_recipes(
         int | None,
         Field(description="Skip this many recipes per store, to read the next page (default 0)."),
     ] = None,
+    ingredients: Annotated[
+        bool,
+        Field(
+            description="true: each recipe comes with its ingredient lines. With it, at most "
+            f"{MAX_RESULTS} recipes per call."
+        ),
+    ] = False,
     without: Annotated[
         list[str] | None,
         Field(
-            description="Drop recipes with any of these words in the name or in an ingredient, "
-            f'e.g. ["oregano", "fisk"]. With it, at most {MAX_RESULTS} recipes per call.'
+            description='Words the household does not eat, e.g. ["oregano", "fisk"]: each '
+            "recipe gets `hits`, its name and ingredient lines that hold one. Removes nothing."
         ),
     ] = None,
 ) -> dict:
@@ -122,16 +129,14 @@ async def list_recipes(
     "juleopskrifter/julefrokost"; an unknown one answers with nemlig's list).
     To read every recipe in a tag or category: ask again with `offset` raised by `limit`, the
     same `limit` each time, until a store gives fewer than `limit`.
-    `without`: what the household does not eat. Each recipe on the page is checked on its name
-    and its ingredient list, and one with any of the words is left out. The words match inside
-    longer words: "løg" also drops "hvidløg", so give the word you mean ("rødløg"). The answer
-    then also has `dropped` per store (id, name, link, `in_name` and `because`: every line that
-    hit) and `unchecked` (kept, but the store gave no ingredients). A dropped recipe is not
-    gone: with one or two lines in `because` and `in_name` false ("1 tsk oregano"), the dish
-    can often be cooked without them. Offer it to the human as "fits if we leave out ..."; after
-    a yes, add_recipe_to_cart has `skip` and `swap`. With `in_name` true, the dish is built on
-    the word. A store is read to its end when its recipes and its dropped ones together are
-    fewer than `limit`.
+    To pick by what is in the dish (what the household does not eat, what is in the fridge, few
+    ingredients): `ingredients` true gives each recipe its ingredient lines, as the store
+    wrote them (null with `ingredients_reason` when the store did not give them). You judge:
+    salmon is fish; a dish with one unwanted line ("1 tsk oregano") can often be cooked
+    without it. Offer that to the human as "fits if we leave out ..."; after a yes,
+    add_recipe_to_cart has `skip` and `swap`. `without` is a safety net for that: it removes
+    nothing, and gives each recipe `hits`, its name and the lines that hold one of the words
+    (inside longer words too: "løg" also hits "hvidløg"). No store has such a filter itself.
     `category` "madplan" is the store's own week plans, the week in `group`: nemlig's "Ugens
     madplan", earlier weeks and "Mad til flere dage" (dinners and lunch boxes in one pack; no
     tags with it); BilkaToGo's plan for this week and the weeks before, 7 dinners each; REMA
@@ -145,7 +150,8 @@ async def list_recipes(
     the store's list says them (REMA 1000; else null: get_recipe has them).
     Use get_recipe."""
     words = [w for w in without or [] if w.strip()]
-    limit = max(1, min(limit, MAX_RESULTS if words else MAX_RECIPES))
+    lines = ingredients or bool(words)
+    limit = max(1, min(limit, MAX_RESULTS if lines else MAX_RECIPES))
     offset = max(0, offset or 0)
 
     async def page(store: Any) -> Any:
@@ -153,16 +159,9 @@ async def list_recipes(
             found = (await store.featured_recipes(offset + limit))[offset:]
         else:
             found = await store.recipes_by_tag(tags or [], category, limit, offset)
-        return await recipe_filter.without(store, found, words) if words else found
+        return await recipe_lines.with_ingredients(store, found, words) if lines else found
 
-    answer = await _each(_names(stores), page)
-    if not words:
-        return _out(answer)
-    checked = {name: a for name, a in answer.items() if "recipes" in a}  # not the errors
-    return _out(
-        {name: a.get("recipes", a) for name, a in answer.items()}
-        | {part: {n: a[part] for n, a in checked.items()} for part in ("dropped", "unchecked")}
-    )
+    return _out(await _each(_names(stores), page))
 
 
 @_tool(READ)
