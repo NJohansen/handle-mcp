@@ -219,6 +219,7 @@ class BilkaRecipesMixin:
     _build: str | None = None
     _pages_at_once: asyncio.Semaphore | None = None
     _lists: dict[str, tuple[float, list[Recipe]]]
+    _ingredients: dict[str, list[str]]
 
     async def _page(self, path: str) -> dict:
         """The page's data. A stale build id answers with the website's HTML: read it again."""
@@ -326,6 +327,19 @@ class BilkaRecipesMixin:
             return list(groups.values())
         found = await asyncio.gather(*(self._collect(c[0], depth - 1, seen) for c in cards))
         return [group for groups in found for group in groups]
+
+    async def recipe_ingredients(self, recipe_id: str) -> list[str]:
+        """The recipe's ingredient text only: its page, no products. Kept: it rarely changes."""
+        path = recipe_path(recipe_id)
+        if not hasattr(self, "_ingredients"):
+            self._ingredients = {}
+        if path not in self._ingredients:
+            sections = _sections(await self._page(path))
+            lines = next((v for k, v in sections.items() if k.startswith("Ingrediens")), None)
+            if lines is None:
+                raise StoreError(f"{ROOT}{path}/ er ikke en opskrift hos BilkaToGo.")
+            self._ingredients[path] = lines
+        return self._ingredients[path]
 
     async def recipe(self, recipe_id: str, persons: int | None = None) -> RecipeDetails:
         """One recipe and its products, one pack each. `persons` is not used: BilkaToGo's

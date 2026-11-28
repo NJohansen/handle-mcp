@@ -11,6 +11,7 @@ other persons and no ingredient has alternatives. Read only.
 from __future__ import annotations
 
 import asyncio
+import logging
 import re
 import time
 from collections.abc import Callable
@@ -21,6 +22,7 @@ from handle_mcp.models import Recipe, RecipeDetails, RecipeItem, RecipeProduct, 
 from handle_mcp.stores import StoreError
 from handle_mcp.stores.rema1000.auth import SHOP
 
+log = logging.getLogger("handle_mcp")
 SLUG = re.compile(r"^[a-z0-9-]+$")
 FEATURED = "ugens-avisopskrifter"  # "Avisopskrifter": dinners made from this week's leaflet
 PAGE, MAX_PAGE = 20, 100  # recipes per page: as the website asks, and the most asked for
@@ -99,6 +101,22 @@ def _line(row: dict) -> str | None:
     return " ".join(p for p in parts if p) if parts[0] else name
 
 
+def _lines(entity: dict) -> list[str] | None:
+    """The recipe's ingredient text, each line once (salt and peber are in more parts of a
+    recipe). None when the answer has no ingredients (the search's short answer)."""
+    groups = _form(entity).get("ingredientGroups")
+    if not isinstance(groups, list):
+        return None
+    rows = [
+        r
+        for g in groups
+        if isinstance(g, dict)
+        for r in g.get("ingredients") or []
+        if isinstance(r, dict)
+    ]
+    return list(dict.fromkeys(line for r in rows if (line := _line(r))))
+
+
 def _last_page(data: dict) -> int:
     return ((data.get("meta") or {}).get("pagination") or {}).get("last_page") or 1
 
@@ -117,6 +135,7 @@ class RemaRecipesMixin:
     _recipe_tag_ids: dict[str, str]
     _recipe_tag_names: dict[str, str]
     _mixes: dict[tuple[str, ...], tuple[float, list[Recipe]]]
+    _ingredients: dict[str, list[str]]
 
     async def recipes(self, query: str, limit: int = 5) -> list[Recipe]:
         data = await self._get("search/recipes", {"query": query, "per_page": limit, "page": 1})
@@ -157,8 +176,7 @@ class RemaRecipesMixin:
             time=_time(form),
             description=_text(form.get("preparationTextBefore")),
             image=_text((fields.get("image") or {}).get("url")),
-            # salt and peber are in more parts of a recipe: the same line is said once
-            ingredients=list(dict.fromkeys(line for r in rows if (line := _line(r)))),
+            ingredients=_lines(entity) or [],
             ingredients_persons=own,
             method=[
                 RecipeSection(title=_text(g.get("name")), steps=steps)
@@ -245,8 +263,38 @@ class RemaRecipesMixin:
             page += 1
 
     async def _tag_page(self, tag_id: str, sort: str, size: int, page: int) -> dict:
+        """One page of a tag's recipes. REMA sends each recipe whole, so its ingredient text
+        is kept: `recipe_ingredients` then asks REMA nothing."""
         params = {"filter[type]": "recipe", "filter[tags.sys.id]": tag_id, "sort": sort}
-        return await self._get("rema1000dk/entities", params | {"per_page": size, "page": page})
+        data = await self._get("rema1000dk/entities", params | {"per_page": size, "page": page})
+        for entity in data["data"]:
+            self._keep_lines(entity)
+        return data
+
+    def _keep_lines(self, entity: Any) -> list[str] | None:
+        slug = (entity.get("fields") or {}).get("slug") if isinstance(entity, dict) else None
+        lines = _lines(entity) if isinstance(slug, str) else None
+        if lines is not None:
+            if not hasattr(self, "_ingredients"):
+                self._ingredients = {}
+            self._ingredients[slug] = lines
+        return lines
+
+    async def recipe_ingredients(self, recipe_id: str) -> list[str]:
+        """The recipe's ingredient text only. From the list it came in, else one call."""
+        slug = recipe_slug(recipe_id)
+        if slug in getattr(self, "_ingredients", {}):
+            return self._ingredients[slug]
+        data = await self._get(
+            "rema1000dk/entities", {"filter[type]": "recipe", "filter[slug]": slug}
+        )
+        entity = next((e for e in data["data"] if isinstance(e, dict)), None)
+        if entity is None:
+            raise StoreError(f"REMA 1000 har ingen opskrift {slug!r}. Brug linket fra søgningen.")
+        lines = self._keep_lines(entity)
+        if lines is None:
+            raise StoreError(CHANGED)
+        return lines
 
     async def _mix(self, ids: list[str], sort: str, group: str) -> list[Recipe]:
         """Every recipe that has all the tags. The call filters on one tag only, so the tag
@@ -272,6 +320,8 @@ class RemaRecipesMixin:
             ]
             if page >= _last_page(data) or not data["data"]:
                 break
+        else:  # REMA has grown past MAX_PAGES pages: the mix is short, say so in the log
+            log.warning("REMA 1000: mere end %d sider i et tag, resten er ikke læst", MAX_PAGES)
         self._mixes[(*ids, sort)] = (time.monotonic() + KEEP, found)
         return found
 

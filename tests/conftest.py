@@ -55,6 +55,14 @@ LeakySlot = make_dataclass(
 )
 
 
+# A recipe with LEAK as extra fields: list_recipes reads a recipe's id and name (`without`).
+LeakyRecipe = make_dataclass(
+    "LeakyRecipe",
+    [(k, object, field(default_factory=lambda v=v: v)) for k, v in LEAK.items()],
+    bases=(Recipe,),
+)
+
+
 class FakeStore:
     """A store that answers from memory. Smuggles LEAK into every answer."""
 
@@ -152,13 +160,18 @@ class FakeStore:
 
     async def recipes_by_tag(self, tags, category=None, limit=20, offset=0):
         self.recipe_calls = [*getattr(self, "recipe_calls", []), (tags, category, limit, offset)]
-        return [
-            self._leak(Recipe("fake", "r2", "Pasta", "https://example.com/r2", group="Aftensmad"))
+        return [LeakyRecipe("fake", "r2", "Pasta", "https://example.com/r2", group="Aftensmad")]
+
+    async def recipe_ingredients(self, recipe_id):
+        if recipe_id == "r3":
+            raise registry.StoreError("fake har kø lige nu.")
+        return {"r1": ["2 dl havregryn", "1 tsk. Oregano"], "r2": ["400 g pasta", "2 fed hvidløg"]}[
+            recipe_id
         ]
 
     async def featured_recipes(self, limit=20):
         return [
-            self._leak(Recipe("fake", f"r{n}", "Grød", f"https://example.com/r{n}", group="Morgen"))
+            LeakyRecipe("fake", f"r{n}", "Grød", f"https://example.com/r{n}", group="Morgen")
             for n in range(1, 4)
         ][:limit]
 

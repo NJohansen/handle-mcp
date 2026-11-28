@@ -209,3 +209,13 @@ async def test_no_build_id_is_a_clear_error(store, site):
     site.build = "nope"  # the HTML has no build id
     with pytest.raises(StoreError, match="ændret format: ingen build"):
         await store.featured_recipes()
+
+
+async def test_the_ingredient_text_is_the_recipes_page_and_is_kept(store, site):
+    lines = await store.recipe_ingredients(KARBONADER)
+    assert lines and any("hakket" in ln.lower() for ln in lines)
+    read = len(site.paths)
+    assert await store.recipe_ingredients("aftensmad/danske-retter/karbonader") == lines
+    assert len(site.paths) == read  # no page is read again
+    with pytest.raises(StoreError, match="ikke en opskrift"):
+        await store.recipe_ingredients("aftensmad")

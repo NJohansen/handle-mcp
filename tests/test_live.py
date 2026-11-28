@@ -10,7 +10,7 @@ import os
 
 import pytest
 
-from handle_mcp import app, compare, recipe_cart
+from handle_mcp import app, compare, recipe_cart, recipe_filter
 from handle_mcp.stores import OFFER_CATEGORIES, STORES
 from handle_mcp.stores.rema1000.pickup import GateClosed
 
@@ -221,6 +221,19 @@ async def test_rema1000_two_tags_and_the_next_page():
     assert len(both) > 50 and all({"Aftensmad", "Mad for børn"} <= set(r.tags) for r in both)
     assert len(first) == len(second) == 20
     assert not {r.id for r in first} & {r.id for r in second}
+
+
+async def test_recipes_without_a_word_in_every_store():
+    """`without`: the ingredient text of each recipe on one small page, in every store."""
+    for name in ("nemlig", "bilkatogo", "rema1000"):
+        store = STORES[name]()
+        page = await store.recipes_by_tag([], "aftensmad", limit=10)
+        parts = await recipe_filter.without(store, page, ["løg"])
+        hits = [d["because"] for d in parts["dropped"]]
+        print(f"\n[{name}] {len(parts['recipes'])} uden løg, fjernet: {hits}")
+        assert len(parts["recipes"]) + len(parts["dropped"]) == len(page) == 10
+        assert parts["dropped"] and not parts["unchecked"]  # onions are in most dinners
+        assert all("løg" in line.lower() for line in hits)
 
 
 @not_yet_skips

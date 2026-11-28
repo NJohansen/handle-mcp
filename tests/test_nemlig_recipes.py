@@ -340,3 +340,11 @@ async def test_no_tags_from_nemlig_is_a_format_change(store, monkeypatch):
     monkeypatch.setattr(store, "_api", api)
     with pytest.raises(StoreError, match="ændret format"):
         await store.recipes_by_tag(["Familievenlig"])
+
+
+async def test_the_ingredient_text_is_one_call_and_is_kept(store, fake):
+    lines = await store.recipe_ingredients(KEBAB)
+    assert lines[:2] == ["2 stk. rødløg", "2 fed hvidløg"] and len(lines) == 17
+    await store.recipe_ingredients("kebabfad-med-fladbrod-98001303")
+    calls = [r.url.path for r in fake.requests if "/meals/recipe" in r.url.path]
+    assert calls == ["/productbff/api/web/meals/recipeDetails/kebabfad-med-fladbrod-98001303"]
