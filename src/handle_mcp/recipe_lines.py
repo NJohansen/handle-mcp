@@ -8,7 +8,8 @@ is cooked without its "1 tsk oregano"; a word filter knows neither.
 The lines are read per recipe (REMA 1000 sends them with its list: no extra call), a few at a
 time, and only for the page that was asked for: never a loop over all of a store's recipes.
 `without` removes nothing. It marks: each recipe gets `hits`, its name and the lines that hold
-one of the words, so no word is overlooked in a long list.
+one of the words, so no word is overlooked in a long list. A recipe whose lines were not read
+has `hits` null, never an empty list: nothing was checked.
 """
 
 from __future__ import annotations
@@ -31,7 +32,7 @@ def hits(words: list[str], name: str, lines: list[str]) -> list[str]:
 
 async def with_ingredients(store: Any, recipes: list[Recipe], words: list[str]) -> list[dict]:
     """Each recipe as in the list, plus `ingredients` (null with `ingredients_reason` when the
-    store did not give them) and, with `words`, `hits`. Every recipe failing (a queue, a format
+    store did not give them) and, with `words`, `hits` (null when the lines are missing). Every recipe failing (a queue, a format
     change) raises the first error."""
     gate = asyncio.Semaphore(AT_ONCE)
 
@@ -52,7 +53,8 @@ async def with_ingredients(store: Any, recipes: list[Recipe], words: list[str]) 
             row |= {"ingredients": None, "ingredients_reason": str(f)}
         else:
             row["ingredients"] = f
-        if words:
-            row["hits"] = hits(words, recipe.name, row["ingredients"] or [])
+        if words:  # lines that were not read are not "no hit": null, the reason is next to it
+            unread = row["ingredients"] is None
+            row["hits"] = None if unread else hits(words, recipe.name, row["ingredients"])
         rows.append(row)
     return rows

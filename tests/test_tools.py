@@ -253,7 +253,7 @@ async def test_recipes_come_with_their_ingredient_lines_when_asked():
 async def test_without_marks_the_name_and_the_lines_and_removes_nothing():
     answer = await server.list_recipes(["fake"], without=["oregano", " "])
     assert [r["id"] for r in answer["fake"]] == ["r1", "r2", "r3"]
-    assert [r["hits"] for r in answer["fake"]] == [["1 tsk. Oregano"], [], []]
+    assert [r["hits"] for r in answer["fake"]] == [["1 tsk. Oregano"], [], None]
     assert answer["fake"][0]["ingredients"]  # `without` brings the lines too
     tagged = await server.list_recipes(["fake"], tags=["x"], without=["PASTA"])
     assert tagged["fake"][0]["hits"] == ["Pasta", "400 g pasta"]  # the name first
