@@ -229,7 +229,7 @@ async def test_recipes_without_a_word_in_every_store():
         store = STORES[name]()
         page = await store.recipes_by_tag([], "aftensmad", limit=10)
         parts = await recipe_filter.without(store, page, ["løg"])
-        hits = [d["because"] for d in parts["dropped"]]
+        hits = [line for d in parts["dropped"] for line in d["because"]]
         print(f"\n[{name}] {len(parts['recipes'])} uden løg, fjernet: {hits}")
         assert len(parts["recipes"]) + len(parts["dropped"]) == len(page) == 10
         assert parts["dropped"] and not parts["unchecked"]  # onions are in most dinners

@@ -125,9 +125,13 @@ async def list_recipes(
     `without`: what the household does not eat. Each recipe on the page is checked on its name
     and its ingredient list, and one with any of the words is left out. The words match inside
     longer words: "løg" also drops "hvidløg", so give the word you mean ("rødløg"). The answer
-    then also has `dropped` per store (name, link and `because`: the line that hit) and
-    `unchecked` (kept, but the store gave no ingredients). A store is read to its end when
-    its recipes and its dropped ones together are fewer than `limit`.
+    then also has `dropped` per store (id, name, link, `in_name` and `because`: every line that
+    hit) and `unchecked` (kept, but the store gave no ingredients). A dropped recipe is not
+    gone: with one or two lines in `because` and `in_name` false ("1 tsk oregano"), the dish
+    can often be cooked without them. Offer it to the human as "fits if we leave out ..."; after
+    a yes, add_recipe_to_cart has `skip` and `swap`. With `in_name` true, the dish is built on
+    the word. A store is read to its end when its recipes and its dropped ones together are
+    fewer than `limit`.
     `category` "madplan" is the store's own week plans, the week in `group`: nemlig's "Ugens
     madplan", earlier weeks and "Mad til flere dage" (dinners and lunch boxes in one pack; no
     tags with it); BilkaToGo's plan for this week and the weeks before, 7 dinners each; REMA

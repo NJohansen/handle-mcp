@@ -244,7 +244,15 @@ async def test_recipes_without_a_word_are_dropped_and_the_answer_says_why():
     answer = await server.list_recipes(["fake"], without=["oregano", " "])
     assert [r["id"] for r in answer["fake"]] == ["r2", "r3"]
     assert answer["dropped"] == {
-        "fake": [{"name": "Grød", "url": "https://example.com/r1", "because": "1 tsk. Oregano"}]
+        "fake": [
+            {
+                "id": "r1",
+                "name": "Grød",
+                "url": "https://example.com/r1",
+                "in_name": False,  # one line away from fitting: the human decides
+                "because": ["1 tsk. Oregano"],
+            }
+        ]
     }
     # r3's ingredients could not be read: it is kept, and the answer says so
     assert [u["url"] for u in answer["unchecked"]["fake"]] == ["https://example.com/r3"]
@@ -253,7 +261,8 @@ async def test_recipes_without_a_word_are_dropped_and_the_answer_says_why():
 
 async def test_a_word_in_the_name_drops_the_recipe_and_nothing_dropped_is_an_empty_list():
     answer = await server.list_recipes(["fake"], tags=["x"], without=["PASTA"])
-    assert answer["fake"] == [] and answer["dropped"]["fake"][0]["because"] == "Pasta"
+    assert answer["fake"] == [] and answer["dropped"]["fake"][0]["in_name"] is True
+    assert answer["dropped"]["fake"][0]["because"] == ["Pasta", "400 g pasta"]  # every hit
     clean = await server.list_recipes(["fake"], tags=["x"], without=["rosiner"])
     assert [r["id"] for r in clean["fake"]] == ["r2"]
     assert clean["dropped"] == {"fake": []} and clean["unchecked"] == {"fake": []}
