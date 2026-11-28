@@ -9,7 +9,7 @@ from typing import Annotated, Any, Literal
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import Field
 
-from handle_mcp import compare
+from handle_mcp import compare, recipe_filter
 from handle_mcp.app import (
     CATEGORY_RESULTS,
     MAX_CATEGORY_RESULTS,
@@ -103,6 +103,13 @@ async def list_recipes(
         int | None,
         Field(description="Skip this many recipes per store, to read the next page (default 0)."),
     ] = None,
+    without: Annotated[
+        list[str] | None,
+        Field(
+            description="Drop recipes with any of these words in the name or in an ingredient, "
+            f'e.g. ["oregano", "fisk"]. With it, at most {MAX_RESULTS} recipes per call.'
+        ),
+    ] = None,
 ) -> dict:
     """Browse the store's recipes, with link, when the human has no dish in mind (for a dish by
     name, use search_recipes). No tags or category: this week's featured
@@ -115,6 +122,12 @@ async def list_recipes(
     "juleopskrifter/julefrokost"; an unknown one answers with nemlig's list).
     To read every recipe in a tag or category: ask again with `offset` raised by `limit`, the
     same `limit` each time, until a store gives fewer than `limit`.
+    `without`: what the household does not eat. Each recipe on the page is checked on its name
+    and its ingredient list, and one with any of the words is left out. The words match inside
+    longer words: "løg" also drops "hvidløg", so give the word you mean ("rødløg"). The answer
+    then also has `dropped` per store (name, link and `because`: the line that hit) and
+    `unchecked` (kept, but the store gave no ingredients). A store is read to its end when
+    its recipes and its dropped ones together are fewer than `limit`.
     `category` "madplan" is the store's own week plans, the week in `group`: nemlig's "Ugens
     madplan", earlier weeks and "Mad til flere dage" (dinners and lunch boxes in one pack; no
     tags with it); BilkaToGo's plan for this week and the weeks before, 7 dinners each; REMA
@@ -127,15 +140,24 @@ async def list_recipes(
     Each recipe has the store's own `tags` (BilkaToGo has none), and `time` and `persons` when
     the store's list says them (REMA 1000; else null: get_recipe has them).
     Use get_recipe."""
-    limit, offset = max(1, min(limit, MAX_RECIPES)), max(0, offset or 0)
-    if not tags and not category:
+    words = [w for w in without or [] if w.strip()]
+    limit = max(1, min(limit, MAX_RESULTS if words else MAX_RECIPES))
+    offset = max(0, offset or 0)
 
-        async def featured(store: Any) -> list:
-            return (await store.featured_recipes(offset + limit))[offset:]
+    async def page(store: Any) -> Any:
+        if not tags and not category:
+            found = (await store.featured_recipes(offset + limit))[offset:]
+        else:
+            found = await store.recipes_by_tag(tags or [], category, limit, offset)
+        return await recipe_filter.without(store, found, words) if words else found
 
-        return _out(await _each(_names(stores), featured))
+    answer = await _each(_names(stores), page)
+    if not words:
+        return _out(answer)
+    checked = {name: a for name, a in answer.items() if "recipes" in a}  # not the errors
     return _out(
-        await _each(_names(stores), lambda s: s.recipes_by_tag(tags or [], category, limit, offset))
+        {name: a.get("recipes", a) for name, a in answer.items()}
+        | {part: {n: a[part] for n, a in checked.items()} for part in ("dropped", "unchecked")}
     )
 
 
