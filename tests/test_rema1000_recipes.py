@@ -265,6 +265,12 @@ async def test_a_tag_page_without_its_list_is_a_clear_error(store, fake):
         await store.recipes_by_tag(["Avisopskrifter"])
 
 
+async def test_one_recipe_without_its_list_is_a_clear_error(store, fake):
+    fake.recipe = {"meta": {}}  # `_get` checks `data` for every call: no KeyError further in
+    with pytest.raises(StoreError, match="har ændret sit svar"):
+        await store.recipe_ingredients("lasagne")
+
+
 async def test_a_queue_page_is_a_clear_error(store, fake):
     fake.status = 503
     with pytest.raises(StoreError, match="REMA 1000 svarer 503"):
