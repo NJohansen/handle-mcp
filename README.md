@@ -65,7 +65,7 @@ Other stores, Claude Desktop, headless machines and AI agents (`--from-env`): [s
 |---|---|:-:|:-:|:-:|---|
 | `search_products` | no | ✓ | ✓ | ✓ | Price, price per kg/l, offers |
 | `search_recipes` | no | ✓ |  | ✓ | The store's recipes by dish |
-| `list_recipes` | no | ✓ | ✓ | ✓ | Featured recipes (BilkaToGo: the week's madplan, REMA 1000: from the leaflet), by tag (nemlig, REMA 1000) or by category |
+| `list_recipes` | no | ✓ | ✓ | ✓ | Featured recipes (BilkaToGo: the week's madplan, REMA 1000: from the leaflet), by tag (nemlig, REMA 1000) or by category, a page at a time; `madplan` is the store's own week plans |
 | `get_recipe` | no | ✓ | ✓ | ✓ | The products to buy for a recipe, for any number of persons (nemlig) |
 | `list_offers` | no | ✓ | ✓ | ✓ | This week's offers and free gifts, also per category |
 | `get_nutrition` | no | ✓ | ✓ | ✓ | Nutrition per 100 g/ml from the label |

@@ -150,13 +150,17 @@ class FakeStore:
             )
         )
 
-    async def recipes_by_tag(self, tags, category=None, limit=20):
+    async def recipes_by_tag(self, tags, category=None, limit=20, offset=0):
+        self.recipe_calls = [*getattr(self, "recipe_calls", []), (tags, category, limit, offset)]
         return [
             self._leak(Recipe("fake", "r2", "Pasta", "https://example.com/r2", group="Aftensmad"))
         ]
 
     async def featured_recipes(self, limit=20):
-        return [self._leak(Recipe("fake", "r1", "Grød", "https://example.com/r1", group="Morgen"))]
+        return [
+            self._leak(Recipe("fake", f"r{n}", "Grød", f"https://example.com/r{n}", group="Morgen"))
+            for n in range(1, 4)
+        ][:limit]
 
     async def orders(self, limit=10):
         return [self._leak(Order("fake", "900000000001", "Leveret", Decimal("612.50")))]

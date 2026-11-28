@@ -190,9 +190,57 @@ async def test_every_tag_must_be_on_the_recipe(store, fake):
     fake.listing = copy.deepcopy(fake.listing)
     fake.listing["meta"]["pagination"]["last_page"] = 1
     fake.listing["data"][1]["fields"]["tags"].append({"id": AFTENSMAD})
+    store._mixes.clear()  # a mix is kept for some minutes
     found = await store.recipes_by_tag(["Avisopskrifter"], category="Aftensmad")
     assert [r.name for r in found] == [fake.listing["data"][1]["fields"]["title"]]
     assert found[0].group == "Avisopskrifter + Aftensmad"
+
+
+async def test_a_mix_of_tags_reads_the_tag_with_the_fewest_recipes_to_its_end(store, fake):
+    totals = {AVIS: 17, AFTENSMAD: 378}
+    both = copy.deepcopy(fake.listing)
+    both["meta"]["pagination"]["last_page"] = 3
+    for entity in both["data"][:2]:
+        entity["fields"]["tags"].append({"id": AFTENSMAD})
+
+    def handle(request):
+        fake.requests.append(request)
+        params = request.url.params
+        if params.get("filter[type]") == "recipeTag":
+            return httpx.Response(200, json=fixture("recipe_tags"))
+        if params["per_page"] == "1":
+            answer = copy.deepcopy(both)
+            answer["meta"]["pagination"]["total"] = totals[params["filter[tags.sys.id]"]]
+            return httpx.Response(200, json=answer)
+        return httpx.Response(200, json=both)
+
+    store = Rema1000Store(httpx.AsyncClient(transport=httpx.MockTransport(handle)))
+    first = await store.recipes_by_tag(["Aftensmad", "Avisopskrifter"], limit=4)
+    recipes = [r.url.params for r in fake.requests if r.url.params["filter[type]"] == "recipe"]
+    pages = [p for p in recipes if p["per_page"] == "100"]
+    assert [p["filter[tags.sys.id]"] for p in pages] == [AVIS] * 3  # 17 recipes, not 378
+    assert [p["page"] for p in pages] == ["1", "2", "3"]
+    assert len(first) == 4  # 2 on each of the 3 pages have both tags
+    asked = len(fake.requests)
+    rest = await store.recipes_by_tag(["Aftensmad", "Avisopskrifter"], limit=4, offset=4)
+    assert len(rest) == 2 and len(fake.requests) == asked  # the next page asks REMA nothing
+
+
+async def test_the_next_page_of_a_tag_is_remas_next_page(store, fake):
+    await store.recipes_by_tag(["Aftensmad"], limit=100, offset=200)
+    first = next(r.url.params for r in fake.requests if "page" in r.url.params)
+    assert (first["per_page"], first["page"]) == ("100", "3")
+    fake.requests.clear()
+    found = await store.recipes_by_tag(["Avisopskrifter"], limit=2, offset=21)
+    pages = [(r.url.params["per_page"], r.url.params["page"]) for r in fake.requests]
+    assert pages == [("20", "2")] and len(found) == 2  # 21 = page 2, after its first one
+
+
+async def test_madplan_is_the_leaflet_recipes(store, fake):
+    found = await store.recipes_by_tag([], category="Madplan", limit=2)
+    params = fake.requests[-1].url.params
+    assert params["filter[tags.sys.id]"] == AVIS and params["sort"] == "-created_at"
+    assert found[0].group == "Avisopskrifter" and found[0].tags == ["Avisopskrifter"]
 
 
 async def test_tags_page_until_the_limit(store, fake):
@@ -203,7 +251,7 @@ async def test_tags_page_until_the_limit(store, fake):
     assert len(found) == 7 and pages == ["1", "2", "3"]  # 3 per page in the fixture
     fake.requests.clear()
     assert await store.recipes_by_tag(["Avisopskrifter", "Aftensmad"]) == []
-    assert len(fake.requests) == 5  # never more than 5 pages
+    assert len(fake.requests) == 2 + 8  # each tag's total, then never more than 8 pages
 
 
 async def test_an_unknown_tag_answers_with_remas_list(store):

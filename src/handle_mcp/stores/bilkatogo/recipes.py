@@ -14,6 +14,7 @@ import asyncio
 import html
 import json
 import re
+import time
 from decimal import Decimal
 from itertools import zip_longest
 from typing import Any
@@ -34,6 +35,9 @@ SLUG = re.compile(r"^[a-z0-9-]+(/[a-z0-9-]+)*$")
 IDENT = re.compile(r"[A-Za-z_$][\w$]*")
 NUMBER = re.compile(r"\d+")
 FEATURED = "madplaner"  # "Ugens madplan": 7 dinners, Monday to Sunday
+EARLIER = "madplaner/tidligere-madplaner"  # the weeks before, one heading per week
+PLAN = "madplan"  # the category that asks for both
+KEEP = 600  # seconds a category's list is kept, so its next page reads no page again
 METHOD = ("Fremgangsm", "Sådan gør du")  # the heading above the steps
 MAX_DEPTH = 2
 PARALLEL = 5  # pages read at once: be polite to the website
@@ -121,10 +125,11 @@ def _own_path(page: dict) -> str:
     return (page.get("path") or "").removeprefix("/bilka-to-go").rstrip("/") + "/"
 
 
-def _cards(page: dict) -> list[tuple[str, str, str | None]]:
+def _cards(page: dict, per_group: bool = False) -> list[tuple[str, str, str | None]]:
     """The pages a category shows, as (path, name, group), in page order. Two kinds: the
     grids of its own or a sub-category's pages ("Pita"), and carousels under a heading
-    ("Lav aftensmad med børnene"). A recipe's "Lignende opskrifter" is its parent's grid."""
+    ("Lav aftensmad med børnene"). A recipe's "Lignende opskrifter" is its parent's grid.
+    A page is said once; with `per_group` once per heading: a dish is in more week plans."""
     own, group, found = _own_path(page), None, {}
     for node in _nodes(page, "Heading", "ContentCard", "CarouselContentCard"):
         kind = node["componentType"].removeprefix("MagnoliaComponents")
@@ -135,15 +140,16 @@ def _cards(page: dict) -> list[tuple[str, str, str | None]]:
         ):
             grid = node["hierarchy"]  # its own sub-pages, or a sub-category's ("Pita")
             for child in grid.get("children") or []:
-                found.setdefault(child.get("path") or "", (_name(child), _name(grid)))
+                found.setdefault((child.get("path") or "", None), (_name(child), _name(grid)))
         elif kind == "CarouselContentCard":
             for card in node.get("contentCards") or []:
                 target = card.get("page") if isinstance(card.get("page"), dict) else {}
                 name = (card.get("header") or _name(target)).strip()
-                found.setdefault(target.get("path") or "", (name, group))
+                key = (target.get("path") or "", group if per_group else None)
+                found.setdefault(key, (name, group))
     return [
         (path.removeprefix(ROOT).strip("/"), name, grp)
-        for path, (name, grp) in found.items()
+        for (path, _), (name, grp) in found.items()
         if path.startswith(ROOT) and path != ROOT
     ]
 
@@ -212,6 +218,7 @@ class BilkaRecipesMixin:
     _algolia: Any
     _build: str | None = None
     _pages_at_once: asyncio.Semaphore | None = None
+    _lists: dict[str, tuple[float, list[Recipe]]]
 
     async def _page(self, path: str) -> dict:
         """The page's data. A stale build id answers with the website's HTML: read it again."""
@@ -254,16 +261,44 @@ class BilkaRecipesMixin:
         return found[:limit]
 
     async def recipes_by_tag(
-        self, tags: list[str], category: str | None = None, limit: int = 20
+        self, tags: list[str], category: str | None = None, limit: int = 20, offset: int = 0
     ) -> list[Recipe]:
         """All recipes in one of BilkaToGo's categories, e.g. "aftensmad" or
-        "aftensmad/danske-retter". A category with sub-categories gives their recipes, mixed."""
+        "aftensmad/danske-retter", `limit` of them after the first `offset`. A category with
+        sub-categories gives their recipes, mixed. "madplan" is this week's plan and then the
+        earlier weeks, in page order."""
         if tags:
             raise StoreError(
                 "BilkaToGo har ingen tags. Brug category, fx aftensmad, aftensmad/pastaretter, "
                 "boern-i-koekkenet eller nemme."
             )
         path = category_path(category or "aftensmad")
+        if not hasattr(self, "_lists"):
+            self._lists = {}
+        kept = self._lists.get(path)
+        if not kept or kept[0] < time.monotonic():
+            plans = {PLAN: (FEATURED, EARLIER), FEATURED: (FEATURED,), EARLIER: (EARLIER,)}
+            if path in plans:
+                found = await self._plans(*plans[path])
+            else:
+                found = await self._category(path, category)
+            kept = self._lists[path] = (time.monotonic() + KEEP, found)
+        return kept[1][offset : offset + limit]
+
+    async def _plans(self, *paths: str) -> list[Recipe]:
+        """This week's plan, then the weeks before it: 7 dinners under each week's heading,
+        in page order. A dish that is in two weeks is said in both."""
+        pages = await asyncio.gather(*(self._page(path) for path in paths))
+        found = [
+            _recipe(self.name, path, name, group)
+            for page in pages
+            for path, name, group in _cards(page, per_group=True)
+        ]
+        if not found:
+            raise StoreError("Fandt ingen opskrifter i BilkaToGos madplaner.")
+        return found
+
+    async def _category(self, path: str, category: str | None) -> list[Recipe]:
         try:
             groups = await self._collect(path, MAX_DEPTH, {})
         except NoPage:
@@ -274,7 +309,7 @@ class BilkaRecipesMixin:
         mixed = [r for row in zip_longest(*groups) for r in row if r]  # one from each, in turn
         if not mixed:
             raise StoreError(f"Fandt ingen opskrifter i BilkaToGos kategori {category!r}.")
-        return mixed[:limit]
+        return list({r.id: r for r in mixed}.values())  # a dish in two sub-categories: once
 
     async def _collect(self, path: str, depth: int, seen: dict[str, dict]) -> list[list[Recipe]]:
         """Recipes per group below `path`. The first card shows if the cards are recipes or
