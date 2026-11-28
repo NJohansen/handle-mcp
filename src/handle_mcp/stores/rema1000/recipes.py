@@ -267,8 +267,6 @@ class RemaRecipesMixin:
         is kept: `recipe_ingredients` then asks REMA nothing."""
         params = {"filter[type]": "recipe", "filter[tags.sys.id]": tag_id, "sort": sort}
         data = await self._get("rema1000dk/entities", params | {"per_page": size, "page": page})
-        if not isinstance(data, dict) or not isinstance(data.get("data"), list):
-            raise StoreError(CHANGED)
         for entity in data["data"]:
             self._keep_lines(entity)
         return data

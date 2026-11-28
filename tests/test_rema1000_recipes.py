@@ -261,7 +261,7 @@ async def test_an_unknown_tag_answers_with_remas_list(store):
 
 async def test_a_tag_page_without_its_list_is_a_clear_error(store, fake):
     fake.listing = {"meta": {}}
-    with pytest.raises(StoreError, match="har ændret sine opskrifter"):
+    with pytest.raises(StoreError, match="har ændret sit svar"):
         await store.recipes_by_tag(["Avisopskrifter"])
 
 
