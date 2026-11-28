@@ -4,7 +4,7 @@ They register on app.mcp. Nothing here writes.
 
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import Field
@@ -14,6 +14,7 @@ from handle_mcp.app import (
     CATEGORY_RESULTS,
     MAX_CATEGORY_RESULTS,
     MAX_ITEMS,
+    MAX_RECIPES,
     MAX_RESULTS,
     READ,
     StoreName,
@@ -91,9 +92,17 @@ async def list_recipes(
         list[str] | None, Field(description='Every tag must match, e.g. ["Familievenlig"].')
     ] = None,
     category: Annotated[
-        str | None, Field(description='e.g. "aftensmad", "frokost". Leave out for the default.')
+        str | None,
+        Field(
+            description='e.g. "aftensmad", "frokost", "juleopskrifter/julefrokost" or "madplan" '
+            "(the store's week plans). Leave out for the default."
+        ),
     ] = None,
-    limit: Annotated[int, Field(description="Recipes per store, 1-25.")] = 20,
+    limit: Annotated[int, Field(description=f"Recipes per store, 1-{MAX_RECIPES}.")] = 20,
+    offset: Annotated[
+        int | None,
+        Field(description="Skip this many recipes per store, to read the next page (default 0)."),
+    ] = None,
 ) -> dict:
     """Browse the store's recipes, with link, when the human has no dish in mind (for a dish by
     name, use search_recipes). No tags or category: this week's featured
@@ -101,19 +110,32 @@ async def list_recipes(
     ["Familievenlig", "Budgetvenlig"] or ["Under 30 min", "Kylling"]. nemlig's tags include
     Under 20/30 min, Budgetvenlig, Familievenlig, Populær, Mad til flere dage, Vegetarisk,
     Kylling, Fisk, Oksekød, Gris and cuisines; an unknown tag answers with the full list.
-    `category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...).
+    `category` (nemlig: aftensmad by default, frokost, madpakke, morgenmad, ...; a
+    sub-category by name or with its parent, e.g. "julefrokost" or
+    "juleopskrifter/julefrokost"; an unknown one answers with nemlig's list).
+    To read every recipe in a tag or category: ask again with `offset` raised by `limit`, the
+    same `limit` each time, until a store gives fewer than `limit`.
+    `category` "madplan" is the store's own week plans, the week in `group`: nemlig's "Ugens
+    madplan", earlier weeks and "Mad til flere dage" (dinners and lunch boxes in one pack; no
+    tags with it); BilkaToGo's plan for this week and the weeks before, 7 dinners each; REMA
+    1000 has no week plan and answers with its "Avisopskrifter".
     BilkaToGo: no tags; no category is this week's "Madplan" (7 dinners); `category` is a path
     like aftensmad or aftensmad/pastaretter, an unknown one answers with the list.
     REMA 1000: no tags or category is "Avisopskrifter" (dinners from this week's leaflet);
     tags are REMA's own, e.g. Aftensmad, Mad for børn, Nem hverdagsmad, Kødfri, Fisk & skaldyr,
-    and `category` is one more tag; an unknown tag answers with the list. With two or more
-    tags only the first tag's 100 most popular are checked: few or none can mean "try one tag".
+    and `category` is one more tag; an unknown tag answers with the list.
+    Each recipe has the store's own `tags` (BilkaToGo has none), and `time` and `persons` when
+    the store's list says them (REMA 1000; else null: get_recipe has them).
     Use get_recipe."""
-    limit = max(1, min(limit, MAX_RESULTS))
+    limit, offset = max(1, min(limit, MAX_RECIPES)), max(0, offset or 0)
     if not tags and not category:
-        return _out(await _each(_names(stores), lambda s: s.featured_recipes(limit)))
+
+        async def featured(store: Any) -> list:
+            return (await store.featured_recipes(offset + limit))[offset:]
+
+        return _out(await _each(_names(stores), featured))
     return _out(
-        await _each(_names(stores), lambda s: s.recipes_by_tag(tags or [], category, limit))
+        await _each(_names(stores), lambda s: s.recipes_by_tag(tags or [], category, limit, offset))
     )
 
 
